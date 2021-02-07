@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "airbnb-typescript/base",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "import/prefer-default-export": "off"
+  }
+}
