@@ -9,6 +9,17 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+        "allowSeparatedGroups": true
+      }
+    ],
+    "max-classes-per-file": "off"
   }
 }

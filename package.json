@@ -1,7 +1,16 @@
 {
   "name": "juice",
   "version": "1.0.0",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm5/index.js",
+  "typings": "./lib/types/index.d.ts",
   "scripts": {
+    "start": "npm run clean && tsc -w -p ./tsconfig.json",
+    "build": "npm run clean && npm run build:cjs && npm run build:es2015 && npm run build:types",
+    "build:cjs": "tsc -p ./tsconfig.json",
+    "build:es2015": "tsc -p ./tsconfig.esm2015.json",
+    "build:types": "tsc -p ./tsconfig.types.json",
+    "clean": "rimraf ./lib",
     "code:lint": "prettier --check . && eslint .",
     "code:fix": "prettier --write . && eslint . --fix"
   },
@@ -14,6 +23,7 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-import": "^2.22.1",
     "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
     "typescript": "^4.1.3"
   }
 }

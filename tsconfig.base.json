@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "moduleResolution": "node",
+
+    "removeComments": true,
+    "skipLibCheck": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./src"],
+  "exclude": ["./node_modules", "./lib"]
+}
