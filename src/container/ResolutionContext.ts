@@ -1,5 +1,5 @@
-import { Token } from '../token';
+import { Binding } from './Binding';
 
 export class ResolutionContext {
-  public readonly instances = new Map<Token, Object>();
+  public readonly instances = new Map<Binding, Object>();
 }

@@ -1,6 +1,6 @@
-import { Token, TokenType } from '../token';
+import { Tag, Token, TokenType } from '../pointers';
+import { injectsRegistry, tagsRegistry } from '../globals';
 import { Constructor } from '../types';
-import { typesRegistry } from '../typesRegistry';
 
 import {
   Binding,
@@ -16,7 +16,7 @@ import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
-  private readonly bindingsRegistry: BindingsRegistry = new Map<Token, Binding>();
+  private readonly bindingsRegistry = new BindingsRegistry();
 
   constructor(public parent?: Container) {}
 
@@ -24,23 +24,29 @@ export class Container {
     return new BindingTypeSyntax<TokenType<T>>(this.bindingsRegistry, token);
   }
 
-  public get<T extends Token>(
-    token: T,
-    context: ResolutionContext = new ResolutionContext(),
-  ): TokenType<T> {
-    const binding = this.resolveBinding(token);
-    return this.resolveValue(token, binding, context);
+  public get<T extends Token>(token: T): TokenType<T> {
+    return this.getSingle(token) as TokenType<T>;
   }
 
-  public getAll<T extends Token[]>(
-    tokens: T,
+  private getSingle(
+    token: Token,
     context: ResolutionContext = new ResolutionContext(),
+    tags?: Tag[],
   ) {
-    return tokens.map((token) => this.get(token, context));
+    const binding = this.resolveBinding(token, tags);
+    return this.resolveValue(binding, context);
   }
 
-  private resolveBinding(token: Token): Binding {
-    const binding = this.bindingsRegistry.get(token);
+  private getMultiple(
+    tokens: Token[],
+    context: ResolutionContext = new ResolutionContext(),
+    tags?: Tag[],
+  ) {
+    return tokens.map((token) => this.getSingle(token, context, tags));
+  }
+
+  private resolveBinding(token: Token, tags?: Tag[]): Binding {
+    const binding = this.bindingsRegistry.get(token, tags);
 
     if (binding) return binding;
     if (this.parent) return this.parent.resolveBinding(token);
@@ -48,46 +54,48 @@ export class Container {
     throw new Error();
   }
 
-  private resolveValue(token: Token, binding: Binding, context: ResolutionContext) {
+  private resolveValue(binding: Binding, context: ResolutionContext) {
     if (isInstanceBinding(binding)) {
       if (isInstanceSingletonBinding(binding)) {
         // eslint-disable-next-line no-param-reassign
-        binding.instance ||= this.construct(binding.value);
+        binding.instance = binding.instance || this.construct(binding.value, context);
         return binding.instance;
       }
 
       if (isInstanceContainerBinding(binding)) {
-        const instance = binding.instances.get(this) || this.construct(binding.value);
+        const instance = binding.instances.get(this) || this.construct(binding.value, context);
         binding.instances.set(this, instance);
         return instance;
       }
 
       if (isInstanceResolutionBinding(binding)) {
-        const instance = context.instances.get(token) || this.construct(binding.value);
-        context.instances.set(token, instance);
+        const instance = context.instances.get(binding) || this.construct(binding.value, context);
+        context.instances.set(binding, instance);
         return instance;
       }
 
-      return this.construct((binding as InstanceTransientBinding).value);
+      return this.construct((binding as InstanceTransientBinding).value, context);
     }
 
     if (isFactoryBinding(binding)) {
-      return () => this.construct(binding.value);
+      return () => this.construct(binding.value, context);
     }
 
     // ValueBinding
     return binding.value;
   }
 
-  private construct(Ctor: Constructor): Object {
+  private construct(Ctor: Constructor, context: ResolutionContext): Object {
     if (Ctor.length === 0) {
       return new Ctor();
     }
 
-    const paramInfo = typesRegistry.get(Ctor);
-    if (!paramInfo) throw new Error();
+    const injects = injectsRegistry.get(Ctor);
+    if (!injects) throw new Error();
 
-    const params = this.getAll(paramInfo);
+    const tags = tagsRegistry.get(Ctor);
+    const params = this.getMultiple(injects, context, tags);
+
     return new Ctor(...params);
   }
 }

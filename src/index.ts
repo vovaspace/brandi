@@ -1,4 +1,4 @@
 export * from './container';
 export * from './registrators';
-export * from './token';
+export * from './pointers';
 export * from './types';

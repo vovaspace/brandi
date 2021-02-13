@@ -1,4 +1,5 @@
 import { Constructor } from '../types';
+import { Tag } from '../pointers';
 
 import type { Container as ContainerType } from './Container';
 
@@ -16,6 +17,8 @@ export enum BindingScope {
 }
 
 export abstract class Binding {
+  public tag: Tag | null = null;
+
   constructor(
     public readonly value: unknown,
     public readonly type: BindingType,

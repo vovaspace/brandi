@@ -1,5 +1,5 @@
 import { Constructor } from '../types';
-import { Token } from '../token';
+import { Token } from '../pointers';
 
 import {
   InstanceBinding,
@@ -8,13 +8,14 @@ import {
   InstanceSingletonBinding,
   InstanceTransientBinding,
 } from './Binding';
+import { BindingWhenSyntax } from './BindingWhenSyntax';
 import { BindingsRegistry } from './BindingsRegistry';
 
 export interface BindingScopeSyntax {
-  inTransientScope(): void;
-  inSingletonScope(): void;
-  inResolutionScope(): void;
-  inContainerScope(): void;
+  inTransientScope(): BindingWhenSyntax;
+  inSingletonScope(): BindingWhenSyntax;
+  inResolutionScope(): BindingWhenSyntax;
+  inContainerScope(): BindingWhenSyntax;
 }
 
 export class BindingScopeSyntax implements BindingScopeSyntax {
@@ -29,8 +30,9 @@ export class BindingScopeSyntax implements BindingScopeSyntax {
     this.inContainerScope = this.in.bind(this, InstanceContainerBinding);
   }
 
-  private in(Ctor: Constructor<InstanceBinding>) {
+  private in(Ctor: Constructor<InstanceBinding>): BindingWhenSyntax {
     const binding = new Ctor(this.value);
     this.bindingsRegistry.set(this.token, binding);
+    return new BindingWhenSyntax(binding);
   }
 }

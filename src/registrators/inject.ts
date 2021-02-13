@@ -1,15 +1,15 @@
 import { Constructor } from '../types';
-import { Token } from '../token';
-import { typesRegistry } from '../typesRegistry';
+import { Token } from '../pointers';
+import { injectsRegistry } from '../globals';
 
-type TokensTuple<T extends [...unknown[]]> = {
-  [Index in keyof T]: Token<T[Index]>;
+export type Tokens<T extends unknown[]> = {
+  [K in keyof T]: Token<T[K]>;
 } &
-  Array<Token>;
+  Array<Token<T[number]>>;
 
 export const inject = <T extends Constructor>(
   target: T,
-  tokens: TokensTuple<ConstructorParameters<T>>,
+  tokens: Tokens<ConstructorParameters<T>>,
 ): void => {
-  typesRegistry.set(target, tokens);
+  injectsRegistry.set(target, tokens);
 };
