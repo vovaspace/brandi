@@ -72,7 +72,12 @@ export class Container {
     }
 
     if (isFactoryBinding(binding)) {
-      return () => this.construct(binding.value, context);
+      return (...args: unknown[]) => {
+        const instance = this.construct(binding.value.ctor, context);
+        return binding.value.transformer
+          ? binding.value.transformer(instance, ...args) || instance
+          : instance;
+      };
     }
 
     return binding.value;

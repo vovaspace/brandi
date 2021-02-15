@@ -37,7 +37,12 @@ export class InstanceBinding extends Binding {
 }
 
 export class FactoryBinding extends Binding {
-  constructor(public readonly value: Constructor) {
+  constructor(
+    public readonly value: {
+      ctor: Constructor;
+      transformer?: (instance: Object, ...args: unknown[]) => Object | void;
+    },
+  ) {
     super(value, BindingType.Factory, BindingScope.Singleton);
   }
 }

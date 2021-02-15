@@ -19,8 +19,13 @@ export class BindingTypeSyntax<T> {
     return new BindingWhenSyntax(binding);
   }
 
-  public toFactory(ctor: T extends Factory<infer R> ? Constructor<R> : never): BindingWhenSyntax {
-    const binding = new FactoryBinding(ctor);
+  public toFactory(
+    ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
+    transformer?: T extends Factory<infer R, infer A>
+      ? (instance: R, ...args: A) => R | void
+      : never,
+  ): BindingWhenSyntax {
+    const binding = new FactoryBinding({ ctor, transformer });
     this.bindingsRegistry.set(this.token, binding);
     return new BindingWhenSyntax(binding);
   }
