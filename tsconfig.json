@@ -6,6 +6,7 @@
 
     "removeComments": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
 
     "strict": true,
     "noUnusedLocals": true,
@@ -15,6 +16,6 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src"],
+  "include": ["./src", "./spec", "./jest.config.js"],
   "exclude": ["./node_modules", "./lib"]
 }

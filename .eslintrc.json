@@ -21,5 +21,22 @@
       }
     ],
     "max-classes-per-file": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["./spec/*.ts"],
+      "env": { "jest/globals": true },
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/all"],
+      "rules": {
+        "jest/prefer-expect-assertions": ["error", { "onlyFunctionsWithAsyncKeyword": true }],
+        "jest/no-hooks": [
+          "error",
+          {
+            "allow": ["beforeAll", "afterEach"]
+          }
+        ]
+      }
+    }
+  ]
 }
