@@ -1,13 +1,7 @@
 import { Constructor } from '../types';
 import { Token } from '../pointers';
 
-import {
-  InstanceBinding,
-  InstanceContainerBinding,
-  InstanceResolutionBinding,
-  InstanceSingletonBinding,
-  InstanceTransientBinding,
-} from './Binding';
+import { BindingScope, InstanceBinding } from './Binding';
 import { BindingWhenSyntax } from './BindingWhenSyntax';
 import { BindingsRegistry } from './BindingsRegistry';
 
@@ -24,14 +18,14 @@ export class BindingScopeSyntax implements BindingScopeSyntax {
     private readonly value: Constructor,
     private readonly bindingsRegistry: BindingsRegistry,
   ) {
-    this.inTransientScope = this.in.bind(this, InstanceTransientBinding);
-    this.inSingletonScope = this.in.bind(this, InstanceSingletonBinding);
-    this.inResolutionScope = this.in.bind(this, InstanceResolutionBinding);
-    this.inContainerScope = this.in.bind(this, InstanceContainerBinding);
+    this.inTransientScope = this.in.bind(this, BindingScope.Transient);
+    this.inSingletonScope = this.in.bind(this, BindingScope.Singleton);
+    this.inResolutionScope = this.in.bind(this, BindingScope.Resolution);
+    this.inContainerScope = this.in.bind(this, BindingScope.Container);
   }
 
-  private in(Ctor: Constructor<InstanceBinding>): BindingWhenSyntax {
-    const binding = new Ctor(this.value);
+  private in(scope: BindingScope): BindingWhenSyntax {
+    const binding = new InstanceBinding(this.value, scope);
     this.bindingsRegistry.set(this.token, binding);
     return new BindingWhenSyntax(binding);
   }

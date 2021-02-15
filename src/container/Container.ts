@@ -2,16 +2,7 @@ import { Tag, Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 import { Constructor } from '../types';
 
-import {
-  Binding,
-  InstanceTransientBinding,
-  ValueBinding,
-  isFactoryBinding,
-  isInstanceBinding,
-  isInstanceContainerBinding,
-  isInstanceResolutionBinding,
-  isInstanceSingletonBinding,
-} from './Binding';
+import { Binding, BindingScope, isFactoryBinding, isInstanceBinding } from './Binding';
 import { BindingTypeSyntax } from './BindingTypeSyntax';
 import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
@@ -59,32 +50,32 @@ export class Container {
 
   private resolveValue(binding: Binding, context: ResolutionContext) {
     if (isInstanceBinding(binding)) {
-      if (isInstanceSingletonBinding(binding)) {
+      if (binding.scope === BindingScope.Singleton) {
         // eslint-disable-next-line no-param-reassign
         binding.instance = binding.instance || this.construct(binding.value, context);
         return binding.instance;
       }
 
-      if (isInstanceContainerBinding(binding)) {
+      if (binding.scope === BindingScope.Container) {
         const instance = binding.instances.get(this) || this.construct(binding.value, context);
         binding.instances.set(this, instance);
         return instance;
       }
 
-      if (isInstanceResolutionBinding(binding)) {
+      if (binding.scope === BindingScope.Resolution) {
         const instance = context.instances.get(binding) || this.construct(binding.value, context);
         context.instances.set(binding, instance);
         return instance;
       }
 
-      return this.construct((binding as InstanceTransientBinding).value, context);
+      return this.construct(binding.value, context);
     }
 
     if (isFactoryBinding(binding)) {
       return () => this.construct(binding.value, context);
     }
 
-    return (binding as ValueBinding).value;
+    return binding.value;
   }
 
   private construct(Ctor: Constructor, context: ResolutionContext): Object {

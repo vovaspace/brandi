@@ -26,37 +26,13 @@ export abstract class Binding {
   ) {}
 }
 
-export abstract class InstanceBinding extends Binding {
-  constructor(public readonly value: Constructor, public readonly scope: BindingScope) {
-    super(value, BindingType.Instance, scope);
-  }
-}
-
-export class InstanceTransientBinding extends InstanceBinding {
-  constructor(public readonly value: Constructor) {
-    super(value, BindingScope.Transient);
-  }
-}
-
-export class InstanceSingletonBinding extends InstanceBinding {
+export class InstanceBinding extends Binding {
   public instance: Object | null = null;
 
-  constructor(public readonly value: Constructor) {
-    super(value, BindingScope.Singleton);
-  }
-}
-
-export class InstanceResolutionBinding extends InstanceBinding {
-  constructor(public readonly value: Constructor) {
-    super(value, BindingScope.Resolution);
-  }
-}
-
-export class InstanceContainerBinding extends InstanceBinding {
   public readonly instances = new Map<ContainerType, Object>();
 
-  constructor(public readonly value: Constructor) {
-    super(value, BindingScope.Container);
+  constructor(public readonly value: Constructor, public readonly scope: BindingScope) {
+    super(value, BindingType.Instance, scope);
   }
 }
 
@@ -74,15 +50,5 @@ export class ValueBinding extends Binding {
 
 export const isInstanceBinding = (binding: Binding): binding is InstanceBinding =>
   binding.type === BindingType.Instance;
-export const isInstanceSingletonBinding = (
-  binding: InstanceBinding,
-): binding is InstanceSingletonBinding => binding.scope === BindingScope.Singleton;
-export const isInstanceResolutionBinding = (
-  binding: InstanceBinding,
-): binding is InstanceResolutionBinding => binding.scope === BindingScope.Resolution;
-export const isInstanceContainerBinding = (
-  binding: InstanceBinding,
-): binding is InstanceContainerBinding => binding.scope === BindingScope.Container;
-
 export const isFactoryBinding = (binding: Binding): binding is FactoryBinding =>
   binding.type === BindingType.Factory;
