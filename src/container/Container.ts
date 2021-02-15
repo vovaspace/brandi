@@ -51,7 +51,7 @@ export class Container {
     if (binding) return binding;
     if (this.parent) return this.parent.resolveBinding(token);
 
-    throw new Error();
+    throw new Error(`No matching bindings found for '${token.description}' token.`);
   }
 
   private resolveValue(binding: Binding, context: ResolutionContext) {
@@ -91,7 +91,7 @@ export class Container {
     }
 
     const injects = injectsRegistry.get(Ctor);
-    if (!injects) throw new Error();
+    if (!injects) throw new Error(`Missing required 'injected' registration in '${Ctor.name}'`);
 
     const tags = tagsRegistry.get(Ctor);
     const params = this.getMultiple(injects, context, tags);
