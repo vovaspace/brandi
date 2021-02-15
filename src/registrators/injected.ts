@@ -7,9 +7,9 @@ export type Tokens<T extends unknown[]> = {
 } &
   Array<Token<T[number]>>;
 
-export const inject = <T extends Constructor>(
+export const injected = <T extends Constructor>(
   target: T,
-  tokens: Tokens<ConstructorParameters<T>>,
+  ...tokens: Tokens<ConstructorParameters<T>>
 ): void => {
   injectsRegistry.set(target, tokens);
 };
