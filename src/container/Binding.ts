@@ -74,9 +74,6 @@ export class ValueBinding extends Binding {
 
 export const isInstanceBinding = (binding: Binding): binding is InstanceBinding =>
   binding.type === BindingType.Instance;
-export const isInstanceTransientBinding = (
-  binding: InstanceBinding,
-): binding is InstanceTransientBinding => binding.scope === BindingScope.Transient;
 export const isInstanceSingletonBinding = (
   binding: InstanceBinding,
 ): binding is InstanceSingletonBinding => binding.scope === BindingScope.Singleton;
@@ -89,6 +86,3 @@ export const isInstanceContainerBinding = (
 
 export const isFactoryBinding = (binding: Binding): binding is FactoryBinding =>
   binding.type === BindingType.Factory;
-
-export const isValueBinding = (binding: Binding): binding is ValueBinding =>
-  binding.type === BindingType.Value;
