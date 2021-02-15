@@ -17,9 +17,15 @@ import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
-  private readonly bindingsRegistry = new BindingsRegistry();
+  private bindingsRegistry = new BindingsRegistry();
 
   constructor(public parent?: Container) {}
+
+  public copy(): Container {
+    const newContainer = new Container(this.parent);
+    newContainer.bindingsRegistry = this.bindingsRegistry.copy();
+    return newContainer;
+  }
 
   public bind<T extends Token>(token: T) {
     return new BindingTypeSyntax<TokenType<T>>(this.bindingsRegistry, token);

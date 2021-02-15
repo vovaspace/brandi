@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`container copy returns an unlinked container from 'copy' method 1`] = `"No matching bindings found for 'third' token."`;
+
 exports[`container injects throws when tries to construct constructor with arguments when target class is not injected 1`] = `"Missing required 'injected' registration in 'SomeClass'"`;
 
 exports[`container simple returns throws when there is not binding 1`] = `"No matching bindings found for 'some' token."`;

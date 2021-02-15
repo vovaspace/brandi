@@ -268,9 +268,7 @@ describe('container', () => {
 
       const childContainer = new Container(parentContainer);
 
-      const instance = childContainer.get(someClassToken);
-
-      expect(instance).toBeInstanceOf(SomeClass);
+      expect(childContainer.get(someClassToken)).toBeInstanceOf(SomeClass);
     });
 
     it("re-binds parent container's binding in a child container", () => {
@@ -284,9 +282,7 @@ describe('container', () => {
       const childContainer = new Container(parentContainer);
       childContainer.bind(classToken).toInstance(AnotherClass).inTransientScope();
 
-      const instance = childContainer.get(classToken);
-
-      expect(instance).toBeInstanceOf(AnotherClass);
+      expect(childContainer.get(classToken)).toBeInstanceOf(AnotherClass);
     });
 
     it('returns an instance in container scope', () => {
@@ -310,6 +306,36 @@ describe('container', () => {
       expect(parentContainerFirstInstance).not.toBe(childContainerSecondInstance);
       expect(parentContainerSecondInstance).not.toBe(childContainerFirstInstance);
       expect(parentContainerSecondInstance).not.toBe(childContainerSecondInstance);
+    });
+  });
+
+  describe('copy', () => {
+    it("returns an unlinked container from 'copy' method", () => {
+      const values = {
+        first: 1,
+        second: 2,
+        third: 3,
+      };
+
+      const tokens = {
+        first: token<number>('first'),
+        second: token<number>('second'),
+        third: token<number>('third'),
+      };
+
+      const parentContainer = new Container();
+      parentContainer.bind(tokens.first).toValue(values.first);
+
+      const originalContainer = new Container(parentContainer);
+      originalContainer.bind(tokens.second).toValue(values.second);
+
+      const copyContainer = originalContainer.copy();
+      copyContainer.bind(tokens.third).toValue(values.third);
+
+      expect(copyContainer.get(tokens.first)).toBe(values.first);
+      expect(copyContainer.get(tokens.second)).toBe(values.second);
+      expect(copyContainer.get(tokens.third)).toBe(values.third);
+      expect(() => originalContainer.get(tokens.third)).toThrowErrorMatchingSnapshot();
     });
   });
 });

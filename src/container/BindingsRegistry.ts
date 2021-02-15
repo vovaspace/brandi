@@ -3,9 +3,9 @@ import { Tag, Token } from '../pointers';
 import { Binding } from './Binding';
 
 export class BindingsRegistry {
-  private readonly map = new Map<Token, Binding[]>();
+  constructor(private readonly map: Map<Token, Binding[]> = new Map<Token, Binding[]>()) {}
 
-  public set(token: Token, binding: Binding) {
+  public set(token: Token, binding: Binding): void {
     const current = this.map.get(token) || [];
     current.unshift(binding);
     this.map.set(token, current);
@@ -20,5 +20,9 @@ export class BindingsRegistry {
       bindings.find((binding) => binding.tag !== null && tags.includes(binding.tag)) ||
       bindings.find((binding) => binding.tag === null)
     );
+  }
+
+  public copy(): BindingsRegistry {
+    return new BindingsRegistry(new Map(this.map));
   }
 }
