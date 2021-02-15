@@ -5,6 +5,7 @@ import { Constructor } from '../types';
 import {
   Binding,
   InstanceTransientBinding,
+  ValueBinding,
   isFactoryBinding,
   isInstanceBinding,
   isInstanceContainerBinding,
@@ -37,11 +38,7 @@ export class Container {
     return this.resolveValue(binding, context);
   }
 
-  private getMultiple(
-    tokens: Token[],
-    context: ResolutionContext = new ResolutionContext(),
-    tags?: Tag[],
-  ) {
+  private getMultiple(tokens: Token[], context: ResolutionContext, tags?: Tag[]) {
     return tokens.map((token) => this.getSingle(token, context, tags));
   }
 
@@ -81,8 +78,7 @@ export class Container {
       return () => this.construct(binding.value, context);
     }
 
-    // ValueBinding
-    return binding.value;
+    return (binding as ValueBinding).value;
   }
 
   private construct(Ctor: Constructor, context: ResolutionContext): Object {
