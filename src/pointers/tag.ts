@@ -1,3 +1,3 @@
 export type Tag = symbol & { __tag__: true };
 
-export const tag = (name: string): Tag => Symbol(name) as Tag;
+export const tag = (description: string): Tag => Symbol(description) as Tag;

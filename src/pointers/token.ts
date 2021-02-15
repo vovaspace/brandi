@@ -5,4 +5,4 @@ export type TokensType<T> = {
   [K in keyof T]: T[K] extends Token ? TokenType<T[K]> : TokensType<T[K]>;
 };
 
-export const token = <T>(name: string) => Symbol(name) as Token<T>;
+export const token = <T>(description: string) => Symbol(description) as Token<T>;
