@@ -1,6 +1,7 @@
 {
-  "name": "juice",
+  "name": "brandi",
   "version": "1.0.0",
+  "description": "Dependency injection container for TypeScript/JavaScript.",
   "exports": "./lib/esm/index.js",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -15,8 +16,27 @@
     "code:lint": "prettier --check . && eslint .",
     "code:fix": "prettier --write . && eslint . --fix"
   },
-  "author": "Vladimir Lewandowski <me@vovaspace.com> (https://vovaspace.com/)",
   "license": "ISC",
+  "author": "Vladimir Lewandowski <me@vovaspace.com> (https://vovaspace.com/)",
+  "homepage": "https://github.com/vovaspace/brandi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vovaspace/brandi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vovaspace/brandi/issues"
+  },
+  "keywords": [
+    "di",
+    "ioc",
+    "dependency injection",
+    "dependency inversion",
+    "inversion of control",
+    "container",
+    "typescript",
+    "javascript",
+    "node"
+  ],
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
