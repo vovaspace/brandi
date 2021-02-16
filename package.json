@@ -6,6 +6,9 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "typings": "./lib/typings/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "test": "jest --colors",
     "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:typings",
