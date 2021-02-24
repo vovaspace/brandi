@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
+    "outDir": "lib",
     "target": "esnext",
+
     "module": "esnext",
     "moduleResolution": "node",
-
-    "removeComments": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "isolatedModules": true,
 
     "strict": true,
     "noUnusedLocals": true,
@@ -16,6 +17,5 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src", "./spec", "./jest.config.js"],
-  "exclude": ["./node_modules", "./lib"]
+  "include": ["./src", "./spec", "./jest.config.js"]
 }

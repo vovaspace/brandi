@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "target": "esnext",
     "removeComments": false,
     "declaration": true,
     "declarationDir": "./lib/typings",
