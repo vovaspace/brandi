@@ -1,24 +1,28 @@
 import { Tag, Token } from '../pointers';
+import { find, includes } from '../utils';
 
 import { Binding } from './Binding';
 
 export class BindingsRegistry {
   constructor(private readonly map: Map<Token, Binding[]> = new Map<Token, Binding[]>()) {}
 
-  public set(token: Token, binding: Binding): void {
-    const current = this.map.get(token) || [];
-    current.unshift(binding);
-    this.map.set(token, current);
+  public push(binding: Binding, token: Token): void {
+    const current = this.map.get(token);
+
+    if (current === undefined) this.map.set(token, [binding]);
+    else current.unshift(binding);
   }
 
-  public get(token: Token, tags: Tag[] | null = null): Binding | undefined {
-    const bindings = this.map.get(token) || [];
+  public get(token: Token, tags?: Tag[]): Binding | undefined {
+    const bindings = this.map.get(token);
 
-    if (tags === null) return bindings.find((binding) => binding.tag === null);
+    if (bindings === undefined) return undefined;
+
+    if (tags === undefined) return find(bindings, (binding) => binding.tag === undefined);
 
     return (
-      bindings.find((binding) => binding.tag !== null && tags.includes(binding.tag)) ||
-      bindings.find((binding) => binding.tag === null)
+      find(bindings, (binding) => includes(tags, binding.tag)) ??
+      find(bindings, (binding) => binding.tag === undefined)
     );
   }
 

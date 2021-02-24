@@ -16,41 +16,47 @@ export enum BindingScope {
   Container,
 }
 
-export abstract class Binding {
-  public tag: Tag | null = null;
-
-  constructor(
-    public readonly value: unknown,
-    public readonly type: BindingType,
-    public readonly scope: BindingScope,
-  ) {}
+export interface Binding {
+  readonly value: unknown;
+  readonly type: BindingType;
+  readonly scope: BindingScope;
+  readonly tag?: Tag;
 }
 
-export class InstanceBinding extends Binding {
+export class InstanceBinding implements Binding {
+  public readonly type = BindingType.Instance;
+
   public instance: Object | null = null;
 
   public readonly instances = new Map<ContainerType, Object>();
 
-  constructor(public readonly value: Constructor, public readonly scope: BindingScope) {
-    super(value, BindingType.Instance, scope);
-  }
+  constructor(
+    public readonly value: Constructor,
+    public readonly scope: BindingScope,
+    public readonly tag?: Tag,
+  ) {}
 }
 
-export class FactoryBinding extends Binding {
+export class FactoryBinding implements Binding {
+  public readonly type = BindingType.Factory;
+
+  public readonly scope = BindingScope.Transient;
+
   constructor(
     public readonly value: {
       ctor: Constructor;
       transformer?: (instance: Object, ...args: unknown[]) => Object | void;
     },
-  ) {
-    super(value, BindingType.Factory, BindingScope.Singleton);
-  }
+    public readonly tag?: Tag,
+  ) {}
 }
 
-export class ValueBinding extends Binding {
-  constructor(public readonly value: unknown) {
-    super(value, BindingType.Value, BindingScope.Singleton);
-  }
+export class ValueBinding implements Binding {
+  public readonly type = BindingType.Value;
+
+  public readonly scope = BindingScope.Transient;
+
+  constructor(public readonly value: unknown, public readonly tag?: Tag) {}
 }
 
 export const isInstanceBinding = (binding: Binding): binding is InstanceBinding =>

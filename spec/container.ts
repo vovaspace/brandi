@@ -302,10 +302,10 @@ describe('container', () => {
       const container = new Container();
       container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
       container
+        .when(tags.some)
         .bind(tokens.firstClass)
         .toInstance(AnotherFirstClass)
-        .inTransientScope()
-        .whenTargetTagged(tags.some);
+        .inTransientScope();
 
       container.bind(tokens.secondClass).toInstance(SecondClass).inTransientScope();
       container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();

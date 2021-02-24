@@ -2,8 +2,9 @@ import { Tag, Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 import { Constructor } from '../types';
 
+import { BindingTokenSyntax } from '../syntax/BindingTokenSyntax';
+
 import { Binding, BindingScope, isFactoryBinding, isInstanceBinding } from './Binding';
-import { BindingTypeSyntax } from './BindingTypeSyntax';
 import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
@@ -19,7 +20,11 @@ export class Container {
   }
 
   public bind<T extends Token>(token: T) {
-    return new BindingTypeSyntax<TokenType<T>>(this.bindingsRegistry, token);
+    return new BindingTokenSyntax(this.bindingsRegistry).bind(token);
+  }
+
+  public when(tag: Tag) {
+    return new BindingTokenSyntax(this.bindingsRegistry, tag);
   }
 
   public get<T extends Token>(token: T): TokenType<T> {
@@ -42,8 +47,8 @@ export class Container {
   private resolveBinding(token: Token, tags?: Tag[]): Binding {
     const binding = this.bindingsRegistry.get(token, tags);
 
-    if (binding) return binding;
-    if (this.parent) return this.parent.resolveBinding(token);
+    if (binding !== undefined) return binding;
+    if (this.parent !== undefined) return this.parent.resolveBinding(token);
 
     throw new Error(`No matching bindings found for '${token.description}' token.`);
   }
