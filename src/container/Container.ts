@@ -63,18 +63,18 @@ export class Container {
     if (isInstanceBinding(binding)) {
       if (isSingletonScopedInstanceBinding(binding)) {
         // eslint-disable-next-line no-param-reassign
-        binding.instance = binding.instance || this.construct(binding.value, context);
+        binding.instance = binding.instance ?? this.construct(binding.value, context);
         return binding.instance;
       }
 
       if (isContainerScopedInstanceBinding(binding)) {
-        const instance = binding.instances.get(this) || this.construct(binding.value, context);
+        const instance = binding.instances.get(this) ?? this.construct(binding.value, context);
         binding.instances.set(this, instance);
         return instance;
       }
 
       if (isResolutionScopedInstanceBinding(binding)) {
-        const instance = context.instances.get(binding) || this.construct(binding.value, context);
+        const instance = context.instances.get(binding) ?? this.construct(binding.value, context);
         context.instances.set(binding, instance);
         return instance;
       }
