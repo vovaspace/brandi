@@ -1,6 +1,5 @@
 import { Tag, Token, TokenType } from '../pointers';
-
-import { BindingsRegistry } from '../container/BindingsRegistry';
+import { BindingsRegistry } from '../registries';
 
 import { BindingTypeSyntax } from './BindingTypeSyntax';
 

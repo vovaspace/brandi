@@ -1,8 +1,7 @@
 import { Constructor, Factory } from '../types';
+import { FactoryBinding, ValueBinding } from '../bindings';
 import { Tag, Token } from '../pointers';
-
-import { FactoryBinding, ValueBinding } from '../container/Binding';
-import { BindingsRegistry } from '../container/BindingsRegistry';
+import { BindingsRegistry } from '../registries';
 
 import { BindingScopeSyntax } from './BindingScopeSyntax';
 
@@ -14,12 +13,11 @@ export class BindingTypeSyntax<T> {
   ) {}
 
   public toInstance<K extends Constructor<T>>(ctor: K): BindingScopeSyntax {
-    return new BindingScopeSyntax(this.bindingsRegistry, this.token, ctor, this.tag);
+    return new BindingScopeSyntax(this.bindingsRegistry, ctor, this.token, this.tag);
   }
 
   public toValue(value: T): void {
-    const binding = new ValueBinding(value, this.tag);
-    this.bindingsRegistry.push(binding, this.token);
+    this.bindingsRegistry.set(new ValueBinding(value), this.token, this.tag);
   }
 
   public toFactory(
@@ -28,7 +26,6 @@ export class BindingTypeSyntax<T> {
       ? (instance: R, ...args: A) => R | void
       : never,
   ): void {
-    const binding = new FactoryBinding({ ctor, transformer }, this.tag);
-    this.bindingsRegistry.push(binding, this.token);
+    this.bindingsRegistry.set(new FactoryBinding({ ctor, transformer }), this.token, this.tag);
   }
 }

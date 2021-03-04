@@ -14,8 +14,7 @@
         "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
         "allowSeparatedGroups": true
       }
-    ],
-    "max-classes-per-file": "off"
+    ]
   },
   "overrides": [
     {
@@ -24,6 +23,7 @@
       "plugins": ["jest"],
       "extends": ["plugin:jest/all"],
       "rules": {
+        "max-classes-per-file": "off",
         "jest/prefer-expect-assertions": ["error", { "onlyFunctionsWithAsyncKeyword": true }],
         "jest/no-hooks": [
           "error",

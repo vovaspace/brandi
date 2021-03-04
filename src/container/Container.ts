@@ -1,11 +1,17 @@
+import {
+  Binding,
+  isContainerScopedInstanceBinding,
+  isFactoryBinding,
+  isInstanceBinding,
+  isResolutionScopedInstanceBinding,
+  isSingletonScopedInstanceBinding,
+} from '../bindings';
 import { Tag, Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
+import { BindingTokenSyntax } from '../syntax';
+import { BindingsRegistry } from '../registries';
 import { Constructor } from '../types';
 
-import { BindingTokenSyntax } from '../syntax/BindingTokenSyntax';
-
-import { Binding, BindingScope, isFactoryBinding, isInstanceBinding } from './Binding';
-import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
@@ -55,19 +61,19 @@ export class Container {
 
   private resolveValue(binding: Binding, context: ResolutionContext) {
     if (isInstanceBinding(binding)) {
-      if (binding.scope === BindingScope.Singleton) {
+      if (isSingletonScopedInstanceBinding(binding)) {
         // eslint-disable-next-line no-param-reassign
         binding.instance = binding.instance || this.construct(binding.value, context);
         return binding.instance;
       }
 
-      if (binding.scope === BindingScope.Container) {
+      if (isContainerScopedInstanceBinding(binding)) {
         const instance = binding.instances.get(this) || this.construct(binding.value, context);
         binding.instances.set(this, instance);
         return instance;
       }
 
-      if (binding.scope === BindingScope.Resolution) {
+      if (isResolutionScopedInstanceBinding(binding)) {
         const instance = context.instances.get(binding) || this.construct(binding.value, context);
         context.instances.set(binding, instance);
         return instance;

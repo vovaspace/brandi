@@ -1,31 +1,39 @@
+import {
+  Binding,
+  ContainerScopedInstanceBinding,
+  ResolutionScopedInstanceBinding,
+  SingletonScopedInstanceBinding,
+  TransientScopedInstanceBinding,
+} from '../bindings';
 import { Tag, Token } from '../pointers';
+import { BindingsRegistry } from '../registries';
 import { Constructor } from '../types';
-
-import { BindingScope, InstanceBinding } from '../container/Binding';
-import { BindingsRegistry } from '../container/BindingsRegistry';
-
-export interface BindingScopeSyntax {
-  inTransientScope(): void;
-  inSingletonScope(): void;
-  inResolutionScope(): void;
-  inContainerScope(): void;
-}
 
 export class BindingScopeSyntax implements BindingScopeSyntax {
   constructor(
     private readonly bindingsRegistry: BindingsRegistry,
-    private readonly token: Token,
     private readonly value: Constructor,
+    private readonly token: Token,
     private readonly tag?: Tag,
-  ) {
-    this.inTransientScope = this.in.bind(this, BindingScope.Transient);
-    this.inSingletonScope = this.in.bind(this, BindingScope.Singleton);
-    this.inResolutionScope = this.in.bind(this, BindingScope.Resolution);
-    this.inContainerScope = this.in.bind(this, BindingScope.Container);
+  ) {}
+
+  public inContainerScope(): void {
+    this.set(new ContainerScopedInstanceBinding(this.value));
   }
 
-  private in(scope: BindingScope): void {
-    const binding = new InstanceBinding(this.value, scope, this.tag);
-    this.bindingsRegistry.push(binding, this.token);
+  public inResolutionScope(): void {
+    this.set(new ResolutionScopedInstanceBinding(this.value));
+  }
+
+  public inSingletonScope(): void {
+    this.set(new SingletonScopedInstanceBinding(this.value));
+  }
+
+  public inTransientScope(): void {
+    this.set(new TransientScopedInstanceBinding(this.value));
+  }
+
+  private set(binding: Binding): void {
+    this.bindingsRegistry.set(binding, this.token, this.tag);
   }
 }
