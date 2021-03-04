@@ -4,7 +4,6 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "import/prefer-default-export": "off",
     "sort-imports": [
       "error",
       {
@@ -13,6 +12,16 @@
         "ignoreMemberSort": false,
         "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
         "allowSeparatedGroups": true
+      }
+    ],
+    "import/prefer-default-export": "off",
+    "@typescript-eslint/explicit-member-accessibility": [
+      "error",
+      {
+        "accessibility": "explicit",
+        "overrides": {
+          "constructors": "no-public"
+        }
       }
     ]
   },
