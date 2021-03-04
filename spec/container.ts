@@ -22,7 +22,7 @@ describe('container', () => {
       expect(container.get(valueToken)).toBe(SomeClass);
     });
 
-    it('returns a not-dynamic factory', () => {
+    it('returns a factory without arguments', () => {
       class SomeClass {}
       const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
 
@@ -38,7 +38,52 @@ describe('container', () => {
       expect(firstInstance).not.toBe(secondInstance);
     });
 
-    it('returns a dynamic factory whose transformer returns void', () => {
+    it('returns a factory without arguments but with a transformer that returns void', () => {
+      class SomeClass {
+        public num: number = 0;
+
+        public init() {
+          this.num += 1;
+        }
+      }
+
+      const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+
+      const container = new Container();
+      container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => instance.init());
+
+      const factory = container.get(someClassFactoryToken);
+      const instance = factory();
+
+      expect(instance).toBeInstanceOf(SomeClass);
+      expect(instance.num).toBe(1);
+    });
+
+    it('returns a factory without arguments but with a transformer that returns a value', () => {
+      class SomeClass {
+        public num: number = 0;
+
+        public init() {
+          this.num += 1;
+        }
+      }
+
+      const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+
+      const container = new Container();
+      container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => {
+        instance.init();
+        return 1;
+      });
+
+      const factory = container.get(someClassFactoryToken);
+      const instance = factory();
+
+      expect(instance).toBeInstanceOf(SomeClass);
+      expect(instance.num).toBe(1);
+    });
+
+    it('returns a factory with arguments', () => {
       class SomeClass {
         public str: string = '';
 
@@ -58,39 +103,6 @@ describe('container', () => {
       container
         .bind(someClassFactoryToken)
         .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
-
-      const str = '1';
-      const num = 1;
-
-      const factory = container.get(someClassFactoryToken);
-      const instance = factory(str, num);
-
-      expect(instance).toBeInstanceOf(SomeClass);
-      expect(instance.str).toBe(str);
-      expect(instance.num).toBe(num);
-    });
-
-    it('returns a dynamic factory whose transformer returns a value and ignores the value returned from the transformer', () => {
-      class SomeClass {
-        public str: string = '';
-
-        public num: number = 0;
-
-        public init(str: string, num: number) {
-          this.str = str;
-          this.num = num;
-        }
-      }
-
-      const someClassFactoryToken = token<Factory<SomeClass, [str: string, num: number]>>(
-        'someClassFactory',
-      );
-
-      const container = new Container();
-      container.bind(someClassFactoryToken).toFactory(SomeClass, (instance, str, num) => {
-        instance.init(str, num);
-        return 1;
-      });
 
       const str = '1';
       const num = 1;

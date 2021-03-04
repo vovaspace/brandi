@@ -20,11 +20,41 @@ export class BindingTypeSyntax<T> {
     this.bindingsRegistry.set(new ValueBinding(value), this.token, this.tag);
   }
 
+  /**
+   * @example <caption>Example usage of factory without arguments.</caption>
+   * const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+   *
+   * container.bind(someClassFactoryToken).toFactory(SomeClass);
+   * // Or
+   * container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => instance.init());
+   *
+   * const someClassFactory = container.get(someClassFactoryToken);
+   * const someClassInstance = someClassFactory();
+   *
+   * console.log(someClassInstance instanceof SomeClass) // -> true
+   */
+  public toFactory(
+    ctor: T extends Factory<infer R> ? Constructor<R> : never,
+    transformer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
+  ): void;
+  /**
+   * @example <caption>Example usage of factory with arguments.</caption>
+   * const someClassFactoryToken = token<Factory<SomeClass, [name: string]>>('someClassFactory');
+   *
+   * container.bind(someClassFactoryToken).toFactory(SomeClass, (instance, name) => instance.setName(name));
+   *
+   * const someClassFactory = container.get(someClassFactoryToken);
+   * const someClassInstance = someClassFactory('Olivia');
+   *
+   * console.log(someClassInstance instanceof SomeClass) // -> true
+   */
   public toFactory(
     ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
-    transformer?: T extends Factory<infer R, infer A>
-      ? (instance: R, ...args: A) => unknown
-      : never,
+    transformer: T extends Factory<infer R, infer A> ? (instance: R, ...args: A) => unknown : never,
+  ): void;
+  public toFactory(
+    ctor: Constructor,
+    transformer?: (instance: Object, ...args: unknown[]) => unknown,
   ): void {
     this.bindingsRegistry.set(new FactoryBinding({ ctor, transformer }), this.token, this.tag);
   }
