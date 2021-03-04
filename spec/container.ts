@@ -38,7 +38,39 @@ describe('container', () => {
       expect(firstInstance).not.toBe(secondInstance);
     });
 
-    it('returns a dynamic factory which returns void', () => {
+    it('returns a dynamic factory whose transformer returns void', () => {
+      class SomeClass {
+        public str: string = '';
+
+        public num: number = 0;
+
+        public init(str: string, num: number) {
+          this.str = str;
+          this.num = num;
+        }
+      }
+
+      const someClassFactoryToken = token<Factory<SomeClass, [str: string, num: number]>>(
+        'someClassFactory',
+      );
+
+      const container = new Container();
+      container
+        .bind(someClassFactoryToken)
+        .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
+
+      const str = '1';
+      const num = 1;
+
+      const factory = container.get(someClassFactoryToken);
+      const instance = factory(str, num);
+
+      expect(instance).toBeInstanceOf(SomeClass);
+      expect(instance.str).toBe(str);
+      expect(instance.num).toBe(num);
+    });
+
+    it('returns a dynamic factory whose transformer returns a value and ignores the value returned from the transformer', () => {
       class SomeClass {
         public str: string = '';
 
@@ -57,6 +89,7 @@ describe('container', () => {
       const container = new Container();
       container.bind(someClassFactoryToken).toFactory(SomeClass, (instance, str, num) => {
         instance.init(str, num);
+        return 1;
       });
 
       const str = '1';
@@ -68,37 +101,6 @@ describe('container', () => {
       expect(instance).toBeInstanceOf(SomeClass);
       expect(instance.str).toBe(str);
       expect(instance.num).toBe(num);
-    });
-
-    it('returns a dynamic factory which returns instance', () => {
-      class SomeClass {
-        public str: string = '';
-
-        public num: number = 0;
-
-        public copy(str: string) {
-          const newSome = new SomeClass();
-          newSome.str = str;
-          newSome.num = this.num + 1;
-          return newSome;
-        }
-      }
-
-      const someClassFactoryToken = token<Factory<SomeClass, [str: string]>>('someClassFactory');
-
-      const container = new Container();
-      container
-        .bind(someClassFactoryToken)
-        .toFactory(SomeClass, (instance, str) => instance.copy(str));
-
-      const str = '1';
-
-      const factory = container.get(someClassFactoryToken);
-      const instance = factory(str);
-
-      expect(instance).toBeInstanceOf(SomeClass);
-      expect(instance.str).toBe(str);
-      expect(instance.num).toBe(1);
     });
 
     it('returns an instance in transient scope', () => {

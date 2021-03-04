@@ -23,7 +23,7 @@ export class BindingTypeSyntax<T> {
   public toFactory(
     ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
     transformer?: T extends Factory<infer R, infer A>
-      ? (instance: R, ...args: A) => R | void
+      ? (instance: R, ...args: A) => unknown
       : never,
   ): void {
     this.bindingsRegistry.set(new FactoryBinding({ ctor, transformer }), this.token, this.tag);
