@@ -1,5 +1,9 @@
 {
-  "extends": ["airbnb-typescript/base", "prettier", "prettier/@typescript-eslint"],
+  "extends": [
+    "airbnb-typescript/base",
+    "prettier",
+    "prettier/@typescript-eslint"
+  ],
   "parserOptions": {
     "project": "./tsconfig.json"
   },
@@ -33,7 +37,10 @@
       "extends": ["plugin:jest/all"],
       "rules": {
         "max-classes-per-file": "off",
-        "jest/prefer-expect-assertions": ["error", { "onlyFunctionsWithAsyncKeyword": true }],
+        "jest/prefer-expect-assertions": [
+          "error",
+          { "onlyFunctionsWithAsyncKeyword": true }
+        ],
         "jest/no-hooks": [
           "error",
           {

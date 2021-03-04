@@ -24,7 +24,10 @@ describe('container', () => {
 
     it('returns a factory without arguments', () => {
       class SomeClass {}
-      const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+
+      const someClassFactoryToken = token<Factory<SomeClass>>(
+        'someClassFactory',
+      );
 
       const container = new Container();
       container.bind(someClassFactoryToken).toFactory(SomeClass);
@@ -47,10 +50,15 @@ describe('container', () => {
         }
       }
 
-      const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+      const someClassFactoryToken = token<Factory<SomeClass>>(
+        'someClassFactory',
+      );
 
       const container = new Container();
-      container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => instance.init());
+
+      container
+        .bind(someClassFactoryToken)
+        .toFactory(SomeClass, (instance) => instance.init());
 
       const factory = container.get(someClassFactoryToken);
       const instance = factory();
@@ -68,9 +76,12 @@ describe('container', () => {
         }
       }
 
-      const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
+      const someClassFactoryToken = token<Factory<SomeClass>>(
+        'someClassFactory',
+      );
 
       const container = new Container();
+
       container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => {
         instance.init();
         return 1;
@@ -95,11 +106,12 @@ describe('container', () => {
         }
       }
 
-      const someClassFactoryToken = token<Factory<SomeClass, [str: string, num: number]>>(
-        'someClassFactory',
-      );
+      const someClassFactoryToken = token<
+        Factory<SomeClass, [str: string, num: number]>
+      >('someClassFactory');
 
       const container = new Container();
+
       container
         .bind(someClassFactoryToken)
         .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
@@ -197,9 +209,19 @@ describe('container', () => {
       injected(ThirdClass, tokens.firstClass, tokens.secondClass);
 
       const container = new Container();
-      container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
-      container.bind(tokens.secondClass).toInstance(SecondClass).inSingletonScope();
-      container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();
+
+      container
+        .bind(tokens.firstClass)
+        .toInstance(FirstClass)
+        .inTransientScope();
+      container
+        .bind(tokens.secondClass)
+        .toInstance(SecondClass)
+        .inSingletonScope();
+      container
+        .bind(tokens.thirdClass)
+        .toInstance(ThirdClass)
+        .inTransientScope();
 
       const firstComeClassInstance = container.get(tokens.thirdClass);
       const secondComeClassInstance = container.get(tokens.thirdClass);
@@ -207,8 +229,12 @@ describe('container', () => {
       expect(firstComeClassInstance.first).toBeInstanceOf(FirstClass);
       expect(firstComeClassInstance.second).toBeInstanceOf(SecondClass);
 
-      expect(firstComeClassInstance.first).not.toBe(secondComeClassInstance.first);
-      expect(firstComeClassInstance.second).toBe(secondComeClassInstance.second);
+      expect(firstComeClassInstance.first).not.toBe(
+        secondComeClassInstance.first,
+      );
+      expect(firstComeClassInstance.second).toBe(
+        secondComeClassInstance.second,
+      );
     });
 
     it('injects instances in resolution scope', () => {
@@ -218,7 +244,11 @@ describe('container', () => {
         constructor(public zero: ZeroClass, public first: FirstClass) {}
       }
       class ThirdClass {
-        constructor(public zero: ZeroClass, public first: FirstClass, public second: SecondClass) {}
+        constructor(
+          public zero: ZeroClass,
+          public first: FirstClass,
+          public second: SecondClass,
+        ) {}
       }
       class FourthClass {
         constructor(
@@ -238,7 +268,12 @@ describe('container', () => {
       };
 
       injected(SecondClass, tokens.zeroClass, tokens.firstClass);
-      injected(ThirdClass, tokens.zeroClass, tokens.firstClass, tokens.secondClass);
+      injected(
+        ThirdClass,
+        tokens.zeroClass,
+        tokens.firstClass,
+        tokens.secondClass,
+      );
       injected(
         FourthClass,
         tokens.zeroClass,
@@ -248,11 +283,24 @@ describe('container', () => {
       );
 
       const container = new Container();
+
       container.bind(tokens.zeroClass).toInstance(ZeroClass).inTransientScope();
-      container.bind(tokens.firstClass).toInstance(FirstClass).inResolutionScope();
-      container.bind(tokens.secondClass).toInstance(SecondClass).inResolutionScope();
-      container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();
-      container.bind(tokens.fourthClass).toInstance(FourthClass).inTransientScope();
+      container
+        .bind(tokens.firstClass)
+        .toInstance(FirstClass)
+        .inResolutionScope();
+      container
+        .bind(tokens.secondClass)
+        .toInstance(SecondClass)
+        .inResolutionScope();
+      container
+        .bind(tokens.thirdClass)
+        .toInstance(ThirdClass)
+        .inTransientScope();
+      container
+        .bind(tokens.fourthClass)
+        .toInstance(FourthClass)
+        .inTransientScope();
 
       const instance = container.get(tokens.fourthClass);
 
@@ -314,16 +362,29 @@ describe('container', () => {
       tagged(FourthClass, tags.unused);
 
       const container = new Container();
-      container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
+
+      container
+        .bind(tokens.firstClass)
+        .toInstance(FirstClass)
+        .inTransientScope();
       container
         .when(tags.some)
         .bind(tokens.firstClass)
         .toInstance(AnotherFirstClass)
         .inTransientScope();
 
-      container.bind(tokens.secondClass).toInstance(SecondClass).inTransientScope();
-      container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();
-      container.bind(tokens.fourthClass).toInstance(FourthClass).inTransientScope();
+      container
+        .bind(tokens.secondClass)
+        .toInstance(SecondClass)
+        .inTransientScope();
+      container
+        .bind(tokens.thirdClass)
+        .toInstance(ThirdClass)
+        .inTransientScope();
+      container
+        .bind(tokens.fourthClass)
+        .toInstance(FourthClass)
+        .inTransientScope();
 
       const secondClassInstance = container.get(tokens.secondClass);
       const thirdClassInstance = container.get(tokens.thirdClass);
@@ -341,7 +402,11 @@ describe('container', () => {
       const someClassToken = token<SomeClass>('someClass');
 
       const parentContainer = new Container();
-      parentContainer.bind(someClassToken).toInstance(SomeClass).inTransientScope();
+
+      parentContainer
+        .bind(someClassToken)
+        .toInstance(SomeClass)
+        .inTransientScope();
 
       const childContainer = new Container(parentContainer);
 
@@ -357,7 +422,11 @@ describe('container', () => {
       parentContainer.bind(classToken).toInstance(SomeClass).inTransientScope();
 
       const childContainer = new Container(parentContainer);
-      childContainer.bind(classToken).toInstance(AnotherClass).inTransientScope();
+
+      childContainer
+        .bind(classToken)
+        .toInstance(AnotherClass)
+        .inTransientScope();
 
       expect(childContainer.get(classToken)).toBeInstanceOf(AnotherClass);
     });
@@ -367,7 +436,11 @@ describe('container', () => {
       const someClassToken = token<SomeClass>('someClass');
 
       const parentContainer = new Container();
-      parentContainer.bind(someClassToken).toInstance(SomeClass).inContainerScope();
+
+      parentContainer
+        .bind(someClassToken)
+        .toInstance(SomeClass)
+        .inContainerScope();
 
       const childContainer = new Container(parentContainer);
 
@@ -379,10 +452,18 @@ describe('container', () => {
       expect(parentContainerFirstInstance).toBe(parentContainerSecondInstance);
       expect(childContainerFirstInstance).toBe(childContainerSecondInstance);
 
-      expect(parentContainerFirstInstance).not.toBe(childContainerFirstInstance);
-      expect(parentContainerFirstInstance).not.toBe(childContainerSecondInstance);
-      expect(parentContainerSecondInstance).not.toBe(childContainerFirstInstance);
-      expect(parentContainerSecondInstance).not.toBe(childContainerSecondInstance);
+      expect(parentContainerFirstInstance).not.toBe(
+        childContainerFirstInstance,
+      );
+      expect(parentContainerFirstInstance).not.toBe(
+        childContainerSecondInstance,
+      );
+      expect(parentContainerSecondInstance).not.toBe(
+        childContainerFirstInstance,
+      );
+      expect(parentContainerSecondInstance).not.toBe(
+        childContainerSecondInstance,
+      );
     });
   });
 
@@ -412,7 +493,9 @@ describe('container', () => {
       expect(copyContainer.get(tokens.first)).toBe(values.first);
       expect(copyContainer.get(tokens.second)).toBe(values.second);
       expect(copyContainer.get(tokens.third)).toBe(values.third);
-      expect(() => originalContainer.get(tokens.third)).toThrowErrorMatchingSnapshot();
+      expect(() =>
+        originalContainer.get(tokens.third),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 });

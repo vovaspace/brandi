@@ -4,9 +4,16 @@ import { BindingsRegistry } from '../registries';
 import { BindingTypeSyntax } from './BindingTypeSyntax';
 
 export class BindingTokenSyntax {
-  constructor(private readonly bindingsRegistry: BindingsRegistry, private readonly tag?: Tag) {}
+  constructor(
+    private readonly bindingsRegistry: BindingsRegistry,
+    private readonly tag?: Tag,
+  ) {}
 
   public bind<T extends Token>(token: T) {
-    return new BindingTypeSyntax<TokenType<T>>(this.bindingsRegistry, token, this.tag);
+    return new BindingTypeSyntax<TokenType<T>>(
+      this.bindingsRegistry,
+      token,
+      this.tag,
+    );
   }
 }

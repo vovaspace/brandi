@@ -13,7 +13,12 @@ export class BindingTypeSyntax<T> {
   ) {}
 
   public toInstance<K extends Constructor<T>>(ctor: K): BindingScopeSyntax {
-    return new BindingScopeSyntax(this.bindingsRegistry, ctor, this.token, this.tag);
+    return new BindingScopeSyntax(
+      this.bindingsRegistry,
+      ctor,
+      this.token,
+      this.tag,
+    );
   }
 
   public toValue(value: T): void {
@@ -50,12 +55,18 @@ export class BindingTypeSyntax<T> {
    */
   public toFactory(
     ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
-    transformer: T extends Factory<infer R, infer A> ? (instance: R, ...args: A) => unknown : never,
+    transformer: T extends Factory<infer R, infer A>
+      ? (instance: R, ...args: A) => unknown
+      : never,
   ): void;
   public toFactory(
     ctor: Constructor,
     transformer?: (instance: Object, ...args: unknown[]) => unknown,
   ): void {
-    this.bindingsRegistry.set(new FactoryBinding({ ctor, transformer }), this.token, this.tag);
+    this.bindingsRegistry.set(
+      new FactoryBinding({ ctor, transformer }),
+      this.token,
+      this.tag,
+    );
   }
 }

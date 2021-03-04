@@ -32,7 +32,10 @@ describe('injected', () => {
 
     injected(SomeClass, tokens.first, tokens.second);
 
-    expect(injectsRegistry.get(SomeClass)).toStrictEqual([tokens.first, tokens.second]);
+    expect(injectsRegistry.get(SomeClass)).toStrictEqual([
+      tokens.first,
+      tokens.second,
+    ]);
   });
 
   it('rewrites tokens', () => {

@@ -5,10 +5,17 @@ export class BindingsRegistry {
   private static notag = createTag('notag');
 
   constructor(
-    private readonly map: Map<Token, Map<Tag, Binding>> = new Map<Token, Map<Tag, Binding>>(),
+    private readonly map: Map<Token, Map<Tag, Binding>> = new Map<
+      Token,
+      Map<Tag, Binding>
+    >(),
   ) {}
 
-  public set(binding: Binding, token: Token, tag: Tag = BindingsRegistry.notag): void {
+  public set(
+    binding: Binding,
+    token: Token,
+    tag: Tag = BindingsRegistry.notag,
+  ): void {
     const current = this.map.get(token);
 
     if (current === undefined) {

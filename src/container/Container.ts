@@ -46,7 +46,11 @@ export class Container {
     return this.resolveValue(binding, context);
   }
 
-  private getMultiple(tokens: Token[], context: ResolutionContext, tags?: Tag[]) {
+  private getMultiple(
+    tokens: Token[],
+    context: ResolutionContext,
+    tags?: Tag[],
+  ) {
     return tokens.map((token) => this.getSingle(token, context, tags));
   }
 
@@ -56,26 +60,37 @@ export class Container {
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);
 
-    throw new Error(`No matching bindings found for '${token.description}' token.`);
+    throw new Error(
+      `No matching bindings found for '${token.description}' token.`,
+    );
   }
 
   private resolveValue(binding: Binding, context: ResolutionContext) {
     if (isInstanceBinding(binding)) {
       if (isSingletonScopedInstanceBinding(binding)) {
         // eslint-disable-next-line no-param-reassign
-        binding.instance = binding.instance ?? this.construct(binding.value, context);
+        binding.instance =
+          binding.instance ?? this.construct(binding.value, context);
+
         return binding.instance;
       }
 
       if (isContainerScopedInstanceBinding(binding)) {
-        const instance = binding.instances.get(this) ?? this.construct(binding.value, context);
+        const instance =
+          binding.instances.get(this) ?? this.construct(binding.value, context);
+
         binding.instances.set(this, instance);
+
         return instance;
       }
 
       if (isResolutionScopedInstanceBinding(binding)) {
-        const instance = context.instances.get(binding) ?? this.construct(binding.value, context);
+        const instance =
+          context.instances.get(binding) ??
+          this.construct(binding.value, context);
+
         context.instances.set(binding, instance);
+
         return instance;
       }
 
@@ -103,7 +118,11 @@ export class Container {
     }
 
     const injects = injectsRegistry.get(Ctor);
-    if (!injects) throw new Error(`Missing required 'injected' registration in '${Ctor.name}'`);
+
+    if (!injects)
+      throw new Error(
+        `Missing required 'injected' registration in '${Ctor.name}'`,
+      );
 
     const tags = tagsRegistry.get(Ctor);
     const params = this.getMultiple(injects, context, tags);

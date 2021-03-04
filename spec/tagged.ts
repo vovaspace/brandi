@@ -28,7 +28,10 @@ describe('tagged', () => {
 
     tagged(SomeClass, tags.first, tags.second);
 
-    expect(tagsRegistry.get(SomeClass)).toStrictEqual([tags.first, tags.second]);
+    expect(tagsRegistry.get(SomeClass)).toStrictEqual([
+      tags.first,
+      tags.second,
+    ]);
   });
 
   it('rewrites tags', () => {
