@@ -12,8 +12,8 @@
   "scripts": {
     "test": "jest --colors",
     "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:typings",
-    "build:esm": "esbuild src/index.ts --bundle --platform=neutral --format=esm --minify --outfile=lib/esm/index.js",
-    "build:cjs": "esbuild src/index.ts --bundle --platform=neutral --format=cjs --minify --outfile=lib/cjs/index.js",
+    "build:esm": "esbuild src/index.ts --bundle --platform=neutral --format=esm --minify --sourcemap --outfile=lib/esm/index.js",
+    "build:cjs": "esbuild src/index.ts --bundle --platform=neutral --format=cjs --minify --sourcemap --outfile=lib/cjs/index.js",
     "build:typings": "tsc -p ./tsconfig.typings.json",
     "clean": "rimraf ./lib",
     "code:lint": "prettier --check . && eslint .",
