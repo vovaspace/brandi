@@ -1,3 +1,4 @@
-import { TagsRegistry } from '../registries';
+import { Constructor } from '../types';
+import { Tag } from '../pointers';
 
-export const tagsRegistry = new TagsRegistry();
+export const tagsRegistry = new Map<Constructor, Tag[]>();

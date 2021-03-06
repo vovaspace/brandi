@@ -1,7 +1,8 @@
-import { Constructor, Factory } from '../types';
+import { Constructor, Factory } from '../../types';
+import { Tag, Token } from '../../pointers';
+
 import { FactoryBinding, ValueBinding } from '../bindings';
-import { Tag, Token } from '../pointers';
-import { BindingsRegistry } from '../registries';
+import { BindingsRegistry } from '../BindingsRegistry';
 
 import { BindingScopeSyntax } from './BindingScopeSyntax';
 

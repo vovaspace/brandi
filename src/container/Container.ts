@@ -1,3 +1,8 @@
+import { Tag, Token, TokenType } from '../pointers';
+import { injectsRegistry, tagsRegistry } from '../globals';
+import { BindingTokenSyntax } from './syntax';
+import { Constructor } from '../types';
+
 import {
   Binding,
   isContainerScopedInstanceBinding,
@@ -5,13 +10,8 @@ import {
   isInstanceBinding,
   isResolutionScopedInstanceBinding,
   isSingletonScopedInstanceBinding,
-} from '../bindings';
-import { Tag, Token, TokenType } from '../pointers';
-import { injectsRegistry, tagsRegistry } from '../globals';
-import { BindingTokenSyntax } from '../syntax';
-import { BindingsRegistry } from '../registries';
-import { Constructor } from '../types';
-
+} from './bindings';
+import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {

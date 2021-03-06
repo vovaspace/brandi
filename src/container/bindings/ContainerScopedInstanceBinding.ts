@@ -1,5 +1,6 @@
-import { Constructor } from '../types';
-import type { Container } from '../container';
+import { Constructor } from '../../types';
+
+import type { Container } from '../Container';
 
 import { Scope, Type } from './Binding';
 import { InstanceBinding } from './InstanceBinding';

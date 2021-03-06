@@ -1,4 +1,4 @@
-import { Constructor } from '../types';
+import { Constructor } from '../../types';
 
 import { Binding, Type } from './Binding';
 

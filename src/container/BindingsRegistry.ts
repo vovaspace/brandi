@@ -1,5 +1,6 @@
 import { Tag, Token, tag as createTag } from '../pointers';
-import { Binding } from '../bindings';
+
+import { Binding } from './bindings';
 
 export class BindingsRegistry {
   private static notag = createTag('notag');

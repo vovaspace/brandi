@@ -1,3 +1,6 @@
+import { Tag, Token } from '../../pointers';
+import { Constructor } from '../../types';
+
 import {
   Binding,
   ContainerScopedInstanceBinding,
@@ -5,9 +8,7 @@ import {
   SingletonScopedInstanceBinding,
   TransientScopedInstanceBinding,
 } from '../bindings';
-import { Tag, Token } from '../pointers';
-import { BindingsRegistry } from '../registries';
-import { Constructor } from '../types';
+import { BindingsRegistry } from '../BindingsRegistry';
 
 export class BindingScopeSyntax implements BindingScopeSyntax {
   constructor(
