@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`container returns an unlinked container from 'copy' method 1`] = `"No matching bindings found for 'copied' token."`;
+
+exports[`container throws when the token was not bound 1`] = `"No matching bindings found for 'some' token."`;

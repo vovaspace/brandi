@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toInstance throws when trying to construct an instance with constructor arguments when the target class was not injected 1`] = `"Missing required 'injected' registration in 'SomeClass'"`;
