@@ -1,6 +1,5 @@
 import { Tag, Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
-import { BindingTokenSyntax } from './syntax';
 import { Constructor } from '../types';
 
 import {
@@ -11,6 +10,7 @@ import {
   isResolutionScopedInstanceBinding,
   isSingletonScopedInstanceBinding,
 } from './bindings';
+import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
 import { BindingsRegistry } from './BindingsRegistry';
 import { ResolutionContext } from './ResolutionContext';
 
@@ -25,11 +25,11 @@ export class Container {
     return newContainer;
   }
 
-  public bind<T extends Token>(token: T) {
+  public bind<T extends Token>(token: T): BindingTypeSyntax<TokenType<T>> {
     return new BindingTokenSyntax(this.registry).bind(token);
   }
 
-  public when(tag: Tag) {
+  public when(tag: Tag): BindingTokenSyntax {
     return new BindingTokenSyntax(this.registry, tag);
   }
 
@@ -41,7 +41,7 @@ export class Container {
     token: Token,
     context: ResolutionContext = new ResolutionContext(),
     tags?: Tag[],
-  ) {
+  ): unknown {
     const binding = this.resolveBinding(token, tags);
     return this.resolveValue(binding, context);
   }
@@ -50,7 +50,7 @@ export class Container {
     tokens: Token[],
     context: ResolutionContext,
     tags?: Tag[],
-  ) {
+  ): unknown[] {
     return tokens.map((token) => this.getSingle(token, context, tags));
   }
 
@@ -65,7 +65,7 @@ export class Container {
     );
   }
 
-  private resolveValue(binding: Binding, context: ResolutionContext) {
+  private resolveValue(binding: Binding, context: ResolutionContext): unknown {
     if (isInstanceBinding(binding)) {
       if (isSingletonScopedInstanceBinding(binding)) {
         // eslint-disable-next-line no-param-reassign

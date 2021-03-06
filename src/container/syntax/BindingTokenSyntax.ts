@@ -10,7 +10,7 @@ export class BindingTokenSyntax {
     private readonly tag?: Tag,
   ) {}
 
-  public bind<T extends Token>(token: T) {
+  public bind<T extends Token>(token: T): BindingTypeSyntax<TokenType<T>> {
     return new BindingTypeSyntax<TokenType<T>>(
       this.bindingsRegistry,
       token,
