@@ -15,22 +15,22 @@ import { Constructor } from '../types';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
-  private bindingsRegistry = new BindingsRegistry();
+  private registry = new BindingsRegistry();
 
   constructor(public parent?: Container) {}
 
   public copy(): Container {
     const newContainer = new Container(this.parent);
-    newContainer.bindingsRegistry = this.bindingsRegistry.copy();
+    newContainer.registry = this.registry.copy();
     return newContainer;
   }
 
   public bind<T extends Token>(token: T) {
-    return new BindingTokenSyntax(this.bindingsRegistry).bind(token);
+    return new BindingTokenSyntax(this.registry).bind(token);
   }
 
   public when(tag: Tag) {
-    return new BindingTokenSyntax(this.bindingsRegistry, tag);
+    return new BindingTokenSyntax(this.registry, tag);
   }
 
   public get<T extends Token>(token: T): TokenType<T> {
@@ -55,7 +55,7 @@ export class Container {
   }
 
   private resolveBinding(token: Token, tags?: Tag[]): Binding {
-    const binding = this.bindingsRegistry.get(token, tags);
+    const binding = this.registry.get(token, tags);
 
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);
