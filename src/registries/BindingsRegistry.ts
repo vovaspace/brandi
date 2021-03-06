@@ -4,12 +4,7 @@ import { Binding } from '../bindings';
 export class BindingsRegistry {
   private static notag = createTag('notag');
 
-  constructor(
-    private readonly map: Map<Token, Map<Tag, Binding>> = new Map<
-      Token,
-      Map<Tag, Binding>
-    >(),
-  ) {}
+  private readonly map = new Map<Token, Map<Tag, Binding>>();
 
   public set(
     binding: Binding,
@@ -40,6 +35,12 @@ export class BindingsRegistry {
   }
 
   public copy(): BindingsRegistry {
-    return new BindingsRegistry(new Map(this.map));
+    const newBindingsRegistry = new BindingsRegistry();
+
+    this.map.forEach((value, key) => {
+      newBindingsRegistry.map.set(key, new Map<Tag, Binding>(value));
+    });
+
+    return newBindingsRegistry;
   }
 }
