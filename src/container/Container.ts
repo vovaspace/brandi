@@ -12,10 +12,13 @@ import {
 } from './bindings';
 import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
 import { BindingsRegistry } from './BindingsRegistry';
+import { ContainerSnapshot } from './ContainerSnapshot';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
   private registry = new BindingsRegistry();
+
+  private snapshot: ContainerSnapshot | null = null;
 
   constructor(public parent?: Container) {}
 
@@ -23,6 +26,20 @@ export class Container {
     const newContainer = new Container(this.parent);
     newContainer.registry = this.registry.copy();
     return newContainer;
+  }
+
+  public capture(): void {
+    this.snapshot = new ContainerSnapshot(this.registry);
+  }
+
+  public restore(): void {
+    if (this.snapshot !== null) {
+      this.registry = this.snapshot.pick();
+    } else {
+      console.error(
+        "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
+      );
+    }
   }
 
   public bind<T extends Token>(token: T): BindingTypeSyntax<TokenType<T>> {

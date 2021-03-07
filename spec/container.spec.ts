@@ -75,4 +75,50 @@ describe('container', () => {
     expect(copiedContainer.get(tokens.original)).toBe(anotherValue);
     expect(copiedContainer.get(tokens.copied)).toBe(copiedValue);
   });
+
+  it('captures the container state to a snapshot', () => {
+    const someValue = 1;
+    const anotherValue = 2;
+    const additionalValue = 3;
+
+    const tokens = {
+      some: token<number>('some'),
+      additional: token<number>('additional'),
+    };
+
+    const container = new Container();
+    container.bind(tokens.some).toValue(someValue);
+
+    container.capture();
+
+    container.bind(tokens.some).toValue(anotherValue);
+    container.bind(tokens.additional).toValue(additionalValue);
+
+    container.restore();
+
+    expect(container.get(tokens.some)).toBe(someValue);
+    expect(() =>
+      container.get(tokens.additional),
+    ).toThrowErrorMatchingSnapshot();
+
+    container.bind(tokens.some).toValue(anotherValue);
+    container.bind(tokens.additional).toValue(additionalValue);
+
+    container.restore();
+
+    expect(container.get(tokens.some)).toBe(someValue);
+    expect(() =>
+      container.get(tokens.additional),
+    ).toThrowErrorMatchingSnapshot();
+  });
+
+  it('logs error when trying to restore a non-captured container state', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementationOnce(() => null);
+
+    const container = new Container();
+    container.restore();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
+  });
 });
