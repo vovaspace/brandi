@@ -35,7 +35,7 @@ export class BindingsRegistry {
     return bindings.get(BindingsRegistry.notag);
   }
 
-  public copy(): BindingsRegistry {
+  public clone(): BindingsRegistry {
     const newBindingsRegistry = new BindingsRegistry();
 
     this.map.forEach((value, key) => {

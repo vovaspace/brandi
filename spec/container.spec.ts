@@ -44,7 +44,7 @@ describe('container', () => {
     expect(() => container.get(tokens.some)).toThrowErrorMatchingSnapshot();
   });
 
-  it("returns an unlinked container from 'copy' method", () => {
+  it("returns an unlinked container from 'clone' method", () => {
     const parentValue = 1;
     const someValue = 2;
     const anotherValue = 3;
@@ -62,7 +62,7 @@ describe('container', () => {
     const originalContainer = new Container(parentContainer);
     originalContainer.bind(tokens.original).toValue(someValue);
 
-    const copiedContainer = originalContainer.copy();
+    const copiedContainer = originalContainer.clone();
     copiedContainer.bind(tokens.original).toValue(anotherValue);
     copiedContainer.bind(tokens.copied).toValue(copiedValue);
 

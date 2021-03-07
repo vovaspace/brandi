@@ -4,10 +4,10 @@ export class ContainerSnapshot {
   private readonly registry: BindingsRegistry;
 
   constructor(registry: BindingsRegistry) {
-    this.registry = registry.copy();
+    this.registry = registry.clone();
   }
 
   public pick(): BindingsRegistry {
-    return this.registry.copy();
+    return this.registry.clone();
   }
 }

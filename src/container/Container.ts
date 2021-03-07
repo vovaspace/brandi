@@ -22,9 +22,9 @@ export class Container {
 
   constructor(public parent?: Container) {}
 
-  public copy(): Container {
+  public clone(): Container {
     const newContainer = new Container(this.parent);
-    newContainer.registry = this.registry.copy();
+    newContainer.registry = this.registry.clone();
     return newContainer;
   }
 
