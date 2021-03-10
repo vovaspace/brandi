@@ -1,5 +1,7 @@
 import { Container, token } from '../src';
 
+import { setEnv } from './utils';
+
 describe('container', () => {
   it('returns a value from the parent container', () => {
     const someValue = 1;
@@ -112,13 +114,30 @@ describe('container', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it('logs error when trying to restore a non-captured container state', () => {
-    const spy = jest.spyOn(console, 'error').mockImplementationOnce(() => null);
+  it("logs error when trying to restore a non-captured container state in 'development' env", () => {
+    const restoreEnv = setEnv('development');
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
     container.restore();
 
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
+
+    restoreEnv();
+    spy.mockRestore();
+  });
+
+  it("skips logging in non-'development' env", () => {
+    const restoreEnv = setEnv('non-development');
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
+
+    const container = new Container();
+    container.restore();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    restoreEnv();
+    spy.mockRestore();
   });
 });
