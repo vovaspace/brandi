@@ -41,7 +41,7 @@ export class BindingTypeSyntax<T> {
    */
   public toFactory(
     ctor: T extends Factory<infer R> ? Constructor<R> : never,
-    transformer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
+    initializer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
   ): void;
   /**
    * @example <caption>Example usage of factory with arguments.</caption>
@@ -56,16 +56,16 @@ export class BindingTypeSyntax<T> {
    */
   public toFactory(
     ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
-    transformer: T extends Factory<infer R, infer A>
+    initializer: T extends Factory<infer R, infer A>
       ? (instance: R, ...args: A) => unknown
       : never,
   ): void;
   public toFactory(
     ctor: Constructor,
-    transformer?: (instance: Object, ...args: unknown[]) => unknown,
+    initializer?: (instance: Object, ...args: unknown[]) => unknown,
   ): void {
     this.bindingsRegistry.set(
-      new FactoryBinding({ ctor, transformer }),
+      new FactoryBinding({ ctor, initializer }),
       this.token,
       this.tag,
     );

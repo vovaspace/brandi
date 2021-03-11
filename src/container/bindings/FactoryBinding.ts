@@ -10,7 +10,7 @@ export class FactoryBinding implements Binding {
   constructor(
     public readonly value: {
       ctor: Constructor;
-      transformer?: (instance: Object, ...args: unknown[]) => unknown;
+      initializer?: (instance: Object, ...args: unknown[]) => unknown;
     },
   ) {}
 }

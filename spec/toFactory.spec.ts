@@ -20,7 +20,7 @@ describe('toFactory', () => {
     expect(firstInstance).not.toBe(secondInstance);
   });
 
-  it('creates a factory without arguments but with a transformer that returns void', () => {
+  it('creates a factory without arguments but with a initializer that returns void', () => {
     class SomeClass {
       public num: number = 0;
 
@@ -46,7 +46,7 @@ describe('toFactory', () => {
     expect(instance.num).toBe(1);
   });
 
-  it('creates a factory without arguments but with a transformer that returns a value and ignores the returned value', () => {
+  it('creates a factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
     class SomeClass {
       public num: number = 0;
 

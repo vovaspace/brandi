@@ -118,8 +118,8 @@ export class Container {
       return (...args: unknown[]) => {
         const instance = this.construct(binding.value.ctor, context);
 
-        if (binding.value.transformer) {
-          binding.value.transformer(instance, ...args);
+        if (binding.value.initializer) {
+          binding.value.initializer(instance, ...args);
         }
 
         return instance;
