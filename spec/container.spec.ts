@@ -114,7 +114,7 @@ describe('container', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it("logs error when trying to restore a non-captured container state in 'development' env", () => {
+  it("logs an error when trying to restore a non-captured container state in 'development' env", () => {
     const restoreEnv = setEnv('development');
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
@@ -128,7 +128,21 @@ describe('container', () => {
     spy.mockRestore();
   });
 
-  it("skips logging in non-'development' env", () => {
+  it('does not log an error when restoring the captured container state', () => {
+    const restoreEnv = setEnv('development');
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
+
+    const container = new Container();
+    container.capture();
+    container.restore();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    restoreEnv();
+    spy.mockRestore();
+  });
+
+  it("skips the logging in non-'development' env", () => {
     const restoreEnv = setEnv('non-development');
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 

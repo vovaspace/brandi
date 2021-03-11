@@ -1,5 +1,9 @@
 import { Container, injected, tag, tagged, token } from '../src';
 
+import { setEnv } from './utils';
+
+jest.useFakeTimers();
+
 describe('toInstance', () => {
   it('creates instances in transient scope', () => {
     class SomeClass {}
@@ -326,5 +330,52 @@ describe('toInstance', () => {
     expect(() =>
       container.get(tokens.someClass),
     ).toThrowErrorMatchingSnapshot();
+  });
+
+  it("logs a warning when a binding scope setting method was not called in 'development' env", () => {
+    const restoreEnv = setEnv('development');
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+    const container = new Container();
+    container.bind(token<unknown>('unknown')).toInstance(class {});
+
+    jest.runAllTimers();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
+
+    restoreEnv();
+    spy.mockRestore();
+  });
+
+  it('does not log a warning when a binding scope setting method was called', () => {
+    const restoreEnv = setEnv('development');
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+    const container = new Container();
+    container
+      .bind(token<unknown>('unknown'))
+      .toInstance(class {})
+      .inTransientScope();
+
+    jest.runAllTimers();
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    restoreEnv();
+    spy.mockRestore();
+  });
+
+  it("skips the logging in non-'development' env", () => {
+    const restoreEnv = setEnv('non-development');
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+    const container = new Container();
+    container.bind(token<unknown>('unknown')).toInstance(class {});
+
+    expect(spy).toHaveBeenCalledTimes(0);
+
+    restoreEnv();
+    spy.mockRestore();
   });
 });
