@@ -2,18 +2,22 @@
   "name": "brandi",
   "version": "1.0.1",
   "description": "Dependency injection container for TypeScript/JavaScript.",
-  "exports": "./lib/esm/index.js",
-  "main": "./lib/cjs/index.js",
-  "module": "./lib/esm/index.js",
+  "main": "./lib/brandi.js",
+  "module": "./lib/brandi.mjs",
+  "esnext": "./lib/brandi.next.js",
+  "exports": {
+    "import": "./lib/brandi.mjs",
+    "require": "./lib/brandi.js",
+    "default": "./lib/brandi.js"
+  },
   "typings": "./lib/typings/index.d.ts",
   "files": [
     "lib"
   ],
   "scripts": {
     "test": "jest --colors",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:typings",
-    "build:esm": "esbuild src/index.ts --bundle --platform=neutral --format=esm --minify --sourcemap --outfile=lib/esm/index.js",
-    "build:cjs": "esbuild src/index.ts --bundle --platform=neutral --format=cjs --minify --sourcemap --outfile=lib/cjs/index.js",
+    "build": "npm run clean && npm run build:lib && npm run build:typings",
+    "build:lib": "node build.config.js",
     "build:typings": "tsc -p ./tsconfig.typings.json",
     "clean": "rimraf ./lib",
     "code:lint": "prettier --check . && eslint .",
