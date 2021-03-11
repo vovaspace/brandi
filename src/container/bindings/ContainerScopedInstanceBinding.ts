@@ -10,7 +10,7 @@ export class ContainerScopedInstanceBinding implements InstanceBinding {
 
   public readonly scope = Scope.Container;
 
-  public readonly instances = new Map<Container, Object>();
+  public readonly instances = new WeakMap<Container, Object>();
 
   constructor(public readonly value: Constructor) {}
 }
