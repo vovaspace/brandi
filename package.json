@@ -1,7 +1,7 @@
 {
   "name": "brandi",
   "version": "1.0.1",
-  "description": "Dependency injection container for TypeScript/JavaScript.",
+  "description": "The dependency injection container.",
   "main": "./lib/brandi.js",
   "module": "./lib/brandi.mjs",
   "esnext": "./lib/brandi.next.js",
