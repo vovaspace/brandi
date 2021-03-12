@@ -40,40 +40,56 @@ export class BindingTypeSyntax<T> {
   }
 
   /**
-   * @example <caption>Example usage of factory without arguments.</caption>
+   * @example <caption>Example usage of instance factory without arguments.</caption>
    * const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
    *
-   * container.bind(someClassFactoryToken).toFactory(SomeClass);
+   * container
+   * .bind(someClassFactoryToken)
+   * .toInstanceFactory(SomeClass);
    * // Or
-   * container.bind(someClassFactoryToken).toFactory(SomeClass, (instance) => instance.init());
+   * container
+   * .bind(someClassFactoryToken)
+   * .toInstanceFactory(SomeClass, (instance) => instance.init());
    *
    * const someClassFactory = container.get(someClassFactoryToken);
    * const someClassInstance = someClassFactory();
    *
    * console.log(someClassInstance instanceof SomeClass) // -> true
    */
-  public toFactory(
-    ctor: T extends Factory<infer R> ? UnknownConstructor<R> : never,
+  public toInstanceFactory(
+    ctor: T extends Factory<infer R>
+      ? R extends Object
+        ? UnknownConstructor<R>
+        : never
+      : never,
     initializer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
   ): void;
+
   /**
-   * @example <caption>Example usage of factory with arguments.</caption>
+   * @example <caption>Example usage of instance factory with arguments.</caption>
    * const someClassFactoryToken = token<Factory<SomeClass, [name: string]>>('someClassFactory');
    *
-   * container.bind(someClassFactoryToken).toFactory(SomeClass, (instance, name) => instance.setName(name));
+   * container
+   * .bind(someClassFactoryToken)
+   * .toInstanceFactory(SomeClass, (instance, name) => instance.setName(name));
    *
    * const someClassFactory = container.get(someClassFactoryToken);
    * const someClassInstance = someClassFactory('Olivia');
    *
    * console.log(someClassInstance instanceof SomeClass) // -> true
    */
-  public toFactory(
-    ctor: T extends Factory<infer R, never[]> ? UnknownConstructor<R> : never,
+  public toInstanceFactory(
+    ctor: T extends Factory<infer R, never[]>
+      ? R extends Object
+        ? UnknownConstructor<R>
+        : never
+      : never,
     initializer: T extends Factory<infer R, infer A>
       ? (instance: R, ...args: A) => unknown
       : never,
   ): void;
-  public toFactory(
+
+  public toInstanceFactory(
     ctor: UnknownConstructor,
     initializer?: (instance: Object, ...args: unknown[]) => unknown,
   ): void {

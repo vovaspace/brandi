@@ -1,6 +1,6 @@
 import { Container, Factory, injected, token } from '../src';
 
-describe('toFactory', () => {
+describe('toInstanceFactory', () => {
   it('creates a factory without arguments', () => {
     class SomeClass {}
 
@@ -9,7 +9,7 @@ describe('toFactory', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.someClassFactory).toFactory(SomeClass);
+    container.bind(tokens.someClassFactory).toInstanceFactory(SomeClass);
 
     const factory = container.get(tokens.someClassFactory);
     const firstInstance = factory();
@@ -37,7 +37,7 @@ describe('toFactory', () => {
 
     container
       .bind(tokens.someClassFactory)
-      .toFactory(SomeClass, (instance) => instance.init());
+      .toInstanceFactory(SomeClass, (instance) => instance.init());
 
     const factory = container.get(tokens.someClassFactory);
     const instance = factory();
@@ -61,10 +61,12 @@ describe('toFactory', () => {
 
     const container = new Container();
 
-    container.bind(tokens.someClassFactory).toFactory(SomeClass, (instance) => {
-      instance.init();
-      return 1;
-    });
+    container
+      .bind(tokens.someClassFactory)
+      .toInstanceFactory(SomeClass, (instance) => {
+        instance.init();
+        return 1;
+      });
 
     const factory = container.get(tokens.someClassFactory);
     const instance = factory();
@@ -95,7 +97,9 @@ describe('toFactory', () => {
 
     container
       .bind(tokens.someClassFactory)
-      .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
+      .toInstanceFactory(SomeClass, (instance, str, num) =>
+        instance.init(str, num),
+      );
 
     const str = '1';
     const num = 1;
@@ -124,7 +128,7 @@ describe('toFactory', () => {
 
     const container = new Container();
     container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
-    container.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    container.bind(tokens.secondClassFactory).toInstanceFactory(SecondClass);
 
     const secondClassFactory = container.get(tokens.secondClassFactory);
     const secondClassInstance = secondClassFactory();
@@ -154,7 +158,9 @@ describe('toFactory', () => {
       .inTransientScope();
 
     const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    childContainer
+      .bind(tokens.secondClassFactory)
+      .toInstanceFactory(SecondClass);
 
     const secondClassFactory = childContainer.get(tokens.secondClassFactory);
     const secondClassInstance = secondClassFactory();
@@ -183,7 +189,9 @@ describe('toFactory', () => {
       .bind(tokens.firstClass)
       .toInstance(FirstClass)
       .inTransientScope();
-    parentContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    parentContainer
+      .bind(tokens.secondClassFactory)
+      .toInstanceFactory(SecondClass);
 
     const childContainer = new Container(parentContainer);
     childContainer
