@@ -1,14 +1,17 @@
 import { Tag, Token, TokenType } from '../pointers';
+import { UnknownConstructor, UnknownFunction } from '../types';
 import { injectsRegistry, tagsRegistry } from '../globals';
-import { Constructor } from '../types';
 
 import {
   Binding,
-  isContainerScopedInstanceBinding,
+  CreatorBinding,
+  FunctionCreatorBinding,
+  isConstructorCreatorBinding,
+  isCreatorBinding,
+  isCreatorContainerScopedBinding,
+  isCreatorResolutionScopedBinding,
+  isCreatorSingletonScopedBinding,
   isFactoryBinding,
-  isInstanceBinding,
-  isResolutionScopedInstanceBinding,
-  isSingletonScopedInstanceBinding,
 } from './bindings';
 import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
 import { BindingsRegistry } from './BindingsRegistry';
@@ -83,44 +86,40 @@ export class Container {
   }
 
   private resolveValue(binding: Binding, context: ResolutionContext): unknown {
-    if (isInstanceBinding(binding)) {
-      if (isSingletonScopedInstanceBinding(binding)) {
-        // eslint-disable-next-line no-param-reassign
-        binding.instance =
-          binding.instance ?? this.construct(binding.value, context);
+    if (isCreatorBinding(binding)) {
+      if (isCreatorSingletonScopedBinding(binding)) {
+        if (binding.hasCached) return binding.cache;
 
-        return binding.instance;
+        const result = this.resolveCreator(binding, context);
+        binding.setCache(result);
+        return result;
       }
 
-      if (isContainerScopedInstanceBinding(binding)) {
-        const instance =
-          binding.instances.get(this) ?? this.construct(binding.value, context);
+      if (isCreatorContainerScopedBinding(binding)) {
+        if (binding.cache.has(this)) return binding.cache.get(this);
 
-        binding.instances.set(this, instance);
-
-        return instance;
+        const result = this.resolveCreator(binding, context);
+        binding.cache.set(this, result);
+        return result;
       }
 
-      if (isResolutionScopedInstanceBinding(binding)) {
-        const instance =
-          context.instances.get(binding) ??
-          this.construct(binding.value, context);
+      if (isCreatorResolutionScopedBinding(binding)) {
+        if (context.cache.has(binding)) return context.cache.get(binding);
 
-        context.instances.set(binding, instance);
-
-        return instance;
+        const result = this.resolveCreator(binding, context);
+        context.cache.set(binding, result);
+        return result;
       }
 
-      return this.construct(binding.value, context);
+      return this.resolveCreator(binding, context);
     }
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
         const instance = this.construct(binding.value.ctor, context);
 
-        if (binding.value.initializer) {
+        if (binding.value.initializer)
           binding.value.initializer(instance, ...args);
-        }
 
         return instance;
       };
@@ -129,21 +128,47 @@ export class Container {
     return binding.value;
   }
 
-  private construct(Ctor: Constructor, context: ResolutionContext): Object {
-    if (Ctor.length === 0) {
-      return new Ctor();
-    }
+  private resolveCreator(
+    binding: CreatorBinding,
+    context: ResolutionContext,
+  ): unknown {
+    if (isConstructorCreatorBinding(binding))
+      return this.construct(binding.value, context);
 
-    const injects = injectsRegistry.get(Ctor);
+    return this.call((binding as FunctionCreatorBinding).value, context);
+  }
+
+  private resolveParameters(
+    target: UnknownConstructor | UnknownFunction,
+    context: ResolutionContext,
+  ): unknown[] {
+    const injects = injectsRegistry.get(target);
 
     if (!injects)
       throw new Error(
-        `Missing required 'injected' registration in '${Ctor.name}'`,
+        `Missing required 'injected' registration of '${target.name}'`,
       );
 
-    const tags = tagsRegistry.get(Ctor);
-    const params = this.getMultiple(injects, context, tags);
+    const tags = tagsRegistry.get(target);
+    return this.getMultiple(injects, context, tags);
+  }
 
-    return new Ctor(...params);
+  private call(func: UnknownFunction, context: ResolutionContext): unknown {
+    if (func.length === 0) return func();
+
+    const parameters = this.resolveParameters(func, context);
+
+    return func(...parameters);
+  }
+
+  private construct(
+    Ctor: UnknownConstructor,
+    context: ResolutionContext,
+  ): Object {
+    if (Ctor.length === 0) return new Ctor();
+
+    const parameters = this.resolveParameters(Ctor, context);
+
+    return new Ctor(...parameters);
   }
 }

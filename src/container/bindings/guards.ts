@@ -1,27 +1,33 @@
 import { Binding, Scope, Type } from './Binding';
-import { ContainerScopedInstanceBinding } from './ContainerScopedInstanceBinding';
+import {
+  ConstructorCreatorBinding,
+  CreatorBinding,
+  CreatorContainerScopedBinding,
+  CreatorResolutionScopedBinding,
+  CreatorSingletonScopedBinding,
+} from './CreatorBinding';
 import { FactoryBinding } from './FactoryBinding';
-import { InstanceBinding } from './InstanceBinding';
-import { ResolutionScopedInstanceBinding } from './ResolutionScopedInstanceBinding';
-import { SingletonScopedInstanceBinding } from './SingletonScopedInstanceBinding';
 
-export const isInstanceBinding = (
-  binding: Binding,
-): binding is InstanceBinding => binding.type === Type.Instance;
+export const isCreatorBinding = (binding: Binding): binding is CreatorBinding =>
+  binding.type === Type.Creator;
 
-export const isContainerScopedInstanceBinding = (
-  binding: InstanceBinding,
-): binding is ContainerScopedInstanceBinding =>
+export const isConstructorCreatorBinding = (
+  binding: CreatorBinding,
+): binding is ConstructorCreatorBinding => binding.isConstructor;
+
+export const isCreatorContainerScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorContainerScopedBinding =>
   binding.scope === Scope.Container;
 
-export const isResolutionScopedInstanceBinding = (
-  binding: InstanceBinding,
-): binding is ResolutionScopedInstanceBinding =>
+export const isCreatorResolutionScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorResolutionScopedBinding =>
   binding.scope === Scope.Resolution;
 
-export const isSingletonScopedInstanceBinding = (
-  binding: InstanceBinding,
-): binding is SingletonScopedInstanceBinding =>
+export const isCreatorSingletonScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorSingletonScopedBinding =>
   binding.scope === Scope.Singleton;
 
 export const isFactoryBinding = (binding: Binding): binding is FactoryBinding =>

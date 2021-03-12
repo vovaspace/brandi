@@ -8,6 +8,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "max-classes-per-file": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "sort-imports": [
       "error",
@@ -37,7 +38,6 @@
       "plugins": ["jest"],
       "extends": ["plugin:jest/all"],
       "rules": {
-        "max-classes-per-file": "off",
         "jest/prefer-expect-assertions": [
           "error",
           { "onlyFunctionsWithAsyncKeyword": true }

@@ -1,7 +1,7 @@
 export enum Type {
-  Instance,
-  Value,
+  Creator,
   Factory,
+  Value,
 }
 
 export enum Scope {

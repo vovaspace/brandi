@@ -1,4 +1,4 @@
-import { Constructor } from '../types';
+import { Creator, CreatorParameters } from '../types';
 import { Token } from '../pointers';
 import { injectsRegistry } from '../globals';
 
@@ -7,9 +7,10 @@ export type Tokens<T extends unknown[]> = {
 } &
   Array<Token<T[number]>>;
 
-export const injected = <T extends Constructor>(
+export const injected = <T extends Creator>(
   target: T,
-  ...tokens: Tokens<ConstructorParameters<T>>
-): void => {
+  ...tokens: Tokens<CreatorParameters<T>>
+) => {
   injectsRegistry.set(target, tokens);
+  return target;
 };

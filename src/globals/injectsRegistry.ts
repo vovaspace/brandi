@@ -1,4 +1,4 @@
-import { Constructor } from '../types';
+import { Creator } from '../types';
 import { Token } from '../pointers';
 
-export const injectsRegistry = new Map<Constructor, Token[]>();
+export const injectsRegistry = new Map<Creator, Token[]>();

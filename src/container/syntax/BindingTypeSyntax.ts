@@ -1,4 +1,4 @@
-import { Constructor, Factory } from '../../types';
+import { Factory, UnknownConstructor, UnknownFunction } from '../../types';
 import { Tag, Token } from '../../pointers';
 
 import { FactoryBinding, ValueBinding } from '../bindings';
@@ -13,10 +13,23 @@ export class BindingTypeSyntax<T> {
     private readonly tag?: Tag,
   ) {}
 
-  public toInstance<K extends Constructor<T>>(ctor: K): BindingScopeSyntax {
+  public toInstance<K extends UnknownConstructor<T>>(
+    ctor: K,
+  ): BindingScopeSyntax {
     return new BindingScopeSyntax(
       this.bindingsRegistry,
       ctor,
+      true,
+      this.token,
+      this.tag,
+    );
+  }
+
+  public toCall<K extends UnknownFunction<T>>(func: K): BindingScopeSyntax {
+    return new BindingScopeSyntax(
+      this.bindingsRegistry,
+      func,
+      false,
       this.token,
       this.tag,
     );
@@ -40,7 +53,7 @@ export class BindingTypeSyntax<T> {
    * console.log(someClassInstance instanceof SomeClass) // -> true
    */
   public toFactory(
-    ctor: T extends Factory<infer R> ? Constructor<R> : never,
+    ctor: T extends Factory<infer R> ? UnknownConstructor<R> : never,
     initializer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
   ): void;
   /**
@@ -55,13 +68,13 @@ export class BindingTypeSyntax<T> {
    * console.log(someClassInstance instanceof SomeClass) // -> true
    */
   public toFactory(
-    ctor: T extends Factory<infer R, never[]> ? Constructor<R> : never,
+    ctor: T extends Factory<infer R, never[]> ? UnknownConstructor<R> : never,
     initializer: T extends Factory<infer R, infer A>
       ? (instance: R, ...args: A) => unknown
       : never,
   ): void;
   public toFactory(
-    ctor: Constructor,
+    ctor: UnknownConstructor,
     initializer?: (instance: Object, ...args: unknown[]) => unknown,
   ): void {
     this.bindingsRegistry.set(

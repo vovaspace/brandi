@@ -286,7 +286,7 @@ describe('toInstance', () => {
     expect(anotherClassInstance.value).toBe(anotherValue);
   });
 
-  it('ignores a unused tag on the target class', () => {
+  it('ignores an unused tag on the target class', () => {
     const someValue = 1;
 
     class SomeClass {
