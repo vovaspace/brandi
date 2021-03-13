@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const { build } = require('esbuild');
+
+const esbuild = require('esbuild');
 
 const pkg = require('./package.json');
 
@@ -10,21 +11,21 @@ const commons = {
   sourcemap: true,
 };
 
-build({
+esbuild.build({
   ...commons,
   outfile: pkg.main,
   format: 'cjs',
   target: 'es2018',
 });
 
-build({
+esbuild.build({
   ...commons,
   outfile: pkg.module,
   format: 'esm',
   target: 'es2018',
 });
 
-build({
+esbuild.build({
   ...commons,
   outfile: pkg.esnext,
   format: 'esm',

@@ -17,5 +17,5 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["./src", "./spec", "./build.config.js", "./jest.config.js"]
+  "include": ["**/*", "./.eslintrc.js"]
 }

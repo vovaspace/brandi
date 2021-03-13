@@ -11,7 +11,7 @@ import {
 import { BindingsRegistry } from '../BindingsRegistry';
 
 export class BindingScopeSyntax {
-  private readonly warningTimeout?: number;
+  private readonly warningTimeout?: NodeJS.Timeout;
 
   constructor(
     private readonly bindingsRegistry: BindingsRegistry,
@@ -47,7 +47,7 @@ export class BindingScopeSyntax {
 
   private set(binding: Binding): void {
     if (process.env.NODE_ENV !== 'production')
-      clearTimeout(this.warningTimeout);
+      clearTimeout(this.warningTimeout!);
 
     this.bindingsRegistry.set(binding, this.token, this.tag);
   }

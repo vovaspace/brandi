@@ -1,49 +1,23 @@
 {
-  "name": "brandi",
-  "version": "1.0.1",
-  "description": "The dependency injection container.",
-  "main": "./lib/brandi.js",
-  "module": "./lib/brandi.mjs",
-  "esnext": "./lib/brandi.next.js",
-  "exports": {
-    "import": "./lib/brandi.mjs",
-    "require": "./lib/brandi.js",
-    "default": "./lib/brandi.js"
-  },
-  "typings": "./lib/typings/index.d.ts",
-  "files": [
-    "lib"
+  "name": "brandi-workspace",
+  "private": true,
+  "workspaces": [
+    "./packages/*"
   ],
   "scripts": {
-    "test": "jest --colors",
-    "build": "npm run clean && npm run build:lib && npm run build:typings",
-    "build:lib": "node build.config.js",
-    "build:typings": "tsc -p ./tsconfig.typings.json",
-    "clean": "rimraf ./lib",
     "code:lint": "prettier --check . && eslint .",
-    "code:fix": "prettier --write . && eslint . --fix"
+    "code:fix": "prettier --write . && eslint --fix ."
   },
   "license": "ISC",
   "author": "Vladimir Lewandowski <me@vovaspace.com> (https://vovaspace.com/)",
   "homepage": "https://github.com/vovaspace/brandi#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vovaspace/brandi.git"
+    "url": "https://github.com/vovaspace/brandi.git"
   },
   "bugs": {
     "url": "https://github.com/vovaspace/brandi/issues"
   },
-  "keywords": [
-    "di",
-    "ioc",
-    "dependency injection",
-    "dependency inversion",
-    "inversion of control",
-    "container",
-    "typescript",
-    "javascript",
-    "node"
-  ],
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
