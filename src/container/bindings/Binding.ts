@@ -1,5 +1,5 @@
 export enum Type {
-  Creator,
+  Entity,
   Factory,
   Value,
 }

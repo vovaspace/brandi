@@ -4,16 +4,16 @@ import { injectsRegistry, tagsRegistry } from '../globals';
 
 import {
   Binding,
-  CreatorBinding,
-  FunctionCreatorBinding,
-  FunctionFactoryBinding,
-  isConstructorCreatorBinding,
-  isConstructorFactoryBinding,
-  isCreatorBinding,
-  isCreatorContainerScopedBinding,
-  isCreatorResolutionScopedBinding,
-  isCreatorSingletonScopedBinding,
+  EntityBinding,
+  EntityFunctionBinding,
+  FactoryFunctionBinding,
+  isEntityBinding,
+  isEntityConstructorBinding,
+  isEntityContainerScopedBinding,
+  isEntityResolutionScopedBinding,
+  isEntitySingletonScopedBinding,
   isFactoryBinding,
+  isFactoryConstructorBinding,
 } from './bindings';
 import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
 import { BindingsRegistry } from './BindingsRegistry';
@@ -88,29 +88,29 @@ export class Container {
   }
 
   private resolveValue(binding: Binding, context: ResolutionContext): unknown {
-    if (isCreatorBinding(binding)) {
-      if (isCreatorSingletonScopedBinding(binding)) {
+    if (isEntityBinding(binding)) {
+      if (isEntitySingletonScopedBinding(binding)) {
         if (binding.hasCached) return binding.cache;
 
-        const result = this.resolveCreator(binding, context);
-        binding.setCache(result);
-        return result;
+        const entity = this.resolveCreator(binding, context);
+        binding.setCache(entity);
+        return entity;
       }
 
-      if (isCreatorContainerScopedBinding(binding)) {
+      if (isEntityContainerScopedBinding(binding)) {
         if (binding.cache.has(this)) return binding.cache.get(this);
 
-        const result = this.resolveCreator(binding, context);
-        binding.cache.set(this, result);
-        return result;
+        const entity = this.resolveCreator(binding, context);
+        binding.cache.set(this, entity);
+        return entity;
       }
 
-      if (isCreatorResolutionScopedBinding(binding)) {
+      if (isEntityResolutionScopedBinding(binding)) {
         if (context.cache.has(binding)) return context.cache.get(binding);
 
-        const result = this.resolveCreator(binding, context);
-        context.cache.set(binding, result);
-        return result;
+        const entity = this.resolveCreator(binding, context);
+        context.cache.set(binding, entity);
+        return entity;
       }
 
       return this.resolveCreator(binding, context);
@@ -118,17 +118,17 @@ export class Container {
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
-        const result = isConstructorFactoryBinding(binding)
+        const entity = isFactoryConstructorBinding(binding)
           ? this.construct(binding.value.creator, context)
           : this.call(
-              (binding as FunctionFactoryBinding).value.creator,
+              (binding as FactoryFunctionBinding).value.creator,
               context,
             );
 
         if (binding.value.initializer)
-          binding.value.initializer(result, ...args);
+          binding.value.initializer(entity, ...args);
 
-        return result;
+        return entity;
       };
     }
 
@@ -136,13 +136,13 @@ export class Container {
   }
 
   private resolveCreator(
-    binding: CreatorBinding,
+    binding: EntityBinding,
     context: ResolutionContext,
   ): unknown {
-    if (isConstructorCreatorBinding(binding))
+    if (isEntityConstructorBinding(binding))
       return this.construct(binding.value, context);
 
-    return this.call((binding as FunctionCreatorBinding).value, context);
+    return this.call((binding as EntityFunctionBinding).value, context);
   }
 
   private resolveParameters(

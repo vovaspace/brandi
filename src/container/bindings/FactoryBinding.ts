@@ -1,4 +1,8 @@
-import { Creator, UnknownConstructor, UnknownFunction } from '../../types';
+import {
+  UnknownConstructor,
+  UnknownCreator,
+  UnknownFunction,
+} from '../../types';
 
 import { Binding, Scope, Type } from './Binding';
 
@@ -9,14 +13,14 @@ export class FactoryBinding implements Binding {
 
   constructor(
     public readonly value: {
-      creator: Creator;
-      initializer?: (result: unknown, ...args: unknown[]) => unknown;
+      creator: UnknownCreator;
+      initializer?: (entity: unknown, ...args: unknown[]) => unknown;
       isConstructor: boolean;
     },
   ) {}
 }
 
-export interface ConstructorFactoryBinding extends FactoryBinding {
+export interface FactoryConstructorBinding extends FactoryBinding {
   readonly value: {
     creator: UnknownConstructor;
     initializer?: (instance: unknown, ...args: unknown[]) => unknown;
@@ -24,10 +28,10 @@ export interface ConstructorFactoryBinding extends FactoryBinding {
   };
 }
 
-export interface FunctionFactoryBinding extends FactoryBinding {
+export interface FactoryFunctionBinding extends FactoryBinding {
   readonly value: {
     creator: UnknownFunction;
-    initializer?: (result: unknown, ...args: unknown[]) => unknown;
+    initializer?: (entity: unknown, ...args: unknown[]) => unknown;
     isConstructor: false;
   };
 }
@@ -35,6 +39,6 @@ export interface FunctionFactoryBinding extends FactoryBinding {
 export const isFactoryBinding = (binding: Binding): binding is FactoryBinding =>
   binding.type === Type.Factory;
 
-export const isConstructorFactoryBinding = (
+export const isFactoryConstructorBinding = (
   binding: FactoryBinding,
-): binding is ConstructorFactoryBinding => binding.value.isConstructor;
+): binding is FactoryConstructorBinding => binding.value.isConstructor;

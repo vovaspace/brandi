@@ -1,12 +1,12 @@
 import { Tag, Token } from '../../pointers';
-import { Creator } from '../../types';
+import { UnknownCreator } from '../../types';
 
 import {
   Binding,
-  CreatorContainerScopedBinding,
-  CreatorResolutionScopedBinding,
-  CreatorSingletonScopedBinding,
-  CreatorTransientScopedBinding,
+  EntityContainerScopedBinding,
+  EntityResolutionScopedBinding,
+  EntitySingletonScopedBinding,
+  EntityTransientScopedBinding,
 } from '../bindings';
 import { BindingsRegistry } from '../BindingsRegistry';
 
@@ -15,7 +15,7 @@ export class BindingScopeSyntax {
 
   constructor(
     private readonly bindingsRegistry: BindingsRegistry,
-    private readonly value: Creator,
+    private readonly value: UnknownCreator,
     private readonly isConstructor: boolean,
     private readonly token: Token,
     private readonly tag?: Tag,
@@ -30,21 +30,19 @@ export class BindingScopeSyntax {
   }
 
   public inContainerScope(): void {
-    this.set(new CreatorContainerScopedBinding(this.value, this.isConstructor));
+    this.set(new EntityContainerScopedBinding(this.value, this.isConstructor));
   }
 
   public inResolutionScope(): void {
-    this.set(
-      new CreatorResolutionScopedBinding(this.value, this.isConstructor),
-    );
+    this.set(new EntityResolutionScopedBinding(this.value, this.isConstructor));
   }
 
   public inSingletonScope(): void {
-    this.set(new CreatorSingletonScopedBinding(this.value, this.isConstructor));
+    this.set(new EntitySingletonScopedBinding(this.value, this.isConstructor));
   }
 
   public inTransientScope(): void {
-    this.set(new CreatorTransientScopedBinding(this.value, this.isConstructor));
+    this.set(new EntityTransientScopedBinding(this.value, this.isConstructor));
   }
 
   private set(binding: Binding): void {

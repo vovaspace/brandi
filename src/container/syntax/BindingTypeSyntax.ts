@@ -1,4 +1,9 @@
-import { Factory, UnknownConstructor, UnknownFunction } from '../../types';
+import {
+  Creator,
+  Factory,
+  UnknownConstructor,
+  UnknownFunction,
+} from '../../types';
 import { Tag, Token } from '../../pointers';
 
 import { FactoryBinding, ValueBinding } from '../bindings';
@@ -40,23 +45,23 @@ export class BindingTypeSyntax<T> {
   }
 
   /**
-   * @example <caption>Example usage of instance factory without arguments.</caption>
+   * @example <caption>Example usage of factory without arguments.</caption>
    * const someClassFactoryToken = token<Factory<SomeClass>>('someClassFactory');
    *
    * container
    * .bind(someClassFactoryToken)
-   * .toInstanceFactory(SomeClass);
+   * .toFactory(SomeClass);
    * // Or
    * container
    * .bind(someClassFactoryToken)
-   * .toInstanceFactory(SomeClass, (instance) => instance.init());
+   * .toFactory(SomeClass, (instance) => instance.init());
    *
    * const someClassFactory = container.get(someClassFactoryToken);
    * const someClassInstance = someClassFactory();
    *
-   * console.log(someClassInstance instanceof SomeClass) // -> true
+   * console.log(someClassInstance instanceof SomeClass); // -> true
    */
-  public toInstanceFactory(
+  public toFactory(
     ctor: T extends Factory<infer R>
       ? R extends Object
         ? UnknownConstructor<R>
@@ -66,19 +71,19 @@ export class BindingTypeSyntax<T> {
   ): void;
 
   /**
-   * @example <caption>Example usage of instance factory with arguments.</caption>
+   * @example <caption>Example usage of factory with arguments.</caption>
    * const someClassFactoryToken = token<Factory<SomeClass, [name: string]>>('someClassFactory');
    *
    * container
    * .bind(someClassFactoryToken)
-   * .toInstanceFactory(SomeClass, (instance, name) => instance.setName(name));
+   * .toFactory(SomeClass, (instance, name) => instance.setName(name));
    *
    * const someClassFactory = container.get(someClassFactoryToken);
    * const someClassInstance = someClassFactory('Olivia');
    *
-   * console.log(someClassInstance instanceof SomeClass) // -> true
+   * console.log(someClassInstance instanceof SomeClass); // -> true
    */
-  public toInstanceFactory(
+  public toFactory(
     ctor: T extends Factory<infer R, never[]>
       ? R extends Object
         ? UnknownConstructor<R>
@@ -89,7 +94,7 @@ export class BindingTypeSyntax<T> {
       : never,
   ): void;
 
-  public toInstanceFactory(
+  public toFactory(
     ctor: UnknownConstructor,
     initializer?: (instance: unknown, ...args: unknown[]) => unknown,
   ): void {
@@ -100,21 +105,55 @@ export class BindingTypeSyntax<T> {
     );
   }
 
-  public toCallFactory(
-    func: T extends Factory<infer R> ? UnknownFunction<R> : never,
-    initializer?: T extends Factory<infer R> ? (result: R) => unknown : never,
+  /**
+   * @example <caption>Example usage of creator without arguments.</caption>
+   * function createSomeEntity(): SomeEntity;
+   *
+   * const someEntityCreatorToken = token<Creator<SomeEntity>>('someEntityCreator');
+   *
+   * container
+   * .bind(someEntityCreatorToken)
+   * .toCreator(createSomeEntity);
+   * // Or
+   * container
+   * .bind(someEntityCreatorToken)
+   * .toCreator(createSomeEntity, (entity) => entity.init());
+   *
+   * const someEntityCreator = container.get(someEntityCreatorToken);
+   * const someEntity = someEntityCreator();
+   *
+   * type ReturnedEntity = typeof someEntity; // to be SomeEntity
+   */
+  public toCreator(
+    func: T extends Creator<infer R> ? UnknownFunction<R> : never,
+    initializer?: T extends Creator<infer R> ? (entity: R) => unknown : never,
   ): void;
 
-  public toCallFactory(
-    func: T extends Factory<infer R, never[]> ? UnknownFunction<R> : never,
-    initializer: T extends Factory<infer R, infer A>
-      ? (result: R, ...args: A) => unknown
+  /**
+   * @example <caption>Example usage of creator with arguments.</caption>
+   * function createSomeEntity(): SomeEntity;
+   *
+   * const someEntityCreatorToken = token<Creator<SomeEntity, [name: string]>>('someEntityCreator');
+   *
+   * container
+   * .bind(someEntityCreatorToken)
+   * .toCreator(createSomeEntity, (entity, name) => entity.setName(name));
+   *
+   * const someEntityCreator = container.get(someEntityCreatorToken);
+   * const someEntity = someEntityCreator('Olivia');
+   *
+   * type ReturnedEntity = typeof someEntity; // to be SomeEntity
+   */
+  public toCreator(
+    func: T extends Creator<infer R, never[]> ? UnknownFunction<R> : never,
+    initializer: T extends Creator<infer R, infer A>
+      ? (entity: R, ...args: A) => unknown
       : never,
   ): void;
 
-  public toCallFactory(
+  public toCreator(
     func: UnknownFunction,
-    initializer?: (result: unknown, ...args: unknown[]) => unknown,
+    initializer?: (entity: unknown, ...args: unknown[]) => unknown,
   ): void {
     this.bindingsRegistry.set(
       new FactoryBinding({ creator: func, initializer, isConstructor: false }),

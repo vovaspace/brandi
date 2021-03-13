@@ -1,7 +1,7 @@
 import { Container, Factory, injected, token } from '../src';
 
-describe('toInstanceFactory', () => {
-  it('creates an instance factory without arguments', () => {
+describe('toFactory', () => {
+  it('creates an factory without arguments', () => {
     class SomeClass {}
 
     const tokens = {
@@ -9,7 +9,7 @@ describe('toInstanceFactory', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.someClassFactory).toInstanceFactory(SomeClass);
+    container.bind(tokens.someClassFactory).toFactory(SomeClass);
 
     const factory = container.get(tokens.someClassFactory);
     const firstInstance = factory();
@@ -20,7 +20,7 @@ describe('toInstanceFactory', () => {
     expect(firstInstance).not.toBe(secondInstance);
   });
 
-  it('creates an instance factory without arguments but with a initializer that returns void', () => {
+  it('creates an factory without arguments but with a initializer that returns void', () => {
     class SomeClass {
       public num: number = 0;
 
@@ -37,7 +37,7 @@ describe('toInstanceFactory', () => {
 
     container
       .bind(tokens.someClassFactory)
-      .toInstanceFactory(SomeClass, (instance) => instance.init());
+      .toFactory(SomeClass, (instance) => instance.init());
 
     const factory = container.get(tokens.someClassFactory);
     const instance = factory();
@@ -46,7 +46,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(1);
   });
 
-  it('creates an instance factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
+  it('creates an factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
     class SomeClass {
       public num: number = 0;
 
@@ -61,12 +61,10 @@ describe('toInstanceFactory', () => {
 
     const container = new Container();
 
-    container
-      .bind(tokens.someClassFactory)
-      .toInstanceFactory(SomeClass, (instance) => {
-        instance.init();
-        return 1;
-      });
+    container.bind(tokens.someClassFactory).toFactory(SomeClass, (instance) => {
+      instance.init();
+      return 1;
+    });
 
     const factory = container.get(tokens.someClassFactory);
     const instance = factory();
@@ -75,7 +73,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(1);
   });
 
-  it('creates an instance factory with arguments', () => {
+  it('creates an factory with arguments', () => {
     class SomeClass {
       public str: string = '';
 
@@ -97,9 +95,7 @@ describe('toInstanceFactory', () => {
 
     container
       .bind(tokens.someClassFactory)
-      .toInstanceFactory(SomeClass, (instance, str, num) =>
-        instance.init(str, num),
-      );
+      .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
 
     const str = '1';
     const num = 1;
@@ -112,7 +108,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(num);
   });
 
-  it('creates an instance factory which injects dependencies', () => {
+  it('creates an factory which injects dependencies', () => {
     class FirstClass {}
 
     class SecondClass {
@@ -128,7 +124,7 @@ describe('toInstanceFactory', () => {
 
     const container = new Container();
     container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
-    container.bind(tokens.secondClassFactory).toInstanceFactory(SecondClass);
+    container.bind(tokens.secondClassFactory).toFactory(SecondClass);
 
     const secondClassFactory = container.get(tokens.secondClassFactory);
     const secondClassInstance = secondClassFactory();
@@ -137,7 +133,7 @@ describe('toInstanceFactory', () => {
     expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
   });
 
-  it('creates an instance factory which gets an injection from parent container', () => {
+  it('creates an factory which gets an injection from parent container', () => {
     class FirstClass {}
 
     class SecondClass {
@@ -158,9 +154,7 @@ describe('toInstanceFactory', () => {
       .inTransientScope();
 
     const childContainer = new Container(parentContainer);
-    childContainer
-      .bind(tokens.secondClassFactory)
-      .toInstanceFactory(SecondClass);
+    childContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
 
     const secondClassFactory = childContainer.get(tokens.secondClassFactory);
     const secondClassInstance = secondClassFactory();
@@ -169,7 +163,7 @@ describe('toInstanceFactory', () => {
     expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
   });
 
-  it('creates an instance factory which gets an injection from the container from which the factory was got', () => {
+  it('creates an factory which gets an injection from the container from which the factory was got', () => {
     class FirstClass {}
     class AnotherFirstClass {}
 
@@ -189,9 +183,7 @@ describe('toInstanceFactory', () => {
       .bind(tokens.firstClass)
       .toInstance(FirstClass)
       .inTransientScope();
-    parentContainer
-      .bind(tokens.secondClassFactory)
-      .toInstanceFactory(SecondClass);
+    parentContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
 
     const childContainer = new Container(parentContainer);
     childContainer

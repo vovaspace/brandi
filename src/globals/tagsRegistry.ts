@@ -1,4 +1,4 @@
-import { Creator } from '../types';
 import { Tag } from '../pointers';
+import { UnknownCreator } from '../types';
 
-export const tagsRegistry = new Map<Creator, Tag[]>();
+export const tagsRegistry = new Map<UnknownCreator, Tag[]>();

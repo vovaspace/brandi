@@ -1,4 +1,4 @@
 export * from './Binding';
-export * from './CreatorBinding';
+export * from './EntityBinding';
 export * from './FactoryBinding';
 export * from './ValueBinding';
