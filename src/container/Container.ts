@@ -6,7 +6,9 @@ import {
   Binding,
   CreatorBinding,
   FunctionCreatorBinding,
+  FunctionFactoryBinding,
   isConstructorCreatorBinding,
+  isConstructorFactoryBinding,
   isCreatorBinding,
   isCreatorContainerScopedBinding,
   isCreatorResolutionScopedBinding,
@@ -116,12 +118,17 @@ export class Container {
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
-        const instance = this.construct(binding.value.ctor, context);
+        const result = isConstructorFactoryBinding(binding)
+          ? this.construct(binding.value.creator, context)
+          : this.call(
+              (binding as FunctionFactoryBinding).value.creator,
+              context,
+            );
 
         if (binding.value.initializer)
-          binding.value.initializer(instance, ...args);
+          binding.value.initializer(result, ...args);
 
-        return instance;
+        return result;
       };
     }
 

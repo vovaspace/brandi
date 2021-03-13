@@ -74,3 +74,25 @@ export class CreatorTransientScopedBinding implements CreatorBinding {
     public readonly isConstructor: boolean,
   ) {}
 }
+
+export const isCreatorBinding = (binding: Binding): binding is CreatorBinding =>
+  binding.type === Type.Creator;
+
+export const isConstructorCreatorBinding = (
+  binding: CreatorBinding,
+): binding is ConstructorCreatorBinding => binding.isConstructor;
+
+export const isCreatorContainerScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorContainerScopedBinding =>
+  binding.scope === Scope.Container;
+
+export const isCreatorResolutionScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorResolutionScopedBinding =>
+  binding.scope === Scope.Resolution;
+
+export const isCreatorSingletonScopedBinding = (
+  binding: CreatorBinding,
+): binding is CreatorSingletonScopedBinding =>
+  binding.scope === Scope.Singleton;

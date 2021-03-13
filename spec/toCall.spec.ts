@@ -194,7 +194,7 @@ describe('toCall', () => {
 
   it('creates call results in resolution scope', () => {
     interface FirstResult {
-      first: true;
+      value: boolean;
     }
 
     interface SecondResult {
@@ -212,7 +212,7 @@ describe('toCall', () => {
       third: ThirdResult;
     }
 
-    const createFirst = (): FirstResult => ({ first: true });
+    const createFirst = (): FirstResult => ({ value: true });
     const createSecond = (first: FirstResult): SecondResult => ({ first });
     const createThird = (
       first: FirstResult,
@@ -380,6 +380,7 @@ describe('toCall', () => {
     }
 
     interface ThirdResult {
+      n: null;
       first: FirstResult;
       second: SecondResult;
     }
@@ -390,7 +391,12 @@ describe('toCall', () => {
       n,
       first,
     });
-    const createThird = (first: FirstResult, second: SecondResult) => ({
+    const createThird = (
+      n: null,
+      first: FirstResult,
+      second: SecondResult,
+    ) => ({
+      n,
       first,
       second,
     });
@@ -404,7 +410,7 @@ describe('toCall', () => {
 
     injected(createFirst, tokens.null);
     injected(createSecond, tokens.null, tokens.firstResult);
-    injected(createThird, tokens.firstResult, tokens.secondResult);
+    injected(createThird, tokens.null, tokens.firstResult, tokens.secondResult);
 
     const container = new Container();
     container.bind(tokens.null).toCall(createNull).inResolutionScope();

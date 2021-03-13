@@ -1,7 +1,7 @@
 import { Container, Factory, injected, token } from '../src';
 
 describe('toInstanceFactory', () => {
-  it('creates a factory without arguments', () => {
+  it('creates an instance factory without arguments', () => {
     class SomeClass {}
 
     const tokens = {
@@ -20,7 +20,7 @@ describe('toInstanceFactory', () => {
     expect(firstInstance).not.toBe(secondInstance);
   });
 
-  it('creates a factory without arguments but with a initializer that returns void', () => {
+  it('creates an instance factory without arguments but with a initializer that returns void', () => {
     class SomeClass {
       public num: number = 0;
 
@@ -46,7 +46,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(1);
   });
 
-  it('creates a factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
+  it('creates an instance factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
     class SomeClass {
       public num: number = 0;
 
@@ -75,7 +75,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(1);
   });
 
-  it('creates a factory with arguments', () => {
+  it('creates an instance factory with arguments', () => {
     class SomeClass {
       public str: string = '';
 
@@ -112,7 +112,7 @@ describe('toInstanceFactory', () => {
     expect(instance.num).toBe(num);
   });
 
-  it('creates a factory which injects dependencies', () => {
+  it('creates an instance factory which injects dependencies', () => {
     class FirstClass {}
 
     class SecondClass {
@@ -137,7 +137,7 @@ describe('toInstanceFactory', () => {
     expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
   });
 
-  it('creates a factory which gets an injection from parent container', () => {
+  it('creates an instance factory which gets an injection from parent container', () => {
     class FirstClass {}
 
     class SecondClass {
@@ -169,7 +169,7 @@ describe('toInstanceFactory', () => {
     expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
   });
 
-  it('creates a factory which gets an injection from the container from which the factory was got', () => {
+  it('creates an instance factory which gets an injection from the container from which the factory was got', () => {
     class FirstClass {}
     class AnotherFirstClass {}
 

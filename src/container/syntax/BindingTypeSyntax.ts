@@ -91,10 +91,33 @@ export class BindingTypeSyntax<T> {
 
   public toInstanceFactory(
     ctor: UnknownConstructor,
-    initializer?: (instance: Object, ...args: unknown[]) => unknown,
+    initializer?: (instance: unknown, ...args: unknown[]) => unknown,
   ): void {
     this.bindingsRegistry.set(
-      new FactoryBinding({ ctor, initializer }),
+      new FactoryBinding({ creator: ctor, initializer, isConstructor: true }),
+      this.token,
+      this.tag,
+    );
+  }
+
+  public toCallFactory(
+    func: T extends Factory<infer R> ? UnknownFunction<R> : never,
+    initializer?: T extends Factory<infer R> ? (result: R) => unknown : never,
+  ): void;
+
+  public toCallFactory(
+    func: T extends Factory<infer R, never[]> ? UnknownFunction<R> : never,
+    initializer: T extends Factory<infer R, infer A>
+      ? (result: R, ...args: A) => unknown
+      : never,
+  ): void;
+
+  public toCallFactory(
+    func: UnknownFunction,
+    initializer?: (result: unknown, ...args: unknown[]) => unknown,
+  ): void {
+    this.bindingsRegistry.set(
+      new FactoryBinding({ creator: func, initializer, isConstructor: false }),
       this.token,
       this.tag,
     );
