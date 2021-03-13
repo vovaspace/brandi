@@ -373,6 +373,8 @@ describe('toInstance', () => {
     const container = new Container();
     container.bind(token<unknown>('unknown')).toInstance(class {});
 
+    jest.runAllTimers();
+
     expect(spy).toHaveBeenCalledTimes(0);
 
     restoreEnv();
