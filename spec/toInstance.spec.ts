@@ -332,8 +332,8 @@ describe('toInstance', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it("logs a warning when a binding scope setting method was not called in 'development' env", () => {
-    const restoreEnv = setEnv('development');
+  it("logs a warning when a binding scope setting method was not called in non-'production' env", () => {
+    const restoreEnv = setEnv('non-production');
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -349,7 +349,7 @@ describe('toInstance', () => {
   });
 
   it('does not log a warning when a binding scope setting method was called', () => {
-    const restoreEnv = setEnv('development');
+    const restoreEnv = setEnv('non-production');
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -366,8 +366,8 @@ describe('toInstance', () => {
     spy.mockRestore();
   });
 
-  it("skips the logging in non-'development' env", () => {
-    const restoreEnv = setEnv('non-development');
+  it("skips the logging in 'production' env", () => {
+    const restoreEnv = setEnv('production');
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();

@@ -20,7 +20,7 @@ export class BindingScopeSyntax {
     private readonly token: Token,
     private readonly tag?: Tag,
   ) {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV !== 'production') {
       this.warningTimeout = setTimeout(() => {
         console.warn(
           `Warning: did you forget to set a scope for '${this.token.description}' token binding? Call 'inTransientScope()', 'inSingletonScope()', 'inContainerScope()' or 'inResolutionScope()'.`,
@@ -48,7 +48,7 @@ export class BindingScopeSyntax {
   private set(binding: Binding): void {
     this.bindingsRegistry.set(binding, this.token, this.tag);
 
-    if (process.env.NODE_ENV === 'development')
+    if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout);
   }
 }

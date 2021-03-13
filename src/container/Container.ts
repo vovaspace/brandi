@@ -40,7 +40,7 @@ export class Container {
   public restore(): void {
     if (this.snapshot !== null) {
       this.registry = this.snapshot.pick();
-    } else if (process.env.NODE_ENV === 'development') {
+    } else if (process.env.NODE_ENV !== 'production') {
       console.error(
         "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
       );
