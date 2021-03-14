@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`container captures the container state to a snapshot 1`] = `"No matching bindings found for 'additional' token."`;
+
+exports[`container captures the container state to a snapshot 2`] = `"No matching bindings found for 'additional' token."`;
+
+exports[`container logs an error when trying to restore a non-captured container state in non-'production' env 1`] = `"Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?"`;
+
+exports[`container returns an unlinked container from 'clone' method 1`] = `"No matching bindings found for 'copied' token."`;
+
+exports[`container throws when the token was not bound 1`] = `"No matching bindings found for 'some' token."`;
