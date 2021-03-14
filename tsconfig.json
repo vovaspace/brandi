@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
     "target": "esnext",
 
     "module": "esnext",
@@ -8,6 +7,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "isolatedModules": true,
+    "jsx": "react",
 
     "strict": true,
     "noUnusedLocals": true,
@@ -17,5 +17,5 @@
     "noUncheckedIndexedAccess": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["**/*", "./.eslintrc.js"]
+  "include": ["**/*", "**/.*.js"]
 }
