@@ -1,4 +1,6 @@
+const base = require('../../jest.config.base');
+
 module.exports = {
-  preset: 'ts-jest',
-  testMatch: ['<rootDir>/spec/*.spec.ts'],
+  ...base,
+  displayName: 'brandi',
 };

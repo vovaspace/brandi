@@ -5,6 +5,7 @@
     "./packages/*"
   ],
   "scripts": {
+    "test": "jest --colors",
     "code:lint": "prettier --check . && eslint .",
     "code:fix": "prettier --write . && eslint --fix ."
   },
