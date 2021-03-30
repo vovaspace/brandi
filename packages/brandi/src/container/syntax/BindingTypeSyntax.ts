@@ -6,7 +6,7 @@ import {
 } from '../../types';
 import { Tag, Token } from '../../pointers';
 
-import { FactoryBinding, ValueBinding } from '../bindings';
+import { ConstantBinding, FactoryBinding } from '../bindings';
 import { BindingsRegistry } from '../BindingsRegistry';
 
 import { BindingScopeSyntax } from './BindingScopeSyntax';
@@ -40,8 +40,8 @@ export class BindingTypeSyntax<T> {
     );
   }
 
-  public toValue(value: T): void {
-    this.bindingsRegistry.set(new ValueBinding(value), this.token, this.tag);
+  public toConstant(value: T): void {
+    this.bindingsRegistry.set(new ConstantBinding(value), this.token, this.tag);
   }
 
   /**

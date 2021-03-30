@@ -1,7 +1,7 @@
 import { Binding, Scope, Type } from './Binding';
 
-export class ValueBinding implements Binding {
-  public readonly type = Type.Value;
+export class ConstantBinding implements Binding {
+  public readonly type = Type.Constant;
 
   public readonly scope = Scope.Transient;
 

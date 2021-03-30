@@ -11,7 +11,7 @@ describe('container', () => {
     };
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
 
     const childContainer = new Container(parentContainer);
 
@@ -27,10 +27,10 @@ describe('container', () => {
     };
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
 
     const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.someValue).toValue(anotherValue);
+    childContainer.bind(tokens.someValue).toConstant(anotherValue);
 
     expect(parentContainer.get(tokens.someValue)).toBe(someValue);
     expect(childContainer.get(tokens.someValue)).toBe(anotherValue);
@@ -59,14 +59,14 @@ describe('container', () => {
     };
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.parent).toValue(parentValue);
+    parentContainer.bind(tokens.parent).toConstant(parentValue);
 
     const originalContainer = new Container(parentContainer);
-    originalContainer.bind(tokens.original).toValue(someValue);
+    originalContainer.bind(tokens.original).toConstant(someValue);
 
     const copiedContainer = originalContainer.clone();
-    copiedContainer.bind(tokens.original).toValue(anotherValue);
-    copiedContainer.bind(tokens.copied).toValue(copiedValue);
+    copiedContainer.bind(tokens.original).toConstant(anotherValue);
+    copiedContainer.bind(tokens.copied).toConstant(copiedValue);
 
     expect(originalContainer.get(tokens.original)).toBe(someValue);
     expect(() =>
@@ -89,12 +89,12 @@ describe('container', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.some).toValue(someValue);
+    container.bind(tokens.some).toConstant(someValue);
 
     container.capture();
 
-    container.bind(tokens.some).toValue(anotherValue);
-    container.bind(tokens.additional).toValue(additionalValue);
+    container.bind(tokens.some).toConstant(anotherValue);
+    container.bind(tokens.additional).toConstant(additionalValue);
 
     container.restore();
 
@@ -103,8 +103,8 @@ describe('container', () => {
       container.get(tokens.additional),
     ).toThrowErrorMatchingSnapshot();
 
-    container.bind(tokens.some).toValue(anotherValue);
-    container.bind(tokens.additional).toValue(additionalValue);
+    container.bind(tokens.some).toConstant(anotherValue);
+    container.bind(tokens.additional).toConstant(additionalValue);
 
     container.restore();
 
