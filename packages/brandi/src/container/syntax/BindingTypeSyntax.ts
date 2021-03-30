@@ -51,7 +51,7 @@ export class BindingTypeSyntax<T> {
    * container
    * .bind(someClassFactoryToken)
    * .toFactory(SomeClass);
-   * // Or
+   * // OR
    * container
    * .bind(someClassFactoryToken)
    * .toFactory(SomeClass, (instance) => instance.init());
@@ -114,7 +114,7 @@ export class BindingTypeSyntax<T> {
    * container
    * .bind(someEntityCreatorToken)
    * .toCreator(createSomeEntity);
-   * // Or
+   * // OR
    * container
    * .bind(someEntityCreatorToken)
    * .toCreator(createSomeEntity, (entity) => entity.init());

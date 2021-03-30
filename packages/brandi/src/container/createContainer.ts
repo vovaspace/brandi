@@ -1,7 +1,7 @@
 import { Container } from './Container';
 
 /**
- * @description Alias for `new Container()`.
+ * @description Alias for `new Container(parent)`.
  * @example <caption>Example usage of `createContainer()`.</caption>
  * const container = createContainer();
  * console.log(container instanceof Container); // -> true
