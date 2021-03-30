@@ -1,66 +1,69 @@
+const codeTheme = require('./src/js/codeTheme.js');
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'Brandi',
-  tagline: 'The dependency injection container for TypeScript/JavaScript.',
+  tagline: 'The dependency injection container powered by TypeScript.',
   url: 'https://your-docusaurus-test-site.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
-  organizationName: 'brandi', // Usually your GitHub org/user name.
-  projectName: 'brandi', // Usually your repo name.
+  favicon: 'images/favicon.ico',
+  organizationName: 'brandi',
+  projectName: 'brandi',
   themeConfig: {
+    prism: {
+      theme: codeTheme,
+    },
     navbar: {
       title: 'Brandi',
       logo: {
         alt: 'Brandi Logo',
-        src: 'img/logo.svg',
+        src: 'images/brandi.svg',
       },
       items: [
         {
-          to: 'docs/',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
+          label: 'Getting Started',
+          to: 'getting-started',
+          activeBasePath: 'getting-started',
+          position: 'right',
         },
-        { to: 'blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          label: 'Reference',
+          to: 'reference',
+          activeBasePath: 'reference',
+          position: 'right',
+        },
+        {
+          label: 'Examples',
+          to: 'examples',
+          activeBasePath: 'examples',
+          position: 'right',
+        },
+        {
           label: 'GitHub',
+          href: 'https://github.com/vovaspace/brandi/',
           position: 'right',
         },
       ],
     },
     footer: {
-      style: 'dark',
+      style: 'light',
       links: [
         {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
-              to: 'docs/',
+              label: 'Getting Started',
+              to: 'getting-started',
             },
             {
-              label: 'Second Doc',
-              to: 'docs/doc2/',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+              label: 'Reference',
+              to: 'reference',
             },
             {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              label: 'Examples',
+              to: 'examples',
             },
           ],
         },
@@ -68,34 +71,34 @@ module.exports = {
           title: 'More',
           items: [
             {
-              label: 'Blog',
-              to: 'blog',
-            },
-            {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/vovaspace/brandi/',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      logo: {
+        alt: 'Brandi Logo',
+        src: 'images/brandi.svg',
+        href: '/',
+      },
+      copyright: `Copyright © ${new Date().getFullYear()} Vladimir Lewandowski. Built with Docusaurus.`,
     },
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
+    sidebarCollapsible: false,
+    hideableSidebar: false,
   },
   presets: [
     [
       '@docusaurus/preset-classic',
       {
         docs: {
+          path: '../docs',
+          routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
+          editUrl: 'https://github.com/vovaspace/brandi/edit/master/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
