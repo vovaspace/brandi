@@ -5,6 +5,8 @@
   "main": "./lib/brandi.js",
   "module": "./lib/brandi.mjs",
   "esnext": "./lib/brandi.next.js",
+  "esnext:main": "./lib/brandi.next.js",
+  "esnext:module": "./lib/brandi.next.js",
   "exports": {
     "import": "./lib/brandi.mjs",
     "require": "./lib/brandi.js",
