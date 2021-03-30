@@ -25,7 +25,7 @@
   },
   "license": "ISC",
   "author": "Vladimir Lewandowski <me@vovaspace.com> (https://vovaspace.com/)",
-  "homepage": "https://github.com/vovaspace/brandi#readme",
+  "homepage": "https://brandi.js.org",
   "repository": {
     "type": "git",
     "url": "https://github.com/vovaspace/brandi.git",
