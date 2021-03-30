@@ -116,9 +116,12 @@ container.capture();
 
 container.bind(TOKENS.apiKey).toConstant('#testKey');
 
+const testKey = container.get(TOKENS.apiKey);
+
 container.restore();
 
-const key = container.get(TOKENS.apiKey);
+const originalKey = container.get(TOKENS.apiKey);
 
-expect(key).toBe('#key9428');
+expect(testKey).toBe('#testKey');
+expect(originalKey).toBe('#key9428');
 ```
