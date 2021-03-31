@@ -2,7 +2,6 @@
   "name": "brandi-workspace",
   "private": true,
   "workspaces": [
-    "./website",
     "./packages/*"
   ],
   "scripts": {
