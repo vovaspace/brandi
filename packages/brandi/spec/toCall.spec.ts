@@ -76,7 +76,7 @@ describe('toCall', () => {
     injected(createSome, tokens.someValue, tokens.anotherResult);
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
+    container.bind(tokens.someValue).toConstant(someValue);
     container
       .bind(tokens.anotherResult)
       .toCall(createAnother)
@@ -115,7 +115,7 @@ describe('toCall', () => {
     injected(createSome, tokens.someValue);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
 
     const childContainer = new Container(parentContainer);
     childContainer
@@ -146,14 +146,14 @@ describe('toCall', () => {
     injected(createSome, tokens.someValue);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
     parentContainer
       .bind(tokens.someResult)
       .toCall(createSome)
       .inTransientScope();
 
     const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.someValue).toValue(anotherValue);
+    childContainer.bind(tokens.someValue).toConstant(anotherValue);
 
     const parentContainerResult = parentContainer.get(tokens.someResult);
     const childContainerResult = childContainer.get(tokens.someResult);
@@ -291,8 +291,8 @@ describe('toCall', () => {
     tagged(createAnother, tags.some);
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
-    container.when(tags.some).bind(tokens.someValue).toValue(anotherValue);
+    container.bind(tokens.someValue).toConstant(someValue);
+    container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
     container.bind(tokens.someResult).toCall(createSome).inTransientScope();
     container
       .bind(tokens.anotherResult)
@@ -329,7 +329,7 @@ describe('toCall', () => {
     tagged(createSome, tags.unused);
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
+    container.bind(tokens.someValue).toConstant(someValue);
     container.bind(tokens.someResult).toCall(createSome).inTransientScope();
 
     const result = container.get(tokens.someResult);

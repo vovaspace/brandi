@@ -1,6 +1,6 @@
 import { Container, token } from '../src';
 
-describe('toValue', () => {
+describe('toConstant', () => {
   it('returns a primitive value', () => {
     const value = 0;
 
@@ -9,7 +9,7 @@ describe('toValue', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.value).toValue(value);
+    container.bind(tokens.value).toConstant(value);
 
     expect(container.get(tokens.value)).toBe(value);
   });
@@ -18,11 +18,11 @@ describe('toValue', () => {
     class SomeClass {}
 
     const tokens = {
-      ctor: token<SomeClass>('ctor'),
+      ctor: token<typeof SomeClass>('ctor'),
     };
 
     const container = new Container();
-    container.bind(tokens.ctor).toValue(SomeClass);
+    container.bind(tokens.ctor).toConstant(SomeClass);
 
     expect(container.get(tokens.ctor)).toBe(SomeClass);
   });

@@ -1,7 +1,7 @@
 export enum Type {
   Entity,
   Factory,
-  Value,
+  Constant,
 }
 
 export enum Scope {

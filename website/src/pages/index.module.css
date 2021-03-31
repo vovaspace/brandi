@@ -1,0 +1,21 @@
+.hero {
+  padding: 4rem 0;
+}
+
+@media screen and (max-width: 966px) {
+  .hero {
+    padding: 2rem 0;
+  }
+}
+
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureImage {
+  height: 7.5rem;
+  width: 7.5rem;
+}

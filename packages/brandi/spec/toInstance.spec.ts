@@ -71,7 +71,7 @@ describe('toInstance', () => {
     );
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
+    container.bind(tokens.someValue).toConstant(someValue);
     container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
     container
       .bind(tokens.secondClass)
@@ -113,7 +113,7 @@ describe('toInstance', () => {
     injected(SomeClass, tokens.someValue);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
 
     const childContainer = new Container(parentContainer);
     childContainer
@@ -142,14 +142,14 @@ describe('toInstance', () => {
     injected(SomeClass, tokens.someValue);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toValue(someValue);
+    parentContainer.bind(tokens.someValue).toConstant(someValue);
     parentContainer
       .bind(tokens.someClass)
       .toInstance(SomeClass)
       .inTransientScope();
 
     const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.someValue).toValue(anotherValue);
+    childContainer.bind(tokens.someValue).toConstant(anotherValue);
 
     const parentContainerInstance = parentContainer.get(tokens.someClass);
     const childContainerInstance = childContainer.get(tokens.someClass);
@@ -271,8 +271,8 @@ describe('toInstance', () => {
     tagged(AnotherClass, tags.some);
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
-    container.when(tags.some).bind(tokens.someValue).toValue(anotherValue);
+    container.bind(tokens.someValue).toConstant(someValue);
+    container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
     container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
     container
       .bind(tokens.anotherClass)
@@ -307,7 +307,7 @@ describe('toInstance', () => {
     tagged(SomeClass, tags.unused);
 
     const container = new Container();
-    container.bind(tokens.someValue).toValue(someValue);
+    container.bind(tokens.someValue).toConstant(someValue);
     container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
 
     const instance = container.get(tokens.someClass);
