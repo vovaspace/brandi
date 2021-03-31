@@ -41,6 +41,5 @@
     "dependency inversion",
     "inversion of control",
     "container"
-  ],
-  "dependencies": {}
+  ]
 }
