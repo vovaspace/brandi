@@ -15,6 +15,8 @@ If that container can't satisfy the request, it passes it along to its parent co
 The requests keep bubbling up until we find an container that can handle the request or run out of container ancestors.
 
 ```typescript
+import { Container, token } from 'brandi';
+
 class ApiService {}
 
 const TOKENS = {
@@ -22,6 +24,7 @@ const TOKENS = {
 };
 
 const parentContainer = new Container();
+
 parentContainer
   .bind(TOKENS.apiService)
   .toInstance(ApiService)

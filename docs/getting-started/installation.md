@@ -17,6 +17,7 @@ yarn add brandi
 ```
 
 The Brandi source code is written in TypeScript but we precompile both CommonJS and ESModule builds to **ES2018**.
+
 Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:main` and `esnext:module` fields.
 
 ## TypeScript
