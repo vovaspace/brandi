@@ -98,7 +98,7 @@ module.exports = {
           path: '../docs',
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/vovaspace/brandi/edit/master/docs/',
+          editUrl: 'https://github.com/vovaspace/brandi/edit/main/docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
