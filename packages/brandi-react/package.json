@@ -1,0 +1,48 @@
+{
+  "name": "brandi-react",
+  "version": "2.0.1",
+  "description": "React bindings for Brandi — the dependency injection container.",
+  "main": "./lib/brandi-react.js",
+  "module": "./lib/brandi-react.mjs",
+  "esnext": "./lib/brandi-react.next.js",
+  "esnext:main": "./lib/brandi-react.next.js",
+  "esnext:module": "./lib/brandi-react.next.js",
+  "exports": {
+    "import": "./lib/brandi-react.mjs",
+    "require": "./lib/brandi-react.js",
+    "default": "./lib/brandi-react.js"
+  },
+  "typings": "./lib/typings/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "jest --colors",
+    "build": "npm run clean && npm run build:lib && npm run build:typings",
+    "build:lib": "node build.config.js",
+    "build:typings": "tsc -p ./tsconfig.typings.json",
+    "clean": "rimraf ./lib",
+    "code:lint": "prettier --check . && eslint .",
+    "code:fix": "prettier --write . && eslint --fix ."
+  },
+  "license": "ISC",
+  "author": "Vladimir Lewandowski <me@vovaspace.com> (https://vovaspace.com/)",
+  "homepage": "https://brandi.js.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vovaspace/brandi.git",
+    "directory": "packages/brandi-react"
+  },
+  "bugs": {
+    "url": "https://github.com/vovaspace/brandi/issues"
+  },
+  "keywords": [
+    "react",
+    "di",
+    "ioc",
+    "dependency injection",
+    "dependency inversion",
+    "inversion of control",
+    "container"
+  ]
+}

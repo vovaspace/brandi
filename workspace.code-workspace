@@ -8,6 +8,9 @@
     },
     {
       "path": "./packages/brandi"
+    },
+    {
+      "path": "./packages/brandi-react"
     }
   ],
   "settings": {
