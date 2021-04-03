@@ -8,11 +8,13 @@ import styles from './index.module.css';
 
 const features = [
   {
+    id: 'framework-agnostic',
     title: 'Framework Agnostic',
     imageUrl: 'images/cubes.svg',
     description: 'Can work with any UI or server framework.',
   },
   {
+    id: 'lightweight-and-effective',
     title: 'Lightweight and Effective',
     imageUrl: 'images/lightning.svg',
     description: (
@@ -30,11 +32,13 @@ const features = [
     ),
   },
   {
+    id: 'strongly-typed',
     title: 'Strongly Typed',
     imageUrl: 'images/weapon.svg',
     description: 'TypeScript support out of box.',
   },
   {
+    id: 'decorators-free',
     title: 'Decorators Free',
     imageUrl: 'images/ok.svg',
     description: (
@@ -80,7 +84,7 @@ export default function Home() {
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
           <Link
-            className={'button button--primary button--lg'}
+            className="button button--primary button--lg"
             to={useBaseUrl('/getting-started')}
           >
             Get Started
@@ -92,8 +96,13 @@ export default function Home() {
           <section className={styles.features}>
             <div className="container">
               <div className="row">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
+                {features.map((feature) => (
+                  <Feature
+                    key={feature.id}
+                    title={feature.title}
+                    imageUrl={feature.imageUrl}
+                    description={feature.description}
+                  />
                 ))}
               </div>
             </div>
