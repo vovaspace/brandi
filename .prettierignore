@@ -1,3 +1,5 @@
-node_modules
-packages
-website
+**/node_modules
+**/build
+**/lib
+**/coverage
+**/.docusaurus

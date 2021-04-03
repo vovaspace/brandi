@@ -2,15 +2,6 @@
   "folders": [
     {
       "path": "."
-    },
-    {
-      "path": "./website"
-    },
-    {
-      "path": "./packages/brandi"
-    },
-    {
-      "path": "./packages/brandi-react"
     }
   ],
   "settings": {
