@@ -8,4 +8,4 @@ exports[`container logs an error when trying to restore a non-captured container
 
 exports[`container returns an unlinked container from 'clone' method 1`] = `"No matching bindings found for 'copied' token."`;
 
-exports[`container throws when the token was not bound 1`] = `"No matching bindings found for 'some' token."`;
+exports[`container throws error when the token was not bound 1`] = `"No matching bindings found for 'some' token."`;

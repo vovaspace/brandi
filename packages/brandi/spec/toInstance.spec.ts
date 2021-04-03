@@ -315,7 +315,7 @@ describe('toInstance', () => {
     expect(instance.value).toBe(someValue);
   });
 
-  it('throws when trying to construct an instance with constructor arguments when the target class was not injected', () => {
+  it('throws error when trying to construct an instance with constructor arguments when the target class was not injected', () => {
     class SomeClass {
       constructor(public dependency: unknown) {}
     }

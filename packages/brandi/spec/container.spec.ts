@@ -36,7 +36,7 @@ describe('container', () => {
     expect(childContainer.get(tokens.someValue)).toBe(anotherValue);
   });
 
-  it('throws when the token was not bound', () => {
+  it('throws error when the token was not bound', () => {
     const tokens = {
       some: token<unknown>('some'),
     };
