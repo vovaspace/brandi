@@ -15,31 +15,30 @@ import {
   isFactoryBinding,
   isFactoryConstructorBinding,
 } from './bindings';
-import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
-import { BindingsRegistry } from './BindingsRegistry';
-import { ContainerSnapshot } from './ContainerSnapshot';
+import { TokenSyntax, TypeSyntax } from './syntax';
+import { BindingsVault } from './BindingsVault';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
-  private registry = new BindingsRegistry();
+  private vault = new BindingsVault();
 
-  private snapshot: ContainerSnapshot | null = null;
+  private snapshot: Container | null = null;
 
   constructor(public parent?: Container) {}
 
   public clone(): Container {
     const newContainer = new Container(this.parent);
-    newContainer.registry = this.registry.clone();
+    newContainer.vault = this.vault.clone();
     return newContainer;
   }
 
   public capture(): void {
-    this.snapshot = new ContainerSnapshot(this.registry);
+    this.snapshot = this.clone();
   }
 
   public restore(): void {
     if (this.snapshot !== null) {
-      this.registry = this.snapshot.pick();
+      this.vault = this.snapshot.vault.clone();
     } else if (process.env.NODE_ENV !== 'production') {
       console.error(
         "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
@@ -47,22 +46,33 @@ export class Container {
     }
   }
 
-  public bind<T extends Token>(token: T): BindingTypeSyntax<TokenType<T>> {
-    return new BindingTokenSyntax(this.registry).bind(token);
+  public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
+    return new TokenSyntax(this.vault).bind(token);
   }
 
-  public when(tag: Tag): BindingTokenSyntax {
-    return new BindingTokenSyntax(this.registry, tag);
+  public when(tag: Tag): TokenSyntax {
+    return new TokenSyntax(this.vault, tag);
   }
 
-  public get<T extends Token>(token: T): TokenType<T> {
-    return this.getSingle(token) as TokenType<T>;
+  public get<T extends Token>(token: T): TokenType<T>;
+
+  /**
+   * @access package
+   *
+   * @deprecated `tags` argument is added for internal use.
+   *              We do not guarantee that this API will be preserved in future versions.
+   *
+   */
+  public get<T extends Token>(token: T, tags: Tag[]): TokenType<T>;
+
+  public get<T extends Token>(token: T, tags?: Tag[]): TokenType<T> {
+    return this.getSingle(token, tags) as TokenType<T>;
   }
 
   private getSingle(
     token: Token,
-    context: ResolutionContext = new ResolutionContext(),
     tags?: Tag[],
+    context: ResolutionContext = new ResolutionContext(),
   ): unknown {
     const binding = this.resolveBinding(token, tags);
     return this.resolveValue(binding, context);
@@ -73,11 +83,11 @@ export class Container {
     context: ResolutionContext,
     tags?: Tag[],
   ): unknown[] {
-    return tokens.map((token) => this.getSingle(token, context, tags));
+    return tokens.map((token) => this.getSingle(token, tags, context));
   }
 
   private resolveBinding(token: Token, tags?: Tag[]): Binding {
-    const binding = this.registry.get(token, tags);
+    const binding = this.vault.get(token, tags);
 
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);

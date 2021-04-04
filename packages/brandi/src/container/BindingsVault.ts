@@ -2,7 +2,7 @@ import { Tag, Token, tag as createTag } from '../pointers';
 
 import { Binding } from './bindings';
 
-export class BindingsRegistry {
+export class BindingsVault {
   private static notag = createTag('notag');
 
   private readonly map = new Map<Token, Map<Tag, Binding>>();
@@ -10,7 +10,7 @@ export class BindingsRegistry {
   public set(
     binding: Binding,
     token: Token,
-    tag: Tag = BindingsRegistry.notag,
+    tag: Tag = BindingsVault.notag,
   ): void {
     const current = this.map.get(token);
 
@@ -25,23 +25,23 @@ export class BindingsRegistry {
     const bindings = this.map.get(token);
 
     if (bindings === undefined) return undefined;
-    if (tags === undefined) return bindings.get(BindingsRegistry.notag);
+    if (tags === undefined) return bindings.get(BindingsVault.notag);
 
     for (let i = 0, len = tags.length; i < len; i += 1) {
       const binding = bindings.get(tags[i]!);
       if (binding) return binding;
     }
 
-    return bindings.get(BindingsRegistry.notag);
+    return bindings.get(BindingsVault.notag);
   }
 
-  public clone(): BindingsRegistry {
-    const newBindingsRegistry = new BindingsRegistry();
+  public clone(): BindingsVault {
+    const newBindingsVault = new BindingsVault();
 
     this.map.forEach((value, key) => {
-      newBindingsRegistry.map.set(key, new Map<Tag, Binding>(value));
+      newBindingsVault.map.set(key, new Map<Tag, Binding>(value));
     });
 
-    return newBindingsRegistry;
+    return newBindingsVault;
   }
 }

@@ -8,13 +8,13 @@ import {
   EntitySingletonScopedBinding,
   EntityTransientScopedBinding,
 } from '../bindings';
-import { BindingsRegistry } from '../BindingsRegistry';
+import { BindingsVault } from '../BindingsVault';
 
-export class BindingScopeSyntax {
+export class ScopeSyntax {
   private readonly warningTimeout?: NodeJS.Timeout;
 
   constructor(
-    private readonly bindingsRegistry: BindingsRegistry,
+    private readonly bindingsVault: BindingsVault,
     private readonly value: UnknownCreator,
     private readonly isConstructor: boolean,
     private readonly token: Token,
@@ -49,6 +49,6 @@ export class BindingScopeSyntax {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.bindingsRegistry.set(binding, this.token, this.tag);
+    this.bindingsVault.set(binding, this.token, this.tag);
   }
 }
