@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { tag } from 'brandi';
 
 import { tagged } from '../src';
-import { useTags } from '../src/tags';
+import { useTags } from '../src/tagged';
 
 const tags = {
   some: tag('some'),
@@ -15,7 +15,7 @@ const TestComponent: React.FunctionComponent = ({ children }) => (
   <div>{children}</div>
 );
 
-describe('tags', () => {
+describe('tagged', () => {
   it('passes tags through a tagged component', () => {
     const TaggedComponent = tagged(tags.some, tags.other)(TestComponent);
 
@@ -46,7 +46,7 @@ describe('tags', () => {
     expect(result.current).toStrictEqual([tags.some, tags.other, tags.another]);
   });
 
-  it('does not pass parent tags throw a locked tagged component', () => {
+  it('does not pass parent tags throw a isolated tagged component', () => {
     const ParentTaggedComponent = tagged(tags.some, tags.other)(TestComponent);
     const ChildTaggedComponent = tagged(tags.another)(TestComponent, true);
 

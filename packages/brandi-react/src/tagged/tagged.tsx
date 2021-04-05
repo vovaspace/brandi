@@ -5,10 +5,10 @@ import { TagsProvider } from './TagsProvider';
 
 export const tagged = (...tags: Tag[]) => <P extends unknown>(
   Component: React.ComponentType<P>,
-  locked?: boolean,
+  isolated?: boolean,
 ): React.ComponentType<P> => {
   const Wrapper: React.FunctionComponent<P> = (props) => (
-    <TagsProvider tags={tags} locked={locked}>
+    <TagsProvider tags={tags} isolated={isolated}>
       <Component {...props} />
     </TagsProvider>
   );

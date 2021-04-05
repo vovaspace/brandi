@@ -6,13 +6,13 @@ import { useTags } from './useTags';
 
 export const TagsProvider: React.FunctionComponent<{
   tags: Tag[];
-  locked?: boolean;
-}> = ({ children, tags, locked = false }) => {
+  isolated?: boolean;
+}> = ({ children, tags, isolated = false }) => {
   const currentTags = useTags();
   const resolvedTags = React.useMemo(
     () =>
-      currentTags && !locked ? [...new Set([...currentTags, ...tags])] : tags,
-    [currentTags, tags, locked],
+      currentTags && !isolated ? [...new Set([...currentTags, ...tags])] : tags,
+    [currentTags, tags, isolated],
   );
 
   return (
