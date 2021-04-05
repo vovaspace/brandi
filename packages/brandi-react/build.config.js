@@ -9,6 +9,7 @@ const commons = {
   bundle: true,
   platform: 'node',
   sourcemap: true,
+  external: ['brandi', 'react'],
 };
 
 esbuild.build({
