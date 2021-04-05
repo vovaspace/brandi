@@ -1,6 +1,6 @@
 {
   "name": "brandi-react",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "React bindings for Brandi — the dependency injection container.",
   "main": "./lib/brandi-react.js",
   "module": "./lib/brandi-react.mjs",
@@ -44,5 +44,9 @@
     "dependency inversion",
     "inversion of control",
     "container"
-  ]
+  ],
+  "peerDependencies": {
+    "brandi": "^2.1.0",
+    "react": "^16.8.0 || ^17"
+  }
 }
