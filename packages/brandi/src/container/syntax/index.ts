@@ -1,3 +1,3 @@
+export * from './ConditionSyntax';
 export * from './ScopeSyntax';
-export * from './TokenSyntax';
 export * from './TypeSyntax';

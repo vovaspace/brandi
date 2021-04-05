@@ -55,6 +55,7 @@ module.exports = {
             allow: ['beforeAll', 'afterEach'],
           },
         ],
+        'jest/lowercase-name': ['error', { ignore: ['describe'] }],
       },
     },
   ],

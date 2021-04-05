@@ -1,10 +1,11 @@
 import {
   Creator,
   Factory,
+  ResolutionCondition,
   UnknownConstructor,
   UnknownFunction,
 } from '../../types';
-import { Tag, Token } from '../../pointers';
+import { Token } from '../../pointers';
 
 import { ConstantBinding, FactoryBinding } from '../bindings';
 import { BindingsVault } from '../BindingsVault';
@@ -15,7 +16,7 @@ export class TypeSyntax<T> {
   constructor(
     private readonly bindingsVault: BindingsVault,
     private readonly token: Token,
-    private readonly tag?: Tag,
+    private readonly condition?: ResolutionCondition,
   ) {}
 
   public toInstance<K extends UnknownConstructor<T>>(ctor: K): ScopeSyntax {
@@ -24,7 +25,7 @@ export class TypeSyntax<T> {
       ctor,
       true,
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
@@ -34,12 +35,16 @@ export class TypeSyntax<T> {
       func,
       false,
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
   public toConstant(value: T): void {
-    this.bindingsVault.set(new ConstantBinding(value), this.token, this.tag);
+    this.bindingsVault.set(
+      new ConstantBinding(value),
+      this.token,
+      this.condition,
+    );
   }
 
   /**
@@ -99,7 +104,7 @@ export class TypeSyntax<T> {
     this.bindingsVault.set(
       new FactoryBinding({ creator: ctor, initializer, isConstructor: true }),
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
@@ -156,7 +161,7 @@ export class TypeSyntax<T> {
     this.bindingsVault.set(
       new FactoryBinding({ creator: func, initializer, isConstructor: false }),
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 }

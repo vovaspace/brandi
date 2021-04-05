@@ -4,7 +4,7 @@ exports[`container captures the container state to a snapshot 1`] = `"No matchin
 
 exports[`container captures the container state to a snapshot 2`] = `"No matching bindings found for 'additional' token."`;
 
-exports[`container logs an error when trying to restore a non-captured container state in non-'production' env 1`] = `"Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?"`;
+exports[`container logs an error when trying to restore a non-captured container state 1`] = `"Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?"`;
 
 exports[`container returns an unlinked container from 'clone' method 1`] = `"No matching bindings found for 'copied' token."`;
 

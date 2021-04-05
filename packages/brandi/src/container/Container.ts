@@ -1,5 +1,10 @@
-import { Tag, Token, TokenType } from '../pointers';
-import { UnknownConstructor, UnknownFunction } from '../types';
+import {
+  ResolutionCondition,
+  UnknownConstructor,
+  UnknownCreator,
+  UnknownFunction,
+} from '../types';
+import { Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 
 import {
@@ -15,7 +20,7 @@ import {
   isFactoryBinding,
   isFactoryConstructorBinding,
 } from './bindings';
-import { TokenSyntax, TypeSyntax } from './syntax';
+import { ConditionSyntax, TypeSyntax } from './syntax';
 import { BindingsVault } from './BindingsVault';
 import { ResolutionContext } from './ResolutionContext';
 
@@ -47,47 +52,54 @@ export class Container {
   }
 
   public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
-    return new TokenSyntax(this.vault).bind(token);
+    return new ConditionSyntax(this.vault).bind(token);
   }
 
-  public when(tag: Tag): TokenSyntax {
-    return new TokenSyntax(this.vault, tag);
+  public when(condition: ResolutionCondition): ConditionSyntax {
+    return new ConditionSyntax(this.vault, condition);
   }
 
   public get<T extends Token>(token: T): TokenType<T>;
 
-  /**
-   * @access package
-   *
-   * @deprecated `tags` argument is added for internal use.
-   *              We do not guarantee that this API will be preserved in future versions.
-   *
-   */
-  public get<T extends Token>(token: T, tags: Tag[]): TokenType<T>;
+  public get<T extends Token>(
+    token: T,
+    conditions: ResolutionCondition[],
+  ): TokenType<T>;
 
-  public get<T extends Token>(token: T, tags?: Tag[]): TokenType<T> {
-    return this.getSingle(token, tags) as TokenType<T>;
+  public get<T extends Token>(
+    token: T,
+    conditions?: ResolutionCondition[],
+  ): TokenType<T> {
+    return this.getSingle(token, conditions) as TokenType<T>;
   }
 
   private getSingle(
     token: Token,
-    tags?: Tag[],
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
     context: ResolutionContext = new ResolutionContext(),
   ): unknown {
-    const binding = this.resolveBinding(token, tags);
+    const binding = this.resolveBinding(token, conditions, target);
     return this.resolveValue(binding, context);
   }
 
   private getMultiple(
     tokens: Token[],
     context: ResolutionContext,
-    tags?: Tag[],
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
   ): unknown[] {
-    return tokens.map((token) => this.getSingle(token, tags, context));
+    return tokens.map((token) =>
+      this.getSingle(token, conditions, target, context),
+    );
   }
 
-  private resolveBinding(token: Token, tags?: Tag[]): Binding {
-    const binding = this.vault.get(token, tags);
+  private resolveBinding(
+    token: Token,
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
+  ): Binding {
+    const binding = this.vault.get(token, conditions, target);
 
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);
@@ -156,7 +168,7 @@ export class Container {
   }
 
   private resolveParameters(
-    target: UnknownConstructor | UnknownFunction,
+    target: UnknownCreator,
     context: ResolutionContext,
   ): unknown[] {
     const injects = injectsRegistry.get(target);
@@ -167,7 +179,7 @@ export class Container {
       );
 
     const tags = tagsRegistry.get(target);
-    return this.getMultiple(injects, context, tags);
+    return this.getMultiple(injects, context, tags, target);
   }
 
   private call(func: UnknownFunction, context: ResolutionContext): unknown {

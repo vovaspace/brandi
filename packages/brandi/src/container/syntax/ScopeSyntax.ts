@@ -1,5 +1,5 @@
-import { Tag, Token } from '../../pointers';
-import { UnknownCreator } from '../../types';
+import { ResolutionCondition, UnknownCreator } from '../../types';
+import { Token } from '../../pointers';
 
 import {
   Binding,
@@ -18,7 +18,7 @@ export class ScopeSyntax {
     private readonly value: UnknownCreator,
     private readonly isConstructor: boolean,
     private readonly token: Token,
-    private readonly tag?: Tag,
+    private readonly condition?: ResolutionCondition,
   ) {
     if (process.env.NODE_ENV !== 'production') {
       this.warningTimeout = setTimeout(() => {
@@ -49,6 +49,6 @@ export class ScopeSyntax {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.bindingsVault.set(binding, this.token, this.tag);
+    this.bindingsVault.set(binding, this.token, this.condition);
   }
 }
