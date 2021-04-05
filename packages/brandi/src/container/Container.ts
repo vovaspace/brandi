@@ -7,6 +7,7 @@ import {
 import { Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 
+import { BindSyntax, TypeSyntax } from './syntax';
 import {
   Binding,
   EntityBinding,
@@ -20,7 +21,6 @@ import {
   isFactoryBinding,
   isFactoryConstructorBinding,
 } from './bindings';
-import { ConditionSyntax, TypeSyntax } from './syntax';
 import { BindingsVault } from './BindingsVault';
 import { ResolutionContext } from './ResolutionContext';
 
@@ -52,11 +52,11 @@ export class Container {
   }
 
   public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
-    return new ConditionSyntax(this.vault).bind(token);
+    return new BindSyntax(this.vault).bind(token);
   }
 
-  public when(condition: ResolutionCondition): ConditionSyntax {
-    return new ConditionSyntax(this.vault, condition);
+  public when(condition: ResolutionCondition): BindSyntax {
+    return new BindSyntax(this.vault, condition);
   }
 
   public get<T extends Token>(token: T): TokenType<T>;

@@ -5,7 +5,7 @@ import { BindingsVault } from '../BindingsVault';
 
 import { TypeSyntax } from './TypeSyntax';
 
-export class ConditionSyntax {
+export class BindSyntax {
   constructor(
     private readonly bindingsVault: BindingsVault,
     private readonly condition?: ResolutionCondition,
