@@ -19,12 +19,11 @@ describe('container', () => {
   });
 
   it("passes a container clone through 'ContainerProvider' with 'cloning' prop", () => {
-    const container = createContainer();
-
     const tokens = {
       some: token<number>('some'),
     };
 
+    const container = createContainer();
     container.bind(tokens.some).toConstant(1);
 
     const wrapper: React.FunctionComponent = ({ children }) => (
