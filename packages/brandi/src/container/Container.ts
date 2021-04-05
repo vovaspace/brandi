@@ -61,6 +61,11 @@ export class Container {
 
   public get<T extends Token>(token: T): TokenType<T>;
 
+  /**
+   * @access package
+   * @deprecated `conditions` argument is added for internal use.
+   *              Use it if you really understand that it is necessary.
+   */
   public get<T extends Token>(
     token: T,
     conditions: ResolutionCondition[],
