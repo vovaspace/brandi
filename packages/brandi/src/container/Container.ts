@@ -27,7 +27,7 @@ import { ResolutionContext } from './ResolutionContext';
 export class Container {
   private vault = new BindingsVault();
 
-  private snapshot: Container | null = null;
+  private snapshot: BindingsVault | null = null;
 
   constructor(public parent?: Container) {}
 
@@ -38,12 +38,12 @@ export class Container {
   }
 
   public capture(): void {
-    this.snapshot = this.clone();
+    this.snapshot = this.vault.clone();
   }
 
   public restore(): void {
     if (this.snapshot !== null) {
-      this.vault = this.snapshot.vault.clone();
+      this.vault = this.snapshot.clone();
     } else if (process.env.NODE_ENV !== 'production') {
       console.error(
         "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
