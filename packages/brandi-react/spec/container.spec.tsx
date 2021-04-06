@@ -6,8 +6,16 @@ import { ContainerProvider } from '../src';
 import { useContainer } from '../src/container';
 
 describe('container', () => {
-  it("passes a container through 'ContainerProvider'", () => {
+  it("passes a container clone through 'ContainerProvider'", () => {
+    const tokens = {
+      some: token<number>('some'),
+    };
+
+    const someValue = 1;
+    const anotherValue = 2;
+
     const container = createContainer();
+    container.bind(tokens.some).toConstant(someValue);
 
     const wrapper: React.FunctionComponent = ({ children }) => (
       <ContainerProvider container={container}>{children}</ContainerProvider>
@@ -15,30 +23,40 @@ describe('container', () => {
 
     const { result } = renderHook(() => useContainer(), { wrapper });
 
-    expect(result.current).toBe(container);
+    container.bind(tokens.some).toConstant(anotherValue);
+
+    expect(result.current).not.toBe(container);
+    expect(result.current).toBeInstanceOf(Container);
+    expect(result.current.get(tokens.some)).toBe(someValue);
   });
 
-  it("passes a container clone through 'ContainerProvider' with 'cloning' prop", () => {
+  it('binds the parent container from the parent context', () => {
     const tokens = {
       some: token<number>('some'),
+      another: token<number>('another'),
     };
 
-    const container = createContainer();
-    container.bind(tokens.some).toConstant(1);
+    const someValue = 1;
+    const anotherValue = 2;
+
+    const parentContainer = createContainer();
+    parentContainer.bind(tokens.some).toConstant(someValue);
+
+    const childContainer = createContainer();
+    childContainer.bind(tokens.another).toConstant(anotherValue);
 
     const wrapper: React.FunctionComponent = ({ children }) => (
-      <ContainerProvider container={container} cloning>
-        {children}
+      <ContainerProvider container={parentContainer}>
+        <ContainerProvider container={childContainer}>
+          {children}
+        </ContainerProvider>
       </ContainerProvider>
     );
 
     const { result } = renderHook(() => useContainer(), { wrapper });
 
-    container.bind(tokens.some).toConstant(2);
-
-    expect(result.current).not.toBe(container);
-    expect(result.current).toBeInstanceOf(Container);
-    expect(result.current.get(tokens.some)).toBe(1);
+    expect(result.current.get(tokens.some)).toBe(someValue);
+    expect(result.current.get(tokens.another)).toBe(anotherValue);
   });
 
   it("throws error when a container is not passed through 'ContainerProvider'", () => {

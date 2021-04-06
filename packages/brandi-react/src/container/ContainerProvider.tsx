@@ -5,15 +5,14 @@ import { ContainerContext } from './ContainerContext';
 
 export const ContainerProvider: React.FunctionComponent<{
   container: Container;
-  cloning?: boolean;
-}> = ({ children, container, cloning = false }) => {
-  const resolvedContainer = React.useMemo(
-    () => (cloning ? container.clone() : container),
-    [cloning, container],
-  );
+}> = ({ children, container }) => {
+  const parentContainer = React.useContext(ContainerContext);
+  const clonedContainer = React.useMemo(() => container.clone(), [container]);
+
+  if (parentContainer) clonedContainer.parent = parentContainer;
 
   return (
-    <ContainerContext.Provider value={resolvedContainer}>
+    <ContainerContext.Provider value={clonedContainer}>
       {children}
     </ContainerContext.Provider>
   );
