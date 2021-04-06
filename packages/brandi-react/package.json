@@ -13,6 +13,7 @@
     "default": "./lib/brandi-react.js"
   },
   "typings": "./lib/typings/index.d.ts",
+  "sideEffects": false,
   "files": [
     "lib"
   ],
