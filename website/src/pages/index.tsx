@@ -17,19 +17,7 @@ const features = [
     id: 'lightweight-and-effective',
     title: 'Lightweight and Effective',
     imageUrl: 'images/lightning.svg',
-    description: (
-      <>
-        Brandi is tiny (
-        <a
-          href="https://bundlephobia.com/result?p=brandi"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          1.4 kB minified + gzipped
-        </a>
-        ) and designed for maximum performance.
-      </>
-    ),
+    description: 'Brandi is tiny and designed for maximum performance.',
   },
   {
     id: 'strongly-typed',

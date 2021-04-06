@@ -26,19 +26,21 @@ module.exports = {
           label: 'Getting Started',
           to: 'getting-started',
           activeBasePath: 'getting-started',
-          position: 'right',
         },
         {
           label: 'Reference',
           to: 'reference',
           activeBasePath: 'reference',
-          position: 'right',
+        },
+        {
+          label: 'Brandi-React',
+          to: 'brandi-react',
+          activeBasePath: 'brandi-react',
         },
         {
           label: 'Examples',
           to: 'examples',
           activeBasePath: 'examples',
-          position: 'right',
         },
         {
           label: 'GitHub',
@@ -60,6 +62,10 @@ module.exports = {
             {
               label: 'Reference',
               to: 'reference',
+            },
+            {
+              label: 'Brandi-React',
+              to: 'brandi-react',
             },
             {
               label: 'Examples',

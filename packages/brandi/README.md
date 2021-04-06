@@ -2,9 +2,12 @@
 
 **Brandi** is a dependency injection container powered by TypeScript.
 
+[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi.svg?style=flat)](https://www.npmjs.com/package/brandi)
+[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi)](https://bundlephobia.com/result?p=brandi)
+
 - **Framework agnostic.** Can work with any UI or server framework.
-- **Lightweight and Effective.** It is tiny ([1.4 kB minified + gzipped](https://bundlephobia.com/result?p=brandi))
-  and designed for maximum performance.
+- **Lightweight and Effective.** It is tiny and designed for maximum performance.
 - **Strongly typed.** TypeScript support out of box.
 - **Decorators free.** Does not require additional parameters in `tsconfig.json` and `Reflect` polyfill.
 
@@ -25,6 +28,10 @@ yarn add brandi
 The Brandi source code is written in TypeScript but we precompile both CommonJS and ESModule builds to **ES2018**.
 
 Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:main` and `esnext:module` fields.
+
+### TypeScript
+
+TypeScript type definitions are **included** in the library and do not need to be installed additionally.
 
 ### No Dependencies
 
@@ -56,6 +63,12 @@ The documentation is divided into several sections:
   - [Binding Scopes](https://brandi.js.org/reference/binding-scopes)
   - [Hierarchical Containers](https://brandi.js.org/reference/hierarchical-containers)
   - [Conditional Bindings](https://brandi.js.org/reference/conditional-bindings)
+- Brandi-React
+  - [Overview](https://brandi.js.org/brandi-react)
+  - [`ContainerProvider`](https://brandi.js.org/brandi-react/container-provider)
+  - [`useInjection`](https://brandi.js.org/brandi-react/use-injection)
+  - [`createInjectionHooks`](https://brandi.js.org/brandi-react/create-injection-hooks)
+  - [`tagged`](https://brandi.js.org/brandi-react/tagged)
 - Examples
   - [Basic Examples](https://brandi.js.org/examples)
 

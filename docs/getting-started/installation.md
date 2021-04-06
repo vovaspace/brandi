@@ -36,3 +36,19 @@ Brandi has no dependencies, but requires the following globals in order to work:
 By default, Brandi will be in development mode. The development mode includes warnings about common mistakes.
 
 Don't forget to set `process.env.NODE_ENV` to `production` when deploying your application.
+
+## Brandi-React
+
+[**Brandi-React**](../brandi-react/overview.md) is the React bindings layer for Brandi.
+
+It lets your React components get dependencies from Brandi containers.
+
+```bash
+# NPM
+npm install brandi-react
+```
+
+```bash
+# Yarn
+yarn add brandi-react
+```

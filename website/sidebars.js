@@ -13,6 +13,13 @@ module.exports = {
       'reference/hierarchical-containers',
       'reference/conditional-bindings',
     ],
+    'Brandi-React': [
+      'brandi-react/overview',
+      'brandi-react/container-provider',
+      'brandi-react/use-injection',
+      'brandi-react/create-injection-hooks',
+      'brandi-react/tagged',
+    ],
     'Examples': ['examples/basic-examples'],
   },
 };

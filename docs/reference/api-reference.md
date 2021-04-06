@@ -34,7 +34,7 @@ This section documents the complete Brandi API.
 - [`clone()`](./container-api.md#clone)
 - [`get(token)`](./container-api.md#gettoken)
 - [`restore()`](./container-api.md#restore)
-- [`when(tag)`](./container-api.md#whentag)
+- [`when(condition)`](./container-api.md#whencondition)
 
 ## Pointers
 
