@@ -11,7 +11,9 @@ export const TagsProvider: React.FunctionComponent<{
   const currentTags = useTags();
   const resolvedTags = React.useMemo(
     () =>
-      currentTags && !isolated ? [...new Set([...currentTags, ...tags])] : tags,
+      currentTags.length > 0 && !isolated
+        ? [...new Set([...currentTags, ...tags])]
+        : tags,
     [currentTags, tags, isolated],
   );
 
