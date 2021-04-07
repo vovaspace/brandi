@@ -2,12 +2,6 @@
   "folders": [
     {
       "path": "."
-    },
-    {
-      "path": "./website"
-    },
-    {
-      "path": "./packages/brandi"
     }
   ],
   "settings": {

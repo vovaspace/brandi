@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`container throws error when a container is not passed through 'ContainerProvider' 1`] = `[Error: Could not get a container from a context. Did you forget to pass the container through 'ContainerProvider'?]`;

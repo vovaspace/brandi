@@ -2,8 +2,10 @@ const path = require('path');
 
 module.exports = {
   extends: [
-    'airbnb-typescript/base',
+    'airbnb-typescript',
+    'airbnb/hooks',
     'prettier',
+    'prettier/react',
     'prettier/@typescript-eslint',
   ],
   parserOptions: {
@@ -23,6 +25,8 @@ module.exports = {
       },
     ],
     'import/prefer-default-export': 'off',
+    'react/prop-types': 'off',
+    'react/jsx-props-no-spreading': 'off',
     '@typescript-eslint/explicit-member-accessibility': [
       'error',
       {
@@ -35,11 +39,12 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/spec/*.ts'],
+      files: ['**/*.spec.ts', '**/*.spec.tsx'],
       env: { 'jest/globals': true },
       plugins: ['jest'],
       extends: ['plugin:jest/all'],
       rules: {
+        'import/no-extraneous-dependencies': 'off',
         'jest/prefer-expect-assertions': [
           'error',
           { onlyFunctionsWithAsyncKeyword: true },
@@ -50,6 +55,7 @@ module.exports = {
             allow: ['beforeAll', 'afterEach'],
           },
         ],
+        'jest/lowercase-name': ['error', { ignore: ['describe'] }],
       },
     },
   ],

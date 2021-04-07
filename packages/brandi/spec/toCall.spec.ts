@@ -1,4 +1,4 @@
-import { Container, injected, tag, tagged, token } from '../src';
+import { Container, injected, token } from '../src';
 
 import { setEnv } from './utils';
 
@@ -258,85 +258,6 @@ describe('toCall', () => {
     expect(result.second).toBe(result.third.second);
   });
 
-  it('creates a call result with an injection that depends on the tag', () => {
-    const someValue = 1;
-    const anotherValue = 2;
-
-    interface SomeResult {
-      some: number;
-    }
-
-    interface AnotherResult {
-      another: number;
-    }
-
-    const createSome = (value: number): SomeResult => ({ some: value });
-    const createAnother = (value: number): AnotherResult => ({
-      another: value,
-    });
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someResult: token<SomeResult>('someResult'),
-      anotherResult: token<AnotherResult>('anotherResult'),
-    };
-
-    const tags = {
-      some: tag('some'),
-    };
-
-    injected(createSome, tokens.someValue);
-    injected(createAnother, tokens.someValue);
-
-    tagged(createAnother, tags.some);
-
-    const container = new Container();
-    container.bind(tokens.someValue).toConstant(someValue);
-    container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
-    container.bind(tokens.someResult).toCall(createSome).inTransientScope();
-    container
-      .bind(tokens.anotherResult)
-      .toCall(createAnother)
-      .inTransientScope();
-
-    const someResult = container.get(tokens.someResult);
-    const anotherResult = container.get(tokens.anotherResult);
-
-    expect(someResult.some).toBe(someValue);
-    expect(anotherResult.another).toBe(anotherValue);
-  });
-
-  it('ignores an unused tag on the target function', () => {
-    const someValue = 1;
-
-    interface SomeResult {
-      value: number;
-    }
-
-    const createSome = (value: number): SomeResult => ({ value });
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someResult: token<SomeResult>('someResult'),
-    };
-
-    const tags = {
-      unused: tag('unused'),
-    };
-
-    injected(createSome, tokens.someValue);
-
-    tagged(createSome, tags.unused);
-
-    const container = new Container();
-    container.bind(tokens.someValue).toConstant(someValue);
-    container.bind(tokens.someResult).toCall(createSome).inTransientScope();
-
-    const result = container.get(tokens.someResult);
-
-    expect(result.value).toBe(someValue);
-  });
-
   it('caches the call result in singleton scope if a falsy value was returned', () => {
     const createNull = jest.fn(() => null);
 
@@ -423,7 +344,7 @@ describe('toCall', () => {
     expect(createNull).toHaveBeenCalledTimes(1);
   });
 
-  it('throws when trying to create a call with arguments when the target function was not injected', () => {
+  it('throws error when trying to create a call with arguments when the target function was not injected', () => {
     interface SomeResult {
       dependency: unknown;
     }
@@ -442,8 +363,7 @@ describe('toCall', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it("logs a warning when a binding scope setting method was not called in non-'production' env", () => {
-    const restoreEnv = setEnv('non-production');
+  it('logs a warning when a binding scope setting method was not called', () => {
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -454,12 +374,10 @@ describe('toCall', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
 
-    restoreEnv();
     spy.mockRestore();
   });
 
   it('does not log a warning when a binding scope setting method was called', () => {
-    const restoreEnv = setEnv('non-production');
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -472,7 +390,6 @@ describe('toCall', () => {
 
     expect(spy).toHaveBeenCalledTimes(0);
 
-    restoreEnv();
     spy.mockRestore();
   });
 

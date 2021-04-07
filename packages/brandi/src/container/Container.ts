@@ -1,7 +1,13 @@
-import { Tag, Token, TokenType } from '../pointers';
-import { UnknownConstructor, UnknownFunction } from '../types';
+import {
+  ResolutionCondition,
+  UnknownConstructor,
+  UnknownCreator,
+  UnknownFunction,
+} from '../types';
+import { Token, TokenType } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 
+import { BindSyntax, TypeSyntax } from './syntax';
 import {
   Binding,
   EntityBinding,
@@ -15,31 +21,29 @@ import {
   isFactoryBinding,
   isFactoryConstructorBinding,
 } from './bindings';
-import { BindingTokenSyntax, BindingTypeSyntax } from './syntax';
-import { BindingsRegistry } from './BindingsRegistry';
-import { ContainerSnapshot } from './ContainerSnapshot';
+import { BindingsVault } from './BindingsVault';
 import { ResolutionContext } from './ResolutionContext';
 
 export class Container {
-  private registry = new BindingsRegistry();
+  private vault = new BindingsVault();
 
-  private snapshot: ContainerSnapshot | null = null;
+  private snapshot: BindingsVault | null = null;
 
   constructor(public parent?: Container) {}
 
   public clone(): Container {
     const newContainer = new Container(this.parent);
-    newContainer.registry = this.registry.clone();
+    newContainer.vault = this.vault.clone();
     return newContainer;
   }
 
   public capture(): void {
-    this.snapshot = new ContainerSnapshot(this.registry);
+    this.snapshot = this.vault.clone();
   }
 
   public restore(): void {
     if (this.snapshot !== null) {
-      this.registry = this.snapshot.pick();
+      this.vault = this.snapshot.clone();
     } else if (process.env.NODE_ENV !== 'production') {
       console.error(
         "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
@@ -47,37 +51,60 @@ export class Container {
     }
   }
 
-  public bind<T extends Token>(token: T): BindingTypeSyntax<TokenType<T>> {
-    return new BindingTokenSyntax(this.registry).bind(token);
+  public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
+    return new BindSyntax(this.vault).bind(token);
   }
 
-  public when(tag: Tag): BindingTokenSyntax {
-    return new BindingTokenSyntax(this.registry, tag);
+  public when(condition: ResolutionCondition): BindSyntax {
+    return new BindSyntax(this.vault, condition);
   }
 
-  public get<T extends Token>(token: T): TokenType<T> {
-    return this.getSingle(token) as TokenType<T>;
+  public get<T extends Token>(token: T): TokenType<T>;
+
+  /**
+   * @access package
+   * @deprecated `conditions` argument is added for internal use.
+   *              Use it if you really understand that it is necessary.
+   */
+  public get<T extends Token>(
+    token: T,
+    conditions: ResolutionCondition[],
+  ): TokenType<T>;
+
+  public get<T extends Token>(
+    token: T,
+    conditions?: ResolutionCondition[],
+  ): TokenType<T> {
+    return this.getSingle(token, conditions) as TokenType<T>;
   }
 
   private getSingle(
     token: Token,
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
     context: ResolutionContext = new ResolutionContext(),
-    tags?: Tag[],
   ): unknown {
-    const binding = this.resolveBinding(token, tags);
+    const binding = this.resolveBinding(token, conditions, target);
     return this.resolveValue(binding, context);
   }
 
   private getMultiple(
     tokens: Token[],
     context: ResolutionContext,
-    tags?: Tag[],
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
   ): unknown[] {
-    return tokens.map((token) => this.getSingle(token, context, tags));
+    return tokens.map((token) =>
+      this.getSingle(token, conditions, target, context),
+    );
   }
 
-  private resolveBinding(token: Token, tags?: Tag[]): Binding {
-    const binding = this.registry.get(token, tags);
+  private resolveBinding(
+    token: Token,
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
+  ): Binding {
+    const binding = this.vault.get(token, conditions, target);
 
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);
@@ -146,7 +173,7 @@ export class Container {
   }
 
   private resolveParameters(
-    target: UnknownConstructor | UnknownFunction,
+    target: UnknownCreator,
     context: ResolutionContext,
   ): unknown[] {
     const injects = injectsRegistry.get(target);
@@ -157,7 +184,7 @@ export class Container {
       );
 
     const tags = tagsRegistry.get(target);
-    return this.getMultiple(injects, context, tags);
+    return this.getMultiple(injects, context, tags, target);
   }
 
   private call(func: UnknownFunction, context: ResolutionContext): unknown {

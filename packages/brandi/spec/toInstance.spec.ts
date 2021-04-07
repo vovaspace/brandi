@@ -1,4 +1,4 @@
-import { Container, injected, tag, tagged, token } from '../src';
+import { Container, injected, token } from '../src';
 
 import { setEnv } from './utils';
 
@@ -243,79 +243,7 @@ describe('toInstance', () => {
     expect(instance.second).toBe(instance.third.second);
   });
 
-  it('creates an instance with an injection that depends on the tag', () => {
-    const someValue = 1;
-    const anotherValue = 2;
-
-    class SomeClass {
-      constructor(public value: number) {}
-    }
-
-    class AnotherClass {
-      constructor(public value: number) {}
-    }
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someClass: token<SomeClass>('someClass'),
-      anotherClass: token<AnotherClass>('anotherClass'),
-    };
-
-    const tags = {
-      some: tag('some'),
-    };
-
-    injected(SomeClass, tokens.someValue);
-    injected(AnotherClass, tokens.someValue);
-
-    tagged(AnotherClass, tags.some);
-
-    const container = new Container();
-    container.bind(tokens.someValue).toConstant(someValue);
-    container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
-    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
-    container
-      .bind(tokens.anotherClass)
-      .toInstance(AnotherClass)
-      .inTransientScope();
-
-    const someClassInstance = container.get(tokens.someClass);
-    const anotherClassInstance = container.get(tokens.anotherClass);
-
-    expect(someClassInstance.value).toBe(someValue);
-    expect(anotherClassInstance.value).toBe(anotherValue);
-  });
-
-  it('ignores an unused tag on the target class', () => {
-    const someValue = 1;
-
-    class SomeClass {
-      constructor(public value: number) {}
-    }
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someClass: token<SomeClass>('someClass'),
-    };
-
-    const tags = {
-      unused: tag('unused'),
-    };
-
-    injected(SomeClass, tokens.someValue);
-
-    tagged(SomeClass, tags.unused);
-
-    const container = new Container();
-    container.bind(tokens.someValue).toConstant(someValue);
-    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
-
-    const instance = container.get(tokens.someClass);
-
-    expect(instance.value).toBe(someValue);
-  });
-
-  it('throws when trying to construct an instance with constructor arguments when the target class was not injected', () => {
+  it('throws error when trying to construct an instance with constructor arguments when the target class was not injected', () => {
     class SomeClass {
       constructor(public dependency: unknown) {}
     }
@@ -332,8 +260,7 @@ describe('toInstance', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it("logs a warning when a binding scope setting method was not called in non-'production' env", () => {
-    const restoreEnv = setEnv('non-production');
+  it('logs a warning when a binding scope setting method was not called', () => {
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -344,12 +271,10 @@ describe('toInstance', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
 
-    restoreEnv();
     spy.mockRestore();
   });
 
   it('does not log a warning when a binding scope setting method was called', () => {
-    const restoreEnv = setEnv('non-production');
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 
     const container = new Container();
@@ -362,7 +287,6 @@ describe('toInstance', () => {
 
     expect(spy).toHaveBeenCalledTimes(0);
 
-    restoreEnv();
     spy.mockRestore();
   });
 

@@ -1,4 +1,4 @@
-import { Container, token } from '../src';
+import { Container, createContainer, token } from '../src';
 
 import { setEnv } from './utils';
 
@@ -36,7 +36,7 @@ describe('container', () => {
     expect(childContainer.get(tokens.someValue)).toBe(anotherValue);
   });
 
-  it('throws when the token was not bound', () => {
+  it('throws error when the token was not bound', () => {
     const tokens = {
       some: token<unknown>('some'),
     };
@@ -78,6 +78,28 @@ describe('container', () => {
     expect(copiedContainer.get(tokens.copied)).toBe(copiedValue);
   });
 
+  it('shares a singleton between the original container and its copy', () => {
+    class SomeClass {}
+
+    const tokens = {
+      someClass: token<SomeClass>('someClass'),
+    };
+
+    const originalContainer = new Container();
+
+    originalContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inSingletonScope();
+
+    const copiedContainer = originalContainer.clone();
+
+    const copiedContainerInstance = copiedContainer.get(tokens.someClass);
+    const originalContainerInstance = originalContainer.get(tokens.someClass);
+
+    expect(copiedContainerInstance).toBe(originalContainerInstance);
+  });
+
   it('captures the container state to a snapshot', () => {
     const someValue = 1;
     const anotherValue = 2;
@@ -114,8 +136,7 @@ describe('container', () => {
     ).toThrowErrorMatchingSnapshot();
   });
 
-  it("logs an error when trying to restore a non-captured container state in non-'production' env", () => {
-    const restoreEnv = setEnv('non-production');
+  it('logs an error when trying to restore a non-captured container state', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
@@ -124,12 +145,10 @@ describe('container', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
 
-    restoreEnv();
     spy.mockRestore();
   });
 
   it('does not log an error when restoring the captured container state', () => {
-    const restoreEnv = setEnv('non-production');
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
@@ -138,7 +157,6 @@ describe('container', () => {
 
     expect(spy).toHaveBeenCalledTimes(0);
 
-    restoreEnv();
     spy.mockRestore();
   });
 
@@ -153,5 +171,19 @@ describe('container', () => {
 
     restoreEnv();
     spy.mockRestore();
+  });
+
+  describe('createContainer', () => {
+    it('creates a container', () => {
+      const container = createContainer();
+      expect(container).toBeInstanceOf(Container);
+    });
+
+    it('creates a container with arguments', () => {
+      const parentContainer = createContainer();
+      const childContainer = createContainer(parentContainer);
+
+      expect(childContainer.parent).toBe(parentContainer);
+    });
   });
 });

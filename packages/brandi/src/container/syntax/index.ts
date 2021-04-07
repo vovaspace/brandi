@@ -1,3 +1,3 @@
-export * from './BindingScopeSyntax';
-export * from './BindingTokenSyntax';
-export * from './BindingTypeSyntax';
+export * from './BindSyntax';
+export * from './ScopeSyntax';
+export * from './TypeSyntax';

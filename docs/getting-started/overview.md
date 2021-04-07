@@ -8,8 +8,7 @@ slug: /getting-started
 **Brandi** is a dependency injection container powered by TypeScript.
 
 - **Framework agnostic.** Can work with any UI or server framework.
-- **Lightweight and Effective.** It is tiny ([1.4 kB minified + gzipped](https://bundlephobia.com/result?p=brandi))
-  and designed for maximum performance.
+- **Lightweight and Effective.** It is tiny and designed for maximum performance.
 - **Strongly typed.** TypeScript support out of box.
 - **Decorators free.** Does not require additional parameters in `tsconfig.json` and `Reflect` polyfill.
 

@@ -28,7 +28,7 @@ Binds the token to the dependency.
 
 #### Arguments
 
-1. `token`: [Token](./pointers-and-registrators.md#tokentdescription).
+1. `token`: [`Token`](./pointers-and-registrators.md#tokentdescription).
 
 #### Returns
 
@@ -39,6 +39,18 @@ Binds the token to the dependency.
 - [`toCall(func)`](./binding-types.md#tocallfunc)
 - [`toFactory(ctor, [initializer])`](./binding-types.md#tofactoryctor-initializer)
 - [`toCreator(func, [initializer])`](./binding-types.md#tocreatorfunc-initializer)
+
+### `when(condition)`
+
+Creates a conditional binding. For more information, see [Conditional Bindings](./conditional-bindings.md) section.
+
+#### Arguments
+
+1. `condition`: [`Tag`](./pointers-and-registrators.md#tag) | `UnknownConstructor` | `UnknownFunction`.
+
+#### Returns
+
+[`bind(token)`](#bindtoken) syntax.
 
 ---
 
@@ -53,20 +65,6 @@ Gets a dependency bound to the token.
 #### Returns
 
 `TokenType<Token>` — a dependency bound to the token.
-
----
-
-### `when(tag)`
-
-Creates a conditional binding by the tag. For more information, see [Conditional Bindings](./conditional-bindings.md) section.
-
-#### Arguments
-
-1. `tag`: [`Tag`](./pointers-and-registrators.md#tag).
-
-#### Returns
-
-[`bind(token)`](#bindtoken) syntax.
 
 ---
 

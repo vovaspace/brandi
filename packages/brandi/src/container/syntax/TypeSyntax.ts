@@ -1,47 +1,50 @@
 import {
   Creator,
   Factory,
+  ResolutionCondition,
   UnknownConstructor,
   UnknownFunction,
 } from '../../types';
-import { Tag, Token } from '../../pointers';
+import { Token } from '../../pointers';
 
 import { ConstantBinding, FactoryBinding } from '../bindings';
-import { BindingsRegistry } from '../BindingsRegistry';
+import { BindingsVault } from '../BindingsVault';
 
-import { BindingScopeSyntax } from './BindingScopeSyntax';
+import { ScopeSyntax } from './ScopeSyntax';
 
-export class BindingTypeSyntax<T> {
+export class TypeSyntax<T> {
   constructor(
-    private readonly bindingsRegistry: BindingsRegistry,
+    private readonly bindingsVault: BindingsVault,
     private readonly token: Token,
-    private readonly tag?: Tag,
+    private readonly condition?: ResolutionCondition,
   ) {}
 
-  public toInstance<K extends UnknownConstructor<T>>(
-    ctor: K,
-  ): BindingScopeSyntax {
-    return new BindingScopeSyntax(
-      this.bindingsRegistry,
+  public toInstance<K extends UnknownConstructor<T>>(ctor: K): ScopeSyntax {
+    return new ScopeSyntax(
+      this.bindingsVault,
       ctor,
       true,
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
-  public toCall<K extends UnknownFunction<T>>(func: K): BindingScopeSyntax {
-    return new BindingScopeSyntax(
-      this.bindingsRegistry,
+  public toCall<K extends UnknownFunction<T>>(func: K): ScopeSyntax {
+    return new ScopeSyntax(
+      this.bindingsVault,
       func,
       false,
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
   public toConstant(value: T): void {
-    this.bindingsRegistry.set(new ConstantBinding(value), this.token, this.tag);
+    this.bindingsVault.set(
+      new ConstantBinding(value),
+      this.token,
+      this.condition,
+    );
   }
 
   /**
@@ -98,10 +101,10 @@ export class BindingTypeSyntax<T> {
     ctor: UnknownConstructor,
     initializer?: (instance: unknown, ...args: unknown[]) => unknown,
   ): void {
-    this.bindingsRegistry.set(
+    this.bindingsVault.set(
       new FactoryBinding({ creator: ctor, initializer, isConstructor: true }),
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 
@@ -155,10 +158,10 @@ export class BindingTypeSyntax<T> {
     func: UnknownFunction,
     initializer?: (entity: unknown, ...args: unknown[]) => unknown,
   ): void {
-    this.bindingsRegistry.set(
+    this.bindingsVault.set(
       new FactoryBinding({ creator: func, initializer, isConstructor: false }),
       this.token,
-      this.tag,
+      this.condition,
     );
   }
 }
