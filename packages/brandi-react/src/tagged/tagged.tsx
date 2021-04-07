@@ -6,7 +6,7 @@ import { TagsProvider } from './TagsProvider';
 export const tagged = (...tags: Tag[]) => <P extends unknown>(
   Component: React.ComponentType<P>,
   isolated?: boolean,
-): React.ComponentType<P> => {
+): React.FunctionComponent<P> => {
   const Wrapper: React.FunctionComponent<P> = (props) => (
     <TagsProvider tags={tags} isolated={isolated}>
       <Component {...props} />
