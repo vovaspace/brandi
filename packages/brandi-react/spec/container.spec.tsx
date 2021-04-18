@@ -59,6 +59,35 @@ describe('container', () => {
     expect(result.current.get(tokens.another)).toBe(anotherValue);
   });
 
+  it("keeps the original parent container with 'isolated' prop", () => {
+    const tokens = {
+      some: token<number>('some'),
+    };
+
+    const someValue = 1;
+    const anotherValue = 2;
+
+    const parentContainer = createContainer();
+    parentContainer.bind(tokens.some).toConstant(someValue);
+
+    const anotherParentContainer = createContainer();
+    anotherParentContainer.bind(tokens.some).toConstant(anotherValue);
+
+    const childContainer = createContainer(parentContainer);
+
+    const wrapper: React.FunctionComponent = ({ children }) => (
+      <ContainerProvider container={anotherParentContainer}>
+        <ContainerProvider container={childContainer} isolated>
+          {children}
+        </ContainerProvider>
+      </ContainerProvider>
+    );
+
+    const { result } = renderHook(() => useContainer(), { wrapper });
+
+    expect(result.current.get(tokens.some)).toBe(someValue);
+  });
+
   it("throws error when a container is not passed through 'ContainerProvider'", () => {
     const { result } = renderHook(() => useContainer());
 

@@ -5,11 +5,14 @@ import { ContainerContext } from './ContainerContext';
 
 export const ContainerProvider: React.FunctionComponent<{
   container: Container;
-}> = ({ children, container }) => {
+  isolated?: boolean;
+}> = ({ children, container, isolated }) => {
   const parentContainer = React.useContext(ContainerContext);
   const clonedContainer = React.useMemo(() => container.clone(), [container]);
 
-  if (parentContainer) clonedContainer.parent = parentContainer;
+  if (!isolated && parentContainer !== null) {
+    clonedContainer.parent = parentContainer;
+  }
 
   return (
     <ContainerContext.Provider value={clonedContainer}>
