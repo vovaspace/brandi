@@ -1,7 +1,7 @@
-import { Token, TokenType } from 'brandi';
+import { TokenType, TokenValue } from 'brandi';
 
 import { useContainer } from '../container';
 import { useTags } from '../tagged';
 
-export const useInjection = <T extends Token>(token: T): TokenType<T> =>
+export const useInjection = <T extends TokenValue>(token: T): TokenType<T> =>
   useContainer().get(token, useTags());

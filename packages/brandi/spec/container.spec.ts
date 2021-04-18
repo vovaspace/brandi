@@ -186,4 +186,49 @@ describe('container', () => {
       expect(childContainer.parent).toBe(parentContainer);
     });
   });
+
+  describe('typings', () => {
+    it('requires to bind the same type of dependency and token', () => {
+      expect.assertions(0);
+
+      class SomeClass {
+        public some = true;
+      }
+
+      class AnotherClass {
+        public another = true;
+      }
+
+      const createAnother = (): AnotherClass => new AnotherClass();
+
+      const tokens = {
+        num: token<number>('num'),
+        some: token<SomeClass>('some'),
+      };
+
+      const container = new Container();
+
+      // @ts-expect-error: Argument of type 'string' is not assignable to parameter of type 'number'.
+      container.bind(tokens.num).toConstant('');
+
+      // @ts-expect-error: Argument of type 'typeof AnotherClass' is not assignable to parameter of type 'UnknownConstructor<SomeClass>'.
+      container.bind(tokens.some).toInstance(AnotherClass).inTransientScope();
+
+      // @ts-expect-error: Argument of type '() => AnotherClass' is not assignable to parameter of type 'UnknownFunction<SomeClass>'.
+      container.bind(tokens.some).toCall(createAnother).inTransientScope();
+    });
+
+    it('does not allow to bind an optional token', () => {
+      expect.assertions(0);
+
+      const tokens = {
+        some: token<number>('some'),
+      };
+
+      const container = new Container();
+
+      // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'Token<unknown>'.
+      container.bind(tokens.some.optional);
+    });
+  });
 });
