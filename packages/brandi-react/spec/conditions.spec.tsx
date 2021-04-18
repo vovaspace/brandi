@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { tag } from 'brandi';
 
 import { tagged } from '../src';
-import { useTags } from '../src/tagged';
+import { useConditions } from '../src/conditions';
 
 const tags = {
   some: tag('some'),
@@ -15,7 +15,7 @@ const TestComponent: React.FunctionComponent = ({ children }) => (
   <div>{children}</div>
 );
 
-describe('tagged', () => {
+describe('conditions', () => {
   it('passes tags through a tagged component', () => {
     const TaggedComponent = tagged(tags.some, tags.other)(TestComponent);
 
@@ -23,7 +23,7 @@ describe('tagged', () => {
       <TaggedComponent>{children}</TaggedComponent>
     );
 
-    const { result } = renderHook(() => useTags(), { wrapper });
+    const { result } = renderHook(() => useConditions(), { wrapper });
 
     expect(result.current).toStrictEqual([tags.some, tags.other]);
   });
@@ -41,7 +41,7 @@ describe('tagged', () => {
       </ParentTaggedComponent>
     );
 
-    const { result } = renderHook(() => useTags(), { wrapper });
+    const { result } = renderHook(() => useConditions(), { wrapper });
 
     expect(result.current).toStrictEqual([tags.some, tags.other, tags.another]);
   });
@@ -56,7 +56,7 @@ describe('tagged', () => {
       </ParentTaggedComponent>
     );
 
-    const { result } = renderHook(() => useTags(), { wrapper });
+    const { result } = renderHook(() => useConditions(), { wrapper });
 
     expect(result.current).toStrictEqual([tags.another]);
   });

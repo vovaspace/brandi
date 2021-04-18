@@ -1,16 +1,16 @@
 import React from 'react';
 import { Tag } from 'brandi';
 
-import { TagsProvider } from './TagsProvider';
+import { ConditionsProvider } from './ConditionsProvider';
 
 export const tagged = (...tags: Tag[]) => <P extends unknown>(
   Component: React.ComponentType<P>,
   isolated?: boolean,
 ): React.FunctionComponent<P> => {
   const Wrapper: React.FunctionComponent<P> = (props) => (
-    <TagsProvider tags={tags} isolated={isolated}>
+    <ConditionsProvider conditions={tags} isolated={isolated}>
       <Component {...props} />
-    </TagsProvider>
+    </ConditionsProvider>
   );
 
   Wrapper.displayName = Component.displayName
