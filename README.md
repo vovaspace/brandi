@@ -84,6 +84,7 @@ The documentation is divided into several sections:
   - [Container API](https://brandi.js.org/reference/container-api)
   - [Binding Types](https://brandi.js.org/reference/binding-types)
   - [Binding Scopes](https://brandi.js.org/reference/binding-scopes)
+  - [Optional Dependencies](https://brandi.js.org/reference/optional-dependencies)
   - [Hierarchical Containers](https://brandi.js.org/reference/hierarchical-containers)
   - [Conditional Bindings](https://brandi.js.org/reference/conditional-bindings)
 - Brandi-React

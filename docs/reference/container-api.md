@@ -60,11 +60,11 @@ Gets a dependency bound to the token.
 
 #### Arguments
 
-1. `token`: [`Token`](./pointers-and-registrators.md#tokentdescription).
+1. `token`: [`TokenValue`](./pointers-and-registrators.md#tokentdescription).
 
 #### Returns
 
-`TokenType<Token>` — a dependency bound to the token.
+`TokenType<TokenValue>` — a dependency bound to the token.
 
 ---
 
