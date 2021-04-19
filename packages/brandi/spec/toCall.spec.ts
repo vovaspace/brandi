@@ -344,7 +344,7 @@ describe('toCall', () => {
     expect(createNull).toHaveBeenCalledTimes(1);
   });
 
-  it('throws error when trying to create a call with arguments when the target function was not injected', () => {
+  it('throws error when trying to create a call with required arguments when the target function was not injected', () => {
     interface SomeResult {
       dependency: unknown;
     }

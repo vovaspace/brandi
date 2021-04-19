@@ -183,31 +183,26 @@ export class Container {
   ): unknown[] {
     const injects = injectsRegistry.get(target);
 
-    if (!injects)
+    if (injects === undefined) {
+      if (target.length === 0) return [];
+
       throw new Error(
         `Missing required 'injected' registration of '${target.name}'`,
       );
+    }
 
     const tags = tagsRegistry.get(target);
     return this.getMultiple(injects, context, tags, target);
   }
 
   private call(func: UnknownFunction, context: ResolutionContext): unknown {
-    if (func.length === 0) return func();
-
-    const parameters = this.resolveParameters(func, context);
-
-    return func(...parameters);
+    return func(...this.resolveParameters(func, context));
   }
 
   private construct(
     Ctor: UnknownConstructor,
     context: ResolutionContext,
   ): Object {
-    if (Ctor.length === 0) return new Ctor();
-
-    const parameters = this.resolveParameters(Ctor, context);
-
-    return new Ctor(...parameters);
+    return new Ctor(...this.resolveParameters(Ctor, context));
   }
 }
