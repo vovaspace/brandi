@@ -20,7 +20,10 @@ The [`useInjection`](./use-injection.md) hook can then access the provided conta
    received from the upstream provider to the `Container.parent`.
    In this way, we can implement a [hierarchical DI system](../reference/hierarchical-containers.md)
    based on a hierarchy of React components.
-2. `children`: `ReactNode`.
+2. `isolated?`: `boolean` — as mentioned above, the provider sets the container
+   received from the upstream provider to the `Container.parent`.
+   `isolated` prop disables this behavior and saves original `Container.parent` value.
+3. `children`: `ReactNode`.
 
 ## Examples
 

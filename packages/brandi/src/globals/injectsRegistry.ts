@@ -1,4 +1,4 @@
-import { Token } from '../pointers';
+import { TokenValue } from '../pointers';
 import { UnknownCreator } from '../types';
 
-export const injectsRegistry = new Map<UnknownCreator, Token[]>();
+export const injectsRegistry = new Map<UnknownCreator, TokenValue[]>();

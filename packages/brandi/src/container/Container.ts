@@ -4,7 +4,7 @@ import {
   UnknownCreator,
   UnknownFunction,
 } from '../types';
-import { Token, TokenType } from '../pointers';
+import { Token, TokenType, TokenValue } from '../pointers';
 import { injectsRegistry, tagsRegistry } from '../globals';
 
 import { BindSyntax, TypeSyntax } from './syntax';
@@ -59,19 +59,19 @@ export class Container {
     return new BindSyntax(this.vault, condition);
   }
 
-  public get<T extends Token>(token: T): TokenType<T>;
+  public get<T extends TokenValue>(token: T): TokenType<T>;
 
   /**
    * @access package
    * @deprecated `conditions` argument is added for internal use.
    *              Use it if you really understand that it is necessary.
    */
-  public get<T extends Token>(
+  public get<T extends TokenValue>(
     token: T,
     conditions: ResolutionCondition[],
   ): TokenType<T>;
 
-  public get<T extends Token>(
+  public get<T extends TokenValue>(
     token: T,
     conditions?: ResolutionCondition[],
   ): TokenType<T> {
@@ -79,17 +79,20 @@ export class Container {
   }
 
   private getSingle(
-    token: Token,
+    token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
     context: ResolutionContext = new ResolutionContext(),
   ): unknown {
     const binding = this.resolveBinding(token, conditions, target);
+
+    if (binding === null) return undefined;
+
     return this.resolveValue(binding, context);
   }
 
   private getMultiple(
-    tokens: Token[],
+    tokens: TokenValue[],
     context: ResolutionContext,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
@@ -100,17 +103,19 @@ export class Container {
   }
 
   private resolveBinding(
-    token: Token,
+    token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-  ): Binding {
+  ): Binding | null {
     const binding = this.vault.get(token, conditions, target);
 
     if (binding !== undefined) return binding;
     if (this.parent !== undefined) return this.parent.resolveBinding(token);
 
+    if (token.__isOptional) return null;
+
     throw new Error(
-      `No matching bindings found for '${token.description}' token.`,
+      `No matching bindings found for '${token.__symbol.description}' token.`,
     );
   }
 
@@ -178,31 +183,26 @@ export class Container {
   ): unknown[] {
     const injects = injectsRegistry.get(target);
 
-    if (!injects)
+    if (injects === undefined) {
+      if (target.length === 0) return [];
+
       throw new Error(
         `Missing required 'injected' registration of '${target.name}'`,
       );
+    }
 
     const tags = tagsRegistry.get(target);
     return this.getMultiple(injects, context, tags, target);
   }
 
   private call(func: UnknownFunction, context: ResolutionContext): unknown {
-    if (func.length === 0) return func();
-
-    const parameters = this.resolveParameters(func, context);
-
-    return func(...parameters);
+    return func(...this.resolveParameters(func, context));
   }
 
   private construct(
     Ctor: UnknownConstructor,
     context: ResolutionContext,
   ): Object {
-    if (Ctor.length === 0) return new Ctor();
-
-    const parameters = this.resolveParameters(Ctor, context);
-
-    return new Ctor(...parameters);
+    return new Ctor(...this.resolveParameters(Ctor, context));
   }
 }

@@ -78,7 +78,7 @@ Registers target injections.
 #### Arguments
 
 1. `target` — constructor or function whose dependencies will be injected.
-2. `...tokens`: `Token[]` — dependency tokens.
+2. `...tokens`: `TokenValue[]` — dependency tokens.
 
 #### Returns
 
@@ -88,13 +88,14 @@ Registers target injections.
 
 ```typescript title="ApiService.ts"
 import { injected } from 'brandi';
-import { TOKENS } from './tokens.ts';
+import { TOKENS } from './tokens';
+import { Logger } from './Logger';
 
 export class ApiService {
-  constructor(private apiKey: string) {}
+  constructor(private apiKey: string, private logger?: Logger) {}
 }
 
-injected(ApiService, TOKENS.apiKey);
+injected(ApiService, TOKENS.apiKey, TOKENS.logger.optional);
 ```
 
 #### Type Safety
@@ -110,30 +111,46 @@ export const TOKENS = {
 };
 ```
 
+<!-- prettier-ignore-start -->
 ```typescript title="ApiService.ts"
 import { injected } from 'brandi';
-import { TOKENS } from './tokens.ts';
+import { TOKENS } from './tokens';
+import { Logger } from './Logger';
 
 export class ApiService {
-  /*                  ↓ The `string` type dependency. */
-  constructor(private apiKey: string) {}
+  constructor(
+    private apiKey: string  /* ← The `string` type dependency. */,
+    private logger?: Logger /* ← The optional dependency. */,
+  ) {}
 }
 
-/*                   ↓ Injecting the `string` type dependency. It's OK. */
-injected(ApiService, TOKENS.strKey);
+injected(
+  ApiService,
+  TOKENS.strKey           /* ← Injecting the `string` type dependency. It's OK. */,
+  TOKENS.logger.optional  /* ← Injecting the optional dependency. It's OK. */,
+);
 
-/**
- *                   ↓ Injecting the `number` type dependency.
- *                     TS Error: `Type 'number' is not assignable to type 'string'. ts(2345)`.
- */
-injected(ApiService, TOKENS.numKey);
+injected(
+  ApiService,
+
+  TOKENS.numKey, /* ← Injecting the `number` type dependency.
+                  *   TS Error: `Type 'number' is not assignable to type 'string'. ts(2345)`.
+                  */
+
+  TOKENS.logger, /* ← Injecting the required value instead of the optional one.
+                  *   TS Error: `Argument of type 'Token<Logger>'
+                  *              is not assignable to parameter of type 'OptionalToken<Logger>'`.
+                  */
+);
 ```
+<!-- prettier-ignore-end -->
 
 ---
 
 ### `tagged(target, ...tags)`
 
 Tags target.
+For more information about tags, see the [Conditional Bindings](./conditional-bindings.md) documentation section.
 
 #### Arguments
 
@@ -148,7 +165,7 @@ Tags target.
 
 ```typescript title="ApiService.ts"
 import { tagged } from 'brandi';
-import { TAGS } from './tags.ts';
+import { TAGS } from './tags';
 
 export class ApiService {}
 

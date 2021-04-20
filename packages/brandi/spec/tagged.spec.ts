@@ -10,7 +10,7 @@ describe('tagged', () => {
     tagsRegistry.clear();
   });
 
-  it("adds a single tag to 'tagsRegistry'", () => {
+  it('registers a single tag', () => {
     class SomeClass {}
 
     const tags = {
@@ -22,7 +22,7 @@ describe('tagged', () => {
     expect(tagsRegistry.get(SomeClass)).toStrictEqual([tags.some]);
   });
 
-  it("adds multiple tags to 'tagsRegistry'", () => {
+  it('registers multiple tags', () => {
     class SomeClass {}
 
     const tags = {

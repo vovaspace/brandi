@@ -1,23 +1,23 @@
 import { ResolutionCondition, UnknownCreator } from '../types';
-import { Token, tag as createTag } from '../pointers';
+import { Token, TokenValue, tag as createTag } from '../pointers';
 
 import { Binding } from './bindings';
 
 export class BindingsVault {
   private static notag = createTag('notag');
 
-  private readonly map = new Map<Token, Map<ResolutionCondition, Binding>>();
+  private readonly map = new Map<symbol, Map<ResolutionCondition, Binding>>();
 
   public set(
     binding: Binding,
     token: Token,
     condition: ResolutionCondition = BindingsVault.notag,
   ): void {
-    const current = this.map.get(token);
+    const current = this.map.get(token.__symbol);
 
     if (current === undefined) {
       this.map.set(
-        token,
+        token.__symbol,
         new Map<ResolutionCondition, Binding>().set(condition, binding),
       );
     } else {
@@ -26,11 +26,11 @@ export class BindingsVault {
   }
 
   public get(
-    token: Token,
+    token: TokenValue,
     conditions: ResolutionCondition[] = [],
     target?: UnknownCreator,
   ): Binding | undefined {
-    const bindings = this.map.get(token);
+    const bindings = this.map.get(token.__symbol);
 
     if (bindings === undefined) return undefined;
 
@@ -56,7 +56,8 @@ export class BindingsVault {
 
       console.warn(
         'Warning: ' +
-          `When resolving a binding by '${token.description}' token with [${conditionsDisplayString}] conditions, more than one binding was found. ` +
+          `When resolving a binding by '${token.__symbol.description}' token with [${conditionsDisplayString}] conditions, ` +
+          'more than one binding was found. ' +
           "In this case, Brandi resolves the binding by the first tag assigned by 'tagged(target, ...tags)' function " +
           "or, if you explicitly passed conditions through 'Container.get(token, conditions)' method, " +
           'by the first resolved condition. ' +

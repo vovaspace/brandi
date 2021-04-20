@@ -2,14 +2,18 @@ import { Container } from 'brandi';
 import React from 'react';
 
 import { ContainerContext } from './ContainerContext';
+import { useContainer } from './useContainer';
 
 export const ContainerProvider: React.FunctionComponent<{
   container: Container;
-}> = ({ children, container }) => {
-  const parentContainer = React.useContext(ContainerContext);
+  isolated?: boolean;
+}> = ({ children, container, isolated }) => {
+  const parentContainer = useContainer(false);
   const clonedContainer = React.useMemo(() => container.clone(), [container]);
 
-  if (parentContainer) clonedContainer.parent = parentContainer;
+  if (!isolated && parentContainer !== null) {
+    clonedContainer.parent = parentContainer;
+  }
 
   return (
     <ContainerContext.Provider value={clonedContainer}>

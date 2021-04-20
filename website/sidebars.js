@@ -10,6 +10,7 @@ module.exports = {
       'reference/container-api',
       'reference/binding-types',
       'reference/binding-scopes',
+      'reference/optional-dependencies',
       'reference/hierarchical-containers',
       'reference/conditional-bindings',
     ],

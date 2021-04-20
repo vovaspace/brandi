@@ -11,11 +11,11 @@ The `createInjectionHooks(...tokens)` creates hooks for getting dependencies mor
 
 ## Arguments
 
-1. `...tokens`: [`Token[]`](../reference/pointers-and-registrators.md#tokentdescription).
+1. `...tokens`: [`TokenValue[]`](../reference/pointers-and-registrators.md#tokentdescription).
 
 ## Returns
 
-`(() => TokenType<Token>)[]` — an array of hooks for getting dependencies.
+`(() => TokenType<TokenValue>)[]` — an array of hooks for getting dependencies.
 
 ## Example
 
@@ -28,14 +28,14 @@ import { TOKENS } from './tokens';
 const [
   useApiService,
   useUserService,
-  useAuthService,
+  useLogger,
 ] = createInjectionHooks(
   TOKENS.apiService,
   TOKENS.userService,
-  TOKENS.authService,
+  TOKENS.logger.optional,
 );
 
-export { useApiService, useUserService, useAuthService };
+export { useApiService, useUserService, useLogger };
 ```
 <!-- prettier-ignore-end -->
 
@@ -55,3 +55,6 @@ export const UserComponent: FunctionComponent = () => {
 
 This `UserComponent` is the same as `UserComponent`
 in [the example](./use-injection.md#example) in `useInjection` section.
+
+For more information about `TOKENS.logger.optional` syntax,
+see the [Optional Dependencies](../reference/optional-dependencies.md) documentation section.

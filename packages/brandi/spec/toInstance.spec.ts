@@ -243,7 +243,7 @@ describe('toInstance', () => {
     expect(instance.second).toBe(instance.third.second);
   });
 
-  it('throws error when trying to construct an instance with constructor arguments when the target class was not injected', () => {
+  it('throws error when trying to construct an instance with required constructor arguments when the target class was not injected', () => {
     class SomeClass {
       constructor(public dependency: unknown) {}
     }

@@ -1,7 +1,16 @@
-import { Token, TokenType } from 'brandi';
+import { TokenType, TokenValue } from 'brandi';
+import React from 'react';
 
+import { useConditions } from '../conditions';
 import { useContainer } from '../container';
-import { useTags } from '../tagged';
 
-export const useInjection = <T extends Token>(token: T): TokenType<T> =>
-  useContainer().get(token, useTags());
+export const useInjection = <T extends TokenValue>(token: T): TokenType<T> => {
+  const container = useContainer();
+  const conditions = useConditions();
+
+  return React.useMemo(() => container.get(token, conditions), [
+    token,
+    conditions,
+    container,
+  ]);
+};

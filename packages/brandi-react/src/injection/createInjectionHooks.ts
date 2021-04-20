@@ -1,12 +1,12 @@
-import { Token, TokenType } from 'brandi';
+import { TokenType, TokenValue } from 'brandi';
 
 import { useInjection } from './useInjection';
 
-type InjectionHooks<T extends Token[]> = {
-  [K in keyof T]: () => TokenType<T[K]>;
+type InjectionHooks<T extends TokenValue[]> = {
+  [K in keyof T]: T[K] extends TokenValue ? () => TokenType<T[K]> : never;
 };
 
-export const createInjectionHooks = <T extends Token[]>(
+export const createInjectionHooks = <T extends TokenValue[]>(
   ...tokens: T
 ): InjectionHooks<T> =>
   tokens.map((token) => () => useInjection(token)) as InjectionHooks<T>;

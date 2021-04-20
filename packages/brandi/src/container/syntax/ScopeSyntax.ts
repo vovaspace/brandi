@@ -23,7 +23,8 @@ export class ScopeSyntax {
     if (process.env.NODE_ENV !== 'production') {
       this.warningTimeout = setTimeout(() => {
         console.warn(
-          `Warning: did you forget to set a scope for '${this.token.description}' token binding? Call 'inTransientScope()', 'inSingletonScope()', 'inContainerScope()' or 'inResolutionScope()'.`,
+          `Warning: did you forget to set a scope for '${this.token.__symbol.description}' token binding? ` +
+            "Call 'inTransientScope()', 'inSingletonScope()', 'inContainerScope()' or 'inResolutionScope()'.",
         );
       });
     }
