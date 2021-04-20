@@ -13,7 +13,7 @@ describe('optional dependencies', () => {
 
     container.bind(tokens.some).toConstant(someValue);
 
-    expect(container.get(tokens.some)).toBe(someValue);
+    expect(container.get(tokens.some.optional)).toBe(someValue);
     expect(container.get(tokens.another.optional)).toBeUndefined();
   });
 
