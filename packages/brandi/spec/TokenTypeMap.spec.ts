@@ -27,8 +27,6 @@ describe('TokenTypeMap', () => {
       >
     >;
 
-    const result: Result = true;
-
-    expect(result).toBe(true);
+    expect(true).toBe<Result>(true);
   });
 });
