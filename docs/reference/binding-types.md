@@ -47,6 +47,7 @@ Binds the token to an class instance in one of the [scopes](./binding-scopes.md)
 - [`inTransientScope()`](./binding-scopes.md#intransientscope)
 - [`inContainerScope()`](./binding-scopes.md#incontainerscope)
 - [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
+- [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
 
 #### Example
 
@@ -104,6 +105,7 @@ except that it binds the token to a function call result instead of a class inst
 - [`inTransientScope()`](./binding-scopes.md#intransientscope)
 - [`inContainerScope()`](./binding-scopes.md#incontainerscope)
 - [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
+- [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
 
 #### Example
 
