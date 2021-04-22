@@ -1,14 +1,15 @@
 export enum Type {
+  Constant,
   Entity,
   Factory,
-  Constant,
 }
 
 export enum Scope {
-  Transient,
-  Singleton,
-  Resolution,
   Container,
+  Global,
+  Resolution,
+  Singleton,
+  Transient,
 }
 
 export interface Binding {

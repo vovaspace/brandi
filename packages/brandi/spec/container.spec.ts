@@ -78,28 +78,6 @@ describe('container', () => {
     expect(copiedContainer.get(tokens.copied)).toBe(copiedValue);
   });
 
-  it('shares a singleton between the original container and its copy', () => {
-    class SomeClass {}
-
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
-    };
-
-    const originalContainer = new Container();
-
-    originalContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inSingletonScope();
-
-    const copiedContainer = originalContainer.clone();
-
-    const copiedContainerInstance = copiedContainer.get(tokens.someClass);
-    const originalContainerInstance = originalContainer.get(tokens.someClass);
-
-    expect(copiedContainerInstance).toBe(originalContainerInstance);
-  });
-
   it('captures the container state to a snapshot', () => {
     const someValue = 1;
     const anotherValue = 2;

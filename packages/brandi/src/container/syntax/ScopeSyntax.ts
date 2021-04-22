@@ -4,6 +4,7 @@ import { Token } from '../../pointers';
 import {
   Binding,
   EntityContainerScopedBinding,
+  EntityGlobalScopedBinding,
   EntityResolutionScopedBinding,
   EntitySingletonScopedBinding,
   EntityTransientScopedBinding,
@@ -32,6 +33,10 @@ export class ScopeSyntax {
 
   public inContainerScope(): void {
     this.set(new EntityContainerScopedBinding(this.value, this.isConstructor));
+  }
+
+  public inGlobalScope(): void {
+    this.set(new EntityGlobalScopedBinding(this.value, this.isConstructor));
   }
 
   public inResolutionScope(): void {
