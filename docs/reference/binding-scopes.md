@@ -133,7 +133,7 @@ expect(userService.emailService).toBe(userService.settingsService.emailService);
 
 Each getting from any container with any token will return the same instance.
 
-### Example
+#### Example
 
 <!-- prettier-ignore-start -->
 ```typescript
