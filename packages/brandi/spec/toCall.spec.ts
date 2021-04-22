@@ -49,6 +49,64 @@ describe('toCall', () => {
     expect(firstResult).toBe(secondResult);
   });
 
+  it('creates singleton scoped call results unique to its bindings', () => {
+    interface SomeResult {
+      some: true;
+    }
+
+    const createSome = (): SomeResult => ({ some: true });
+
+    const tokens = {
+      someResult: token<SomeResult>('some'),
+    };
+
+    const parentContainer = new Container();
+    const childContainer = new Container(parentContainer);
+
+    parentContainer
+      .bind(tokens.someResult)
+      .toCall(createSome)
+      .inSingletonScope();
+
+    childContainer
+      .bind(tokens.someResult)
+      .toCall(createSome)
+      .inSingletonScope();
+
+    const parentResult = parentContainer.get(tokens.someResult);
+    const childResult = childContainer.get(tokens.someResult);
+
+    expect(parentResult).toStrictEqual<SomeResult>({ some: true });
+    expect(childResult).toStrictEqual<SomeResult>({ some: true });
+    expect(parentResult).not.toBe(childResult);
+  });
+
+  it('shares a singleton between the original container and its copy', () => {
+    interface SomeResult {
+      some: true;
+    }
+
+    const createSome = (): SomeResult => ({ some: true });
+
+    const tokens = {
+      someResult: token<SomeResult>('some'),
+    };
+
+    const originalContainer = new Container();
+
+    originalContainer
+      .bind(tokens.someResult)
+      .toCall(createSome)
+      .inSingletonScope();
+
+    const copiedContainer = originalContainer.clone();
+
+    const copiedContainerResult = copiedContainer.get(tokens.someResult);
+    const originalContainerResult = originalContainer.get(tokens.someResult);
+
+    expect(copiedContainerResult).toBe(originalContainerResult);
+  });
+
   it('creates call results with injections', () => {
     const someValue = 0;
 
@@ -258,7 +316,41 @@ describe('toCall', () => {
     expect(result.second).toBe(result.third.second);
   });
 
-  it('caches the call result in singleton scope if a falsy value was returned', () => {
+  it('creates call results in global scope', () => {
+    interface SomeResult {
+      some: true;
+    }
+
+    const createSome = (): SomeResult => ({ some: true });
+
+    const tokens = {
+      someResult: token<SomeResult>('some'),
+    };
+
+    const parentContainer = new Container();
+    const childContainer = new Container(parentContainer);
+    const independentContainer = new Container();
+
+    parentContainer.bind(tokens.someResult).toCall(createSome).inGlobalScope();
+    childContainer.bind(tokens.someResult).toCall(createSome).inGlobalScope();
+
+    independentContainer
+      .bind(tokens.someResult)
+      .toCall(createSome)
+      .inGlobalScope();
+
+    const parentResult = parentContainer.get(tokens.someResult);
+    const childResult = childContainer.get(tokens.someResult);
+    const independentResult = independentContainer.get(tokens.someResult);
+
+    expect(parentResult).toStrictEqual<SomeResult>({ some: true });
+    expect(childResult).toStrictEqual<SomeResult>({ some: true });
+    expect(independentResult).toStrictEqual<SomeResult>({ some: true });
+    expect(parentResult).toBe(childResult);
+    expect(childResult).toBe(independentResult);
+  });
+
+  it("caches the call result in singleton scope if a 'null' value was returned", () => {
     const createNull = jest.fn(() => null);
 
     const tokens = {
@@ -274,7 +366,7 @@ describe('toCall', () => {
     expect(createNull).toHaveBeenCalledTimes(1);
   });
 
-  it('caches the call result in container scope if a falsy value was returned', () => {
+  it("caches the call result in container scope if a 'null' value was returned", () => {
     const createNull = jest.fn(() => null);
 
     const tokens = {
@@ -290,7 +382,7 @@ describe('toCall', () => {
     expect(createNull).toHaveBeenCalledTimes(1);
   });
 
-  it('caches the call result in resolution scope if a falsy value was returned', () => {
+  it("caches the call result in resolution scope if a 'null' value was returned", () => {
     interface FirstResult {
       n: null;
     }

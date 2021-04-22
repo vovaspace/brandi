@@ -5,7 +5,7 @@ import {
   UnknownFunction,
 } from '../types';
 import { Token, TokenType, TokenValue } from '../pointers';
-import { injectsRegistry, tagsRegistry } from '../globals';
+import { entitiesRegistry, injectsRegistry, tagsRegistry } from '../globals';
 
 import { BindSyntax, TypeSyntax } from './syntax';
 import {
@@ -16,6 +16,7 @@ import {
   isEntityBinding,
   isEntityConstructorBinding,
   isEntityContainerScopedBinding,
+  isEntityGlobalScopedBinding,
   isEntityResolutionScopedBinding,
   isEntitySingletonScopedBinding,
   isFactoryBinding,
@@ -122,15 +123,18 @@ export class Container {
   private resolveValue(binding: Binding, context: ResolutionContext): unknown {
     if (isEntityBinding(binding)) {
       if (isEntitySingletonScopedBinding(binding)) {
-        if (binding.hasCached) return binding.cache;
+        if (binding.cache !== undefined) return binding.cache;
 
         const entity = this.resolveCreator(binding, context);
-        binding.setCache(entity);
+        // eslint-disable-next-line no-param-reassign
+        binding.cache = entity;
         return entity;
       }
 
       if (isEntityContainerScopedBinding(binding)) {
-        if (binding.cache.has(this)) return binding.cache.get(this);
+        const cache = binding.cache.get(this);
+
+        if (cache !== undefined) return cache;
 
         const entity = this.resolveCreator(binding, context);
         binding.cache.set(this, entity);
@@ -138,10 +142,22 @@ export class Container {
       }
 
       if (isEntityResolutionScopedBinding(binding)) {
-        if (context.cache.has(binding)) return context.cache.get(binding);
+        const cache = context.cache.get(binding);
+
+        if (cache !== undefined) return cache;
 
         const entity = this.resolveCreator(binding, context);
         context.cache.set(binding, entity);
+        return entity;
+      }
+
+      if (isEntityGlobalScopedBinding(binding)) {
+        const cache = entitiesRegistry.get(binding.value);
+
+        if (cache !== undefined) return cache;
+
+        const entity = this.resolveCreator(binding, context);
+        entitiesRegistry.set(binding.value, entity);
         return entity;
       }
 

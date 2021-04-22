@@ -41,6 +41,56 @@ describe('toInstance', () => {
     expect(firstInstance).toBe(secondInstance);
   });
 
+  it('creates singleton scoped instances unique to its bindings', () => {
+    class SomeClass {}
+
+    const tokens = {
+      someClass: token<SomeClass>('someClass'),
+    };
+
+    const parentContainer = new Container();
+    const childContainer = new Container(parentContainer);
+
+    parentContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inSingletonScope();
+
+    childContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inSingletonScope();
+
+    const parentInstance = parentContainer.get(tokens.someClass);
+    const childInstance = childContainer.get(tokens.someClass);
+
+    expect(parentInstance).toBeInstanceOf(SomeClass);
+    expect(childInstance).toBeInstanceOf(SomeClass);
+    expect(parentInstance).not.toBe(childInstance);
+  });
+
+  it('shares a singleton between the original container and its copy', () => {
+    class SomeClass {}
+
+    const tokens = {
+      someClass: token<SomeClass>('someClass'),
+    };
+
+    const originalContainer = new Container();
+
+    originalContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inSingletonScope();
+
+    const copiedContainer = originalContainer.clone();
+
+    const copiedContainerInstance = copiedContainer.get(tokens.someClass);
+    const originalContainerInstance = originalContainer.get(tokens.someClass);
+
+    expect(copiedContainerInstance).toBe(originalContainerInstance);
+  });
+
   it('creates instances with injections', () => {
     const someValue = 1;
 
@@ -241,6 +291,40 @@ describe('toInstance', () => {
     expect(instance.first).toBe(instance.third.first);
     expect(instance.first).toBe(instance.third.second.first);
     expect(instance.second).toBe(instance.third.second);
+  });
+
+  it('creates instances in global scope', () => {
+    class SomeClass {}
+
+    const tokens = {
+      someClass: token<SomeClass>('someClass'),
+    };
+
+    const parentContainer = new Container();
+    const childContainer = new Container(parentContainer);
+    const independentContainer = new Container();
+
+    parentContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
+
+    childContainer.bind(tokens.someClass).toInstance(SomeClass).inGlobalScope();
+
+    independentContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
+
+    const parentInstance = parentContainer.get(tokens.someClass);
+    const childInstance = childContainer.get(tokens.someClass);
+    const independentInstance = independentContainer.get(tokens.someClass);
+
+    expect(parentInstance).toBeInstanceOf(SomeClass);
+    expect(childInstance).toBeInstanceOf(SomeClass);
+    expect(independentInstance).toBeInstanceOf(SomeClass);
+    expect(parentInstance).toBe(childInstance);
+    expect(childInstance).toBe(independentInstance);
   });
 
   it('throws error when trying to construct an instance with required constructor arguments when the target class was not injected', () => {
