@@ -298,6 +298,7 @@ describe('toInstance', () => {
 
     const tokens = {
       someClass: token<SomeClass>('someClass'),
+      secondSomeClass: token<SomeClass>('anotherSomeClass'),
     };
 
     const parentContainer = new Container();
@@ -308,23 +309,47 @@ describe('toInstance', () => {
       .bind(tokens.someClass)
       .toInstance(SomeClass)
       .inGlobalScope();
+    parentContainer
+      .bind(tokens.secondSomeClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
 
     childContainer.bind(tokens.someClass).toInstance(SomeClass).inGlobalScope();
+    childContainer
+      .bind(tokens.secondSomeClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
 
     independentContainer
       .bind(tokens.someClass)
       .toInstance(SomeClass)
       .inGlobalScope();
+    independentContainer
+      .bind(tokens.secondSomeClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
 
     const parentInstance = parentContainer.get(tokens.someClass);
+    const parentSecondInstance = parentContainer.get(tokens.secondSomeClass);
     const childInstance = childContainer.get(tokens.someClass);
+    const childSecondInstance = childContainer.get(tokens.secondSomeClass);
     const independentInstance = independentContainer.get(tokens.someClass);
+    const independentSecondInstance = independentContainer.get(
+      tokens.secondSomeClass,
+    );
 
     expect(parentInstance).toBeInstanceOf(SomeClass);
+    expect(parentSecondInstance).toBeInstanceOf(SomeClass);
     expect(childInstance).toBeInstanceOf(SomeClass);
+    expect(childSecondInstance).toBeInstanceOf(SomeClass);
     expect(independentInstance).toBeInstanceOf(SomeClass);
+    expect(independentSecondInstance).toBeInstanceOf(SomeClass);
+
+    expect(parentInstance).toBe(parentSecondInstance);
     expect(parentInstance).toBe(childInstance);
+    expect(childInstance).toBe(childSecondInstance);
     expect(childInstance).toBe(independentInstance);
+    expect(independentInstance).toBe(independentSecondInstance);
   });
 
   it('throws error when trying to construct an instance with required constructor arguments when the target class was not injected', () => {

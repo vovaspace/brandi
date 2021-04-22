@@ -350,83 +350,164 @@ describe('toCall', () => {
     expect(childResult).toBe(independentResult);
   });
 
-  it("caches the call result in singleton scope if a 'null' value was returned", () => {
+  it("caches the call result in singleton scope if a falsy but not 'undefined' value was returned", () => {
     const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+    const createUndefined = jest.fn(() => undefined);
 
     const tokens = {
       null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      undefined: token<undefined>('undefined'),
     };
 
     const container = new Container();
     container.bind(tokens.null).toCall(createNull).inSingletonScope();
+    container.bind(tokens.false).toCall(createFalse).inSingletonScope();
+    container.bind(tokens.zero).toCall(createZero).inSingletonScope();
+    container.bind(tokens.undefined).toCall(createUndefined).inSingletonScope();
 
     container.get(tokens.null);
     container.get(tokens.null);
+    container.get(tokens.false);
+    container.get(tokens.false);
+    container.get(tokens.zero);
+    container.get(tokens.zero);
+    container.get(tokens.undefined);
+    container.get(tokens.undefined);
 
     expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+    expect(createUndefined).toHaveBeenCalledTimes(2);
   });
 
-  it("caches the call result in container scope if a 'null' value was returned", () => {
+  it("caches the call result in container scope if a falsy but not 'undefined' value was returned", () => {
     const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+    const createUndefined = jest.fn(() => undefined);
 
     const tokens = {
       null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      undefined: token<undefined>('undefined'),
     };
 
     const container = new Container();
     container.bind(tokens.null).toCall(createNull).inContainerScope();
+    container.bind(tokens.false).toCall(createFalse).inContainerScope();
+    container.bind(tokens.zero).toCall(createZero).inContainerScope();
+    container.bind(tokens.undefined).toCall(createUndefined).inContainerScope();
 
     container.get(tokens.null);
     container.get(tokens.null);
+    container.get(tokens.false);
+    container.get(tokens.false);
+    container.get(tokens.zero);
+    container.get(tokens.zero);
+    container.get(tokens.undefined);
+    container.get(tokens.undefined);
 
     expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+    expect(createUndefined).toHaveBeenCalledTimes(2);
   });
 
-  it("caches the call result in resolution scope if a 'null' value was returned", () => {
+  it('caches the call result in resolution scope if a falsy value was returned', () => {
     interface FirstResult {
       n: null;
+      f: boolean;
+      z: number;
     }
 
     interface SecondResult {
       n: null;
+      f: boolean;
+      z: number;
       first: FirstResult;
     }
 
     interface ThirdResult {
       n: null;
+      f: boolean;
+      z: number;
       first: FirstResult;
       second: SecondResult;
     }
 
     const createNull = jest.fn(() => null);
-    const createFirst = (n: null): FirstResult => ({ n });
-    const createSecond = (n: null, first: FirstResult): SecondResult => ({
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+
+    const createFirst = (n: null, f: boolean, z: number): FirstResult => ({
       n,
+      f,
+      z,
+    });
+
+    const createSecond = (
+      n: null,
+      f: boolean,
+      z: number,
+      first: FirstResult,
+    ): SecondResult => ({
+      n,
+      f,
+      z,
       first,
     });
+
     const createThird = (
       n: null,
+      f: boolean,
+      z: number,
       first: FirstResult,
       second: SecondResult,
     ) => ({
       n,
+      f,
+      z,
       first,
       second,
     });
 
     const tokens = {
       null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
       firstResult: token<FirstResult>('firstResult'),
       secondResult: token<SecondResult>('secondResult'),
       thirdResult: token<ThirdResult>('thirdResult'),
     };
 
-    injected(createFirst, tokens.null);
-    injected(createSecond, tokens.null, tokens.firstResult);
-    injected(createThird, tokens.null, tokens.firstResult, tokens.secondResult);
+    injected(createFirst, tokens.null, tokens.false, tokens.zero);
+    injected(
+      createSecond,
+      tokens.null,
+      tokens.false,
+      tokens.zero,
+      tokens.firstResult,
+    );
+    injected(
+      createThird,
+      tokens.null,
+      tokens.false,
+      tokens.zero,
+      tokens.firstResult,
+      tokens.secondResult,
+    );
 
     const container = new Container();
+
     container.bind(tokens.null).toCall(createNull).inResolutionScope();
+    container.bind(tokens.false).toCall(createFalse).inResolutionScope();
+    container.bind(tokens.zero).toCall(createZero).inResolutionScope();
+
     container.bind(tokens.firstResult).toCall(createFirst).inTransientScope();
     container.bind(tokens.secondResult).toCall(createSecond).inTransientScope();
     container.bind(tokens.thirdResult).toCall(createThird).inTransientScope();
@@ -434,6 +515,54 @@ describe('toCall', () => {
     container.get(tokens.thirdResult);
 
     expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+  });
+
+  it("caches the call result in global scope if a falsy but not 'undefined' value was returned", () => {
+    const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+    const createUndefined = jest.fn(() => undefined);
+
+    const tokens = {
+      null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      undefined: token<undefined>('undefined'),
+    };
+
+    const firstContainer = new Container();
+    firstContainer.bind(tokens.null).toCall(createNull).inGlobalScope();
+    firstContainer.bind(tokens.false).toCall(createFalse).inGlobalScope();
+    firstContainer.bind(tokens.zero).toCall(createZero).inGlobalScope();
+    firstContainer
+      .bind(tokens.undefined)
+      .toCall(createUndefined)
+      .inGlobalScope();
+
+    const secondContainer = new Container();
+    secondContainer.bind(tokens.null).toCall(createNull).inGlobalScope();
+    secondContainer.bind(tokens.false).toCall(createFalse).inGlobalScope();
+    secondContainer.bind(tokens.zero).toCall(createZero).inGlobalScope();
+    secondContainer
+      .bind(tokens.undefined)
+      .toCall(createUndefined)
+      .inGlobalScope();
+
+    firstContainer.get(tokens.null);
+    secondContainer.get(tokens.null);
+    firstContainer.get(tokens.false);
+    secondContainer.get(tokens.false);
+    firstContainer.get(tokens.zero);
+    secondContainer.get(tokens.zero);
+    firstContainer.get(tokens.undefined);
+    secondContainer.get(tokens.undefined);
+
+    expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+    expect(createUndefined).toHaveBeenCalledTimes(2);
   });
 
   it('throws error when trying to create a call with required arguments when the target function was not injected', () => {
