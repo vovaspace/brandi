@@ -23,7 +23,8 @@ import {
   isFactoryConstructorBinding,
 } from './bindings';
 import { BindingsVault } from './BindingsVault';
-import { ResolutionContext } from './ResolutionContext';
+
+type ResolutionContext = Map<Binding, unknown>;
 
 export class Container {
   private vault = new BindingsVault();
@@ -83,7 +84,7 @@ export class Container {
     token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-    context: ResolutionContext = new ResolutionContext(),
+    context: ResolutionContext = new Map<Binding, unknown>(),
   ): unknown {
     const binding = this.resolveBinding(token, conditions, target);
 
@@ -123,45 +124,51 @@ export class Container {
   private resolveValue(binding: Binding, context: ResolutionContext): unknown {
     if (isEntityBinding(binding)) {
       if (isEntitySingletonScopedBinding(binding)) {
-        if (binding.cache !== undefined) return binding.cache;
-
-        const entity = this.resolveCreator(binding, context);
-        // eslint-disable-next-line no-param-reassign
-        binding.cache = entity;
-        return entity;
+        return this.resolveEntityCache(
+          binding,
+          context,
+          () => binding.cache,
+          (entity) => {
+            // eslint-disable-next-line no-param-reassign
+            binding.cache = entity;
+          },
+        );
       }
 
       if (isEntityContainerScopedBinding(binding)) {
-        const cache = binding.cache.get(this);
-
-        if (cache !== undefined) return cache;
-
-        const entity = this.resolveCreator(binding, context);
-        binding.cache.set(this, entity);
-        return entity;
+        return this.resolveEntityCache(
+          binding,
+          context,
+          () => binding.cache.get(this),
+          (entity) => {
+            binding.cache.set(this, entity);
+          },
+        );
       }
 
       if (isEntityResolutionScopedBinding(binding)) {
-        const cache = context.cache.get(binding);
-
-        if (cache !== undefined) return cache;
-
-        const entity = this.resolveCreator(binding, context);
-        context.cache.set(binding, entity);
-        return entity;
+        return this.resolveEntityCache(
+          binding,
+          context,
+          () => context.get(binding),
+          (entity) => {
+            context.set(binding, entity);
+          },
+        );
       }
 
       if (isEntityGlobalScopedBinding(binding)) {
-        const cache = entitiesRegistry.get(binding.value);
-
-        if (cache !== undefined) return cache;
-
-        const entity = this.resolveCreator(binding, context);
-        entitiesRegistry.set(binding.value, entity);
-        return entity;
+        return this.resolveEntityCache(
+          binding,
+          context,
+          () => entitiesRegistry.get(binding.value),
+          (entity) => {
+            entitiesRegistry.set(binding.value, entity);
+          },
+        );
       }
 
-      return this.resolveCreator(binding, context);
+      return this.resolveEntity(binding, context);
     }
 
     if (isFactoryBinding(binding)) {
@@ -183,7 +190,22 @@ export class Container {
     return binding.value;
   }
 
-  private resolveCreator(
+  private resolveEntityCache(
+    binding: EntityBinding,
+    context: ResolutionContext,
+    getCache: () => unknown,
+    setCache: (entity: unknown) => void,
+  ) {
+    const cache = getCache();
+
+    if (cache !== undefined) return cache;
+
+    const entity = this.resolveEntity(binding, context);
+    setCache(entity);
+    return entity;
+  }
+
+  private resolveEntity(
     binding: EntityBinding,
     context: ResolutionContext,
   ): unknown {
