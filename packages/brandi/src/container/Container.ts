@@ -90,7 +90,7 @@ export class Container {
 
     if (binding === null) return undefined;
 
-    return this.resolveValue(binding, context);
+    return this.resolveValue(token, binding, context);
   }
 
   private getMultiple(
@@ -121,7 +121,11 @@ export class Container {
     );
   }
 
-  private resolveValue(binding: Binding, context: ResolutionContext): unknown {
+  private resolveValue(
+    token: TokenValue,
+    binding: Binding,
+    context: ResolutionContext,
+  ): unknown {
     if (isEntityBinding(binding)) {
       if (isEntitySingletonScopedBinding(binding)) {
         return this.resolveEntityCache(
@@ -161,9 +165,18 @@ export class Container {
         return this.resolveEntityCache(
           binding,
           context,
-          () => entitiesRegistry.get(binding.value),
+          () => entitiesRegistry.get(token.__symbol)?.get(binding.value),
           (entity) => {
-            entitiesRegistry.set(binding.value, entity);
+            const entities = entitiesRegistry.get(token.__symbol);
+
+            if (entities === undefined) {
+              entitiesRegistry.set(
+                token.__symbol,
+                new Map<UnknownCreator, unknown>().set(binding.value, entity),
+              );
+            } else {
+              entities.set(binding.value, entity);
+            }
           },
         );
       }

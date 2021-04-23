@@ -296,9 +296,12 @@ describe('toInstance', () => {
   it('creates instances in global scope', () => {
     class SomeClass {}
 
+    class AnotherClass {}
+
     const tokens = {
-      someClass: token<SomeClass>('someClass'),
-      secondSomeClass: token<SomeClass>('anotherSomeClass'),
+      firstSomeClass: token<SomeClass>('firstSomeClass'),
+      secondSomeClass: token<SomeClass>('secondSomeClass'),
+      thirdSomeClass: token<SomeClass>('thirdSomeClass'),
     };
 
     const parentContainer = new Container();
@@ -306,50 +309,85 @@ describe('toInstance', () => {
     const independentContainer = new Container();
 
     parentContainer
-      .bind(tokens.someClass)
+      .bind(tokens.firstSomeClass)
       .toInstance(SomeClass)
       .inGlobalScope();
     parentContainer
       .bind(tokens.secondSomeClass)
       .toInstance(SomeClass)
       .inGlobalScope();
+    parentContainer
+      .bind(tokens.thirdSomeClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
 
-    childContainer.bind(tokens.someClass).toInstance(SomeClass).inGlobalScope();
+    childContainer
+      .bind(tokens.firstSomeClass)
+      .toInstance(SomeClass)
+      .inGlobalScope();
     childContainer
       .bind(tokens.secondSomeClass)
       .toInstance(SomeClass)
       .inGlobalScope();
+    childContainer
+      .bind(tokens.thirdSomeClass)
+      .toInstance(AnotherClass)
+      .inGlobalScope();
 
     independentContainer
-      .bind(tokens.someClass)
+      .bind(tokens.firstSomeClass)
       .toInstance(SomeClass)
       .inGlobalScope();
     independentContainer
       .bind(tokens.secondSomeClass)
       .toInstance(SomeClass)
       .inGlobalScope();
+    independentContainer
+      .bind(tokens.thirdSomeClass)
+      .toInstance(AnotherClass)
+      .inGlobalScope();
 
-    const parentInstance = parentContainer.get(tokens.someClass);
+    const parentFirstInstance = parentContainer.get(tokens.firstSomeClass);
     const parentSecondInstance = parentContainer.get(tokens.secondSomeClass);
-    const childInstance = childContainer.get(tokens.someClass);
+    const parentThirdInstance = parentContainer.get(tokens.thirdSomeClass);
+    const childFirstInstance = childContainer.get(tokens.firstSomeClass);
     const childSecondInstance = childContainer.get(tokens.secondSomeClass);
-    const independentInstance = independentContainer.get(tokens.someClass);
+    const childThirdInstance = childContainer.get(tokens.thirdSomeClass);
+    const independentFirstInstance = independentContainer.get(
+      tokens.firstSomeClass,
+    );
     const independentSecondInstance = independentContainer.get(
       tokens.secondSomeClass,
     );
+    const independentThirdInstance = independentContainer.get(
+      tokens.thirdSomeClass,
+    );
 
-    expect(parentInstance).toBeInstanceOf(SomeClass);
+    expect(parentFirstInstance).toBeInstanceOf(SomeClass);
+    expect(childFirstInstance).toBeInstanceOf(SomeClass);
+    expect(independentFirstInstance).toBeInstanceOf(SomeClass);
+
     expect(parentSecondInstance).toBeInstanceOf(SomeClass);
-    expect(childInstance).toBeInstanceOf(SomeClass);
     expect(childSecondInstance).toBeInstanceOf(SomeClass);
-    expect(independentInstance).toBeInstanceOf(SomeClass);
     expect(independentSecondInstance).toBeInstanceOf(SomeClass);
 
-    expect(parentInstance).toBe(parentSecondInstance);
-    expect(parentInstance).toBe(childInstance);
-    expect(childInstance).toBe(childSecondInstance);
-    expect(childInstance).toBe(independentInstance);
-    expect(independentInstance).toBe(independentSecondInstance);
+    expect(parentThirdInstance).toBeInstanceOf(SomeClass);
+    expect(childThirdInstance).toBeInstanceOf(AnotherClass);
+    expect(independentThirdInstance).toBeInstanceOf(AnotherClass);
+
+    expect(parentFirstInstance).toBe(childFirstInstance);
+    expect(childFirstInstance).toBe(independentFirstInstance);
+
+    expect(parentSecondInstance).toBe(childSecondInstance);
+    expect(childSecondInstance).toBe(independentSecondInstance);
+
+    expect(parentSecondInstance).not.toBe(parentFirstInstance);
+
+    expect(childThirdInstance).toBe(independentThirdInstance);
+    expect(childThirdInstance).not.toBe(parentThirdInstance);
+
+    expect(parentThirdInstance).not.toBe(parentFirstInstance);
+    expect(parentThirdInstance).not.toBe(parentSecondInstance);
   });
 
   it('throws error when trying to construct an instance with required constructor arguments when the target class was not injected', () => {

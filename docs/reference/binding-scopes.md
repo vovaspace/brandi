@@ -131,7 +131,7 @@ expect(userService.emailService).toBe(userService.settingsService.emailService);
 
 ## `inGlobalScope()`
 
-Each getting from any container with any token will return the same instance.
+Each getting from any container will return the same instance.
 
 #### Example
 
@@ -151,11 +151,6 @@ childContainer
   .toInstance(ApiService)
   .inGlobalScope();
 
-childContainer
-  .bind(TOKENS.secondApiService) /* ← Another token, */
-  .toInstance(ApiService)        /* ← But the same class. */
-  .inGlobalScope();
-
 independentContainer
   .bind(TOKENS.apiService)
   .toInstance(ApiService)
@@ -163,13 +158,11 @@ independentContainer
 
 const apiServiceParent = parentContainer.get(TOKENS.apiService);
 const apiServiceChild = childContainer.get(TOKENS.apiService);
-const secondApiServiceChild = childContainer.get(TOKENS.secondApiService);
 const apiServiceIndependent = independentContainer.get(TOKENS.apiService);
 
 /* The instances are the same. */
 expect(apiServiceParent).toBe(apiServiceChild);
 expect(apiServiceParent).toBe(apiServiceIndependent);
-expect(apiServiceChild).toBe(secondApiServiceChild);
 expect(apiServiceChild).toBe(apiServiceIndependent);
 ```
 <!-- prettier-ignore-end -->
