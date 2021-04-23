@@ -317,37 +317,87 @@ describe('toCall', () => {
   });
 
   it('creates call results in global scope', () => {
-    interface SomeResult {
-      some: true;
+    interface Result {
+      some: boolean;
     }
 
-    const createSome = (): SomeResult => ({ some: true });
+    const createSome = (): Result => ({ some: true });
+    const createAnother = (): Result => ({ some: false });
 
     const tokens = {
-      someResult: token<SomeResult>('some'),
+      firstResult: token<Result>('firstResult'),
+      secondResult: token<Result>('secondResult'),
+      thirdResult: token<Result>('thirdResult'),
     };
 
     const parentContainer = new Container();
     const childContainer = new Container(parentContainer);
     const independentContainer = new Container();
 
-    parentContainer.bind(tokens.someResult).toCall(createSome).inGlobalScope();
-    childContainer.bind(tokens.someResult).toCall(createSome).inGlobalScope();
-
-    independentContainer
-      .bind(tokens.someResult)
+    parentContainer.bind(tokens.firstResult).toCall(createSome).inGlobalScope();
+    parentContainer
+      .bind(tokens.secondResult)
       .toCall(createSome)
       .inGlobalScope();
+    parentContainer.bind(tokens.thirdResult).toCall(createSome).inGlobalScope();
 
-    const parentResult = parentContainer.get(tokens.someResult);
-    const childResult = childContainer.get(tokens.someResult);
-    const independentResult = independentContainer.get(tokens.someResult);
+    childContainer.bind(tokens.firstResult).toCall(createSome).inGlobalScope();
+    childContainer.bind(tokens.secondResult).toCall(createSome).inGlobalScope();
+    childContainer
+      .bind(tokens.thirdResult)
+      .toCall(createAnother)
+      .inGlobalScope();
 
-    expect(parentResult).toStrictEqual<SomeResult>({ some: true });
-    expect(childResult).toStrictEqual<SomeResult>({ some: true });
-    expect(independentResult).toStrictEqual<SomeResult>({ some: true });
-    expect(parentResult).toBe(childResult);
-    expect(childResult).toBe(independentResult);
+    independentContainer
+      .bind(tokens.firstResult)
+      .toCall(createSome)
+      .inGlobalScope();
+    independentContainer
+      .bind(tokens.secondResult)
+      .toCall(createSome)
+      .inGlobalScope();
+    independentContainer
+      .bind(tokens.thirdResult)
+      .toCall(createAnother)
+      .inGlobalScope();
+
+    const parentFirstResult = parentContainer.get(tokens.firstResult);
+    const parentSecondResult = parentContainer.get(tokens.secondResult);
+    const parentThirdResult = parentContainer.get(tokens.thirdResult);
+    const childFirstResult = childContainer.get(tokens.firstResult);
+    const childSecondResult = childContainer.get(tokens.secondResult);
+    const childThirdResult = childContainer.get(tokens.thirdResult);
+    const independentFirstResult = independentContainer.get(tokens.firstResult);
+    const independentSecondResult = independentContainer.get(
+      tokens.secondResult,
+    );
+    const independentThirdResult = independentContainer.get(tokens.thirdResult);
+
+    expect(parentFirstResult).toStrictEqual<Result>({ some: true });
+    expect(childFirstResult).toStrictEqual<Result>({ some: true });
+    expect(independentFirstResult).toStrictEqual<Result>({ some: true });
+
+    expect(parentSecondResult).toStrictEqual<Result>({ some: true });
+    expect(childSecondResult).toStrictEqual<Result>({ some: true });
+    expect(independentSecondResult).toStrictEqual<Result>({ some: true });
+
+    expect(parentThirdResult).toStrictEqual<Result>({ some: true });
+    expect(childThirdResult).toStrictEqual<Result>({ some: false });
+    expect(independentThirdResult).toStrictEqual<Result>({ some: false });
+
+    expect(parentFirstResult).toBe(childFirstResult);
+    expect(childFirstResult).toBe(independentFirstResult);
+
+    expect(parentSecondResult).toBe(childSecondResult);
+    expect(childSecondResult).toBe(independentSecondResult);
+
+    expect(parentSecondResult).not.toBe(parentFirstResult);
+
+    expect(childThirdResult).toBe(independentThirdResult);
+    expect(childThirdResult).not.toBe(parentThirdResult);
+
+    expect(parentThirdResult).not.toBe(parentFirstResult);
+    expect(parentThirdResult).not.toBe(parentSecondResult);
   });
 
   it("caches the call result in singleton scope if a falsy but not 'undefined' value was returned", () => {
