@@ -14,37 +14,21 @@ import { ScopeSyntax } from './ScopeSyntax';
 
 export class TypeSyntax<T> {
   constructor(
-    private readonly bindingsVault: BindingsVault,
+    private readonly vault: BindingsVault,
     private readonly token: Token,
     private readonly condition?: ResolutionCondition,
   ) {}
 
   public toInstance<K extends UnknownConstructor<T>>(ctor: K): ScopeSyntax {
-    return new ScopeSyntax(
-      this.bindingsVault,
-      ctor,
-      true,
-      this.token,
-      this.condition,
-    );
+    return new ScopeSyntax(this.vault, ctor, true, this.token, this.condition);
   }
 
   public toCall<K extends UnknownFunction<T>>(func: K): ScopeSyntax {
-    return new ScopeSyntax(
-      this.bindingsVault,
-      func,
-      false,
-      this.token,
-      this.condition,
-    );
+    return new ScopeSyntax(this.vault, func, false, this.token, this.condition);
   }
 
   public toConstant(value: T): void {
-    this.bindingsVault.set(
-      new ConstantBinding(value),
-      this.token,
-      this.condition,
-    );
+    this.vault.set(new ConstantBinding(value), this.token, this.condition);
   }
 
   /**
@@ -101,7 +85,7 @@ export class TypeSyntax<T> {
     ctor: UnknownConstructor,
     initializer?: (instance: unknown, ...args: unknown[]) => unknown,
   ): void {
-    this.bindingsVault.set(
+    this.vault.set(
       new FactoryBinding({ creator: ctor, initializer, isConstructor: true }),
       this.token,
       this.condition,
@@ -158,7 +142,7 @@ export class TypeSyntax<T> {
     func: UnknownFunction,
     initializer?: (entity: unknown, ...args: unknown[]) => unknown,
   ): void {
-    this.bindingsVault.set(
+    this.vault.set(
       new FactoryBinding({ creator: func, initializer, isConstructor: false }),
       this.token,
       this.condition,

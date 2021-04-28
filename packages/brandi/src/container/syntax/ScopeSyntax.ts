@@ -14,7 +14,7 @@ export class ScopeSyntax {
   private readonly warningTimeout?: NodeJS.Timeout;
 
   constructor(
-    private readonly bindingsVault: BindingsVault,
+    private readonly vault: BindingsVault,
     private readonly value: UnknownCreator,
     private readonly isConstructor: boolean,
     private readonly token: Token,
@@ -61,7 +61,7 @@ export class ScopeSyntax {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.bindingsVault.set(
+    this.vault.set(
       new Ctor(this.value, this.isConstructor),
       this.token,
       this.condition,

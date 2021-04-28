@@ -7,15 +7,11 @@ import { TypeSyntax } from './TypeSyntax';
 
 export class BindSyntax {
   constructor(
-    private readonly bindingsVault: BindingsVault,
+    protected vault: BindingsVault,
     private readonly condition?: ResolutionCondition,
   ) {}
 
   public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
-    return new TypeSyntax<TokenType<T>>(
-      this.bindingsVault,
-      token,
-      this.condition,
-    );
+    return new TypeSyntax<TokenType<T>>(this.vault, token, this.condition);
   }
 }

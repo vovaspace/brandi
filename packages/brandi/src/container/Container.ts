@@ -4,10 +4,9 @@ import {
   UnknownCreator,
   UnknownFunction,
 } from '../types';
-import { Token, TokenType, TokenValue } from '../pointers';
+import { TokenType, TokenValue } from '../pointers';
 import { entitiesRegistry, injectsRegistry, tagsRegistry } from '../globals';
 
-import { BindSyntax, TypeSyntax } from './syntax';
 import {
   Binding,
   EntityBinding,
@@ -23,15 +22,16 @@ import {
   isFactoryConstructorBinding,
 } from './bindings';
 import { BindingsVault } from './BindingsVault';
+import { WhenSyntax } from './syntax';
 
 type ResolutionContext = Map<Binding, unknown>;
 
-export class Container {
-  private vault = new BindingsVault();
-
+export class Container extends WhenSyntax {
   private snapshot: BindingsVault | null = null;
 
-  constructor(public parent?: Container) {}
+  constructor(public parent?: Container) {
+    super(new BindingsVault());
+  }
 
   public clone(): Container {
     const newContainer = new Container(this.parent);
@@ -51,14 +51,6 @@ export class Container {
         "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
       );
     }
-  }
-
-  public bind<T extends Token>(token: T): TypeSyntax<TokenType<T>> {
-    return new BindSyntax(this.vault).bind(token);
-  }
-
-  public when(condition: ResolutionCondition): BindSyntax {
-    return new BindSyntax(this.vault, condition);
   }
 
   public get<T extends TokenValue>(token: T): TokenType<T>;
