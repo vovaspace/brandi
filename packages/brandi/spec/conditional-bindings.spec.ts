@@ -406,6 +406,59 @@ describe('conditional bindings', () => {
     expect(instance.value).toBe(someValue);
   });
 
+  it('injects a dependency by conditions from the parent container', () => {
+    const defaultValue = 1;
+    const someValue = 2;
+    const anotherValue = 3;
+
+    class SomeClass {
+      constructor(public value: number) {}
+    }
+    class AnotherClass {
+      constructor(public value: number) {}
+    }
+
+    const tokens = {
+      value: token<number>('value'),
+      someClass: token<SomeClass>('someClass'),
+      anotherClass: token<AnotherClass>('anotherClass'),
+    };
+
+    const tags = {
+      some: tag('some'),
+    };
+
+    injected(SomeClass, tokens.value);
+    tagged(SomeClass, tags.some);
+
+    injected(AnotherClass, tokens.value);
+
+    const parentContainer = new Container();
+
+    parentContainer.bind(tokens.value).toConstant(defaultValue);
+    parentContainer.when(tags.some).bind(tokens.value).toConstant(someValue);
+    parentContainer
+      .when(AnotherClass)
+      .bind(tokens.value)
+      .toConstant(anotherValue);
+
+    const childContainer = new Container(parentContainer);
+    childContainer
+      .bind(tokens.someClass)
+      .toInstance(SomeClass)
+      .inTransientScope();
+    childContainer
+      .bind(tokens.anotherClass)
+      .toInstance(AnotherClass)
+      .inTransientScope();
+
+    const someInstance = childContainer.get(tokens.someClass);
+    const anotherInstance = childContainer.get(tokens.anotherClass);
+
+    expect(someInstance.value).toBe(someValue);
+    expect(anotherInstance.value).toBe(anotherValue);
+  });
+
   it('takes a binding by the tag assigned first with multiple related tags on the target', () => {
     const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
 

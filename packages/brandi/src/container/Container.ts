@@ -112,7 +112,8 @@ export class Container {
     const binding = this.vault.get(token, conditions, target);
 
     if (binding !== undefined) return binding;
-    if (this.parent !== undefined) return this.parent.resolveBinding(token);
+    if (this.parent !== undefined)
+      return this.parent.resolveBinding(token, conditions, target);
 
     if (token.__isOptional) return null;
 

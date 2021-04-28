@@ -3,7 +3,7 @@ import { Container, createContainer, token } from '../src';
 import { setEnv } from './utils';
 
 describe('container', () => {
-  it('returns a value from the parent container', () => {
+  it('returns a dependency from the parent container', () => {
     const someValue = 1;
 
     const tokens = {
