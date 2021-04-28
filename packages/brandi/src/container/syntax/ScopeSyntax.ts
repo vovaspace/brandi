@@ -2,7 +2,6 @@ import { ResolutionCondition, UnknownCreator } from '../../types';
 import { Token } from '../../pointers';
 
 import {
-  Binding,
   EntityContainerScopedBinding,
   EntityGlobalScopedBinding,
   EntityResolutionScopedBinding,
@@ -32,29 +31,40 @@ export class ScopeSyntax {
   }
 
   public inContainerScope(): void {
-    this.set(new EntityContainerScopedBinding(this.value, this.isConstructor));
+    this.set(EntityContainerScopedBinding);
   }
 
   public inGlobalScope(): void {
-    this.set(new EntityGlobalScopedBinding(this.value, this.isConstructor));
+    this.set(EntityGlobalScopedBinding);
   }
 
   public inResolutionScope(): void {
-    this.set(new EntityResolutionScopedBinding(this.value, this.isConstructor));
+    this.set(EntityResolutionScopedBinding);
   }
 
   public inSingletonScope(): void {
-    this.set(new EntitySingletonScopedBinding(this.value, this.isConstructor));
+    this.set(EntitySingletonScopedBinding);
   }
 
   public inTransientScope(): void {
-    this.set(new EntityTransientScopedBinding(this.value, this.isConstructor));
+    this.set(EntityTransientScopedBinding);
   }
 
-  private set(binding: Binding): void {
+  private set(
+    Ctor:
+      | typeof EntityContainerScopedBinding
+      | typeof EntityGlobalScopedBinding
+      | typeof EntityResolutionScopedBinding
+      | typeof EntitySingletonScopedBinding
+      | typeof EntityTransientScopedBinding,
+  ): void {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.bindingsVault.set(binding, this.token, this.condition);
+    this.bindingsVault.set(
+      new Ctor(this.value, this.isConstructor),
+      this.token,
+      this.condition,
+    );
   }
 }
