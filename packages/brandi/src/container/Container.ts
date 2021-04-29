@@ -14,7 +14,7 @@ import {
 import { BindingsVault } from './BindingsVault';
 import { WhenSyntax } from './syntax';
 
-type ResolutionContext = Map<Binding, unknown>;
+type ResolutionCache = Map<Binding, unknown>;
 
 export class Container extends WhenSyntax {
   private snapshot: BindingsVault | null = null;
@@ -66,23 +66,23 @@ export class Container extends WhenSyntax {
     token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-    context: ResolutionContext = new Map<Binding, unknown>(),
+    cache: ResolutionCache = new Map<Binding, unknown>(),
   ): unknown {
     const binding = this.resolveBinding(token, conditions, target);
 
     if (binding === null) return undefined;
 
-    return this.resolveValue(binding, context);
+    return this.resolveValue(binding, cache);
   }
 
   private getMultiple(
     tokens: TokenValue[],
-    context: ResolutionContext,
+    cache: ResolutionCache,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
   ): unknown[] {
     return tokens.map((token) =>
-      this.getSingle(token, conditions, target, context),
+      this.getSingle(token, conditions, target, cache),
     );
   }
 
@@ -104,12 +104,12 @@ export class Container extends WhenSyntax {
     );
   }
 
-  private resolveValue(binding: Binding, context: ResolutionContext): unknown {
+  private resolveValue(binding: Binding, cache: ResolutionCache): unknown {
     if (isInstanceBinding(binding)) {
       if (isInstanceSingletonScopedBinding(binding)) {
         return this.resolveInstanceCache(
           binding,
-          context,
+          cache,
           () => binding.cache,
           (instance) => {
             // eslint-disable-next-line no-param-reassign
@@ -121,7 +121,7 @@ export class Container extends WhenSyntax {
       if (isInstanceContainerScopedBinding(binding)) {
         return this.resolveInstanceCache(
           binding,
-          context,
+          cache,
           () => binding.cache.get(this),
           (instance) => {
             binding.cache.set(this, instance);
@@ -132,20 +132,20 @@ export class Container extends WhenSyntax {
       if (isInstanceResolutionScopedBinding(binding)) {
         return this.resolveInstanceCache(
           binding,
-          context,
-          () => context.get(binding),
+          cache,
+          () => cache.get(binding),
           (instance) => {
-            context.set(binding, instance);
+            cache.set(binding, instance);
           },
         );
       }
 
-      return this.resolveInstance(binding.value, context);
+      return this.resolveInstance(binding.value, cache);
     }
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
-        const instance = this.resolveInstance(binding.value.creator, context);
+        const instance = this.resolveInstance(binding.value.creator, cache);
 
         if (binding.value.initializer)
           binding.value.initializer(instance, ...args);
@@ -159,24 +159,24 @@ export class Container extends WhenSyntax {
 
   private resolveInstanceCache(
     binding: InstanceBinding,
-    context: ResolutionContext,
+    cache: ResolutionCache,
     getCache: () => unknown,
     setCache: (instance: unknown) => void,
   ) {
-    const cache = getCache();
+    const instanceCache = getCache();
 
-    if (cache !== undefined) return cache;
+    if (instanceCache !== undefined) return instanceCache;
 
-    const instance = this.resolveInstance(binding.value, context);
+    const instance = this.resolveInstance(binding.value, cache);
     setCache(instance);
     return instance;
   }
 
   private resolveInstance(
     creator: UnknownCreator,
-    context: ResolutionContext,
+    cache: ResolutionCache,
   ): unknown {
-    const parameters = this.resolveParameters(creator, context);
+    const parameters = this.resolveParameters(creator, cache);
     const isCallable = callableRegistry.get(creator);
 
     if (isCallable !== undefined) {
@@ -204,7 +204,7 @@ export class Container extends WhenSyntax {
 
   private resolveParameters(
     target: UnknownCreator,
-    context: ResolutionContext,
+    cache: ResolutionCache,
   ): unknown[] {
     const injects = injectsRegistry.get(target);
 
@@ -216,7 +216,6 @@ export class Container extends WhenSyntax {
       );
     }
 
-    const tags = tagsRegistry.get(target);
-    return this.getMultiple(injects, context, tags, target);
+    return this.getMultiple(injects, cache, tagsRegistry.get(target), target);
   }
 }
