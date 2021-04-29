@@ -3,7 +3,6 @@ import { Token } from '../../pointers';
 
 import {
   EntityContainerScopedBinding,
-  EntityGlobalScopedBinding,
   EntityResolutionScopedBinding,
   EntitySingletonScopedBinding,
   EntityTransientScopedBinding,
@@ -34,10 +33,6 @@ export class ScopeSyntax {
     this.set(EntityContainerScopedBinding);
   }
 
-  public inGlobalScope(): void {
-    this.set(EntityGlobalScopedBinding);
-  }
-
   public inResolutionScope(): void {
     this.set(EntityResolutionScopedBinding);
   }
@@ -53,7 +48,6 @@ export class ScopeSyntax {
   private set(
     Ctor:
       | typeof EntityContainerScopedBinding
-      | typeof EntityGlobalScopedBinding
       | typeof EntityResolutionScopedBinding
       | typeof EntitySingletonScopedBinding
       | typeof EntityTransientScopedBinding,

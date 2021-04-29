@@ -37,17 +37,6 @@ export class EntityContainerScopedBinding implements EntityBinding {
   ) {}
 }
 
-export class EntityGlobalScopedBinding implements EntityBinding {
-  public readonly type = Type.Entity;
-
-  public readonly scope = Scope.Global;
-
-  constructor(
-    public readonly value: UnknownCreator,
-    public readonly isConstructor: boolean,
-  ) {}
-}
-
 export class EntityResolutionScopedBinding implements EntityBinding {
   public readonly type = Type.Entity;
 
@@ -93,10 +82,6 @@ export const isEntityConstructorBinding = (
 export const isEntityContainerScopedBinding = (
   binding: EntityBinding,
 ): binding is EntityContainerScopedBinding => binding.scope === Scope.Container;
-
-export const isEntityGlobalScopedBinding = (
-  binding: EntityBinding,
-): binding is EntityGlobalScopedBinding => binding.scope === Scope.Global;
 
 export const isEntityResolutionScopedBinding = (
   binding: EntityBinding,

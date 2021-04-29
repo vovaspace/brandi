@@ -5,7 +5,7 @@ import {
   UnknownFunction,
 } from '../types';
 import { TokenType, TokenValue } from '../pointers';
-import { entitiesRegistry, injectsRegistry, tagsRegistry } from '../globals';
+import { injectsRegistry, tagsRegistry } from '../globals';
 
 import {
   Binding,
@@ -15,7 +15,6 @@ import {
   isEntityBinding,
   isEntityConstructorBinding,
   isEntityContainerScopedBinding,
-  isEntityGlobalScopedBinding,
   isEntityResolutionScopedBinding,
   isEntitySingletonScopedBinding,
   isFactoryBinding,
@@ -82,7 +81,7 @@ export class Container extends WhenSyntax {
 
     if (binding === null) return undefined;
 
-    return this.resolveValue(token, binding, context);
+    return this.resolveValue(binding, context);
   }
 
   private getMultiple(
@@ -114,11 +113,7 @@ export class Container extends WhenSyntax {
     );
   }
 
-  private resolveValue(
-    token: TokenValue,
-    binding: Binding,
-    context: ResolutionContext,
-  ): unknown {
+  private resolveValue(binding: Binding, context: ResolutionContext): unknown {
     if (isEntityBinding(binding)) {
       if (isEntitySingletonScopedBinding(binding)) {
         return this.resolveEntityCache(
@@ -150,26 +145,6 @@ export class Container extends WhenSyntax {
           () => context.get(binding),
           (entity) => {
             context.set(binding, entity);
-          },
-        );
-      }
-
-      if (isEntityGlobalScopedBinding(binding)) {
-        return this.resolveEntityCache(
-          binding,
-          context,
-          () => entitiesRegistry.get(token.__symbol)?.get(binding.value),
-          (entity) => {
-            const entities = entitiesRegistry.get(token.__symbol);
-
-            if (entities === undefined) {
-              entitiesRegistry.set(
-                token.__symbol,
-                new Map<UnknownCreator, unknown>().set(binding.value, entity),
-              );
-            } else {
-              entities.set(binding.value, entity);
-            }
           },
         );
       }

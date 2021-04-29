@@ -6,7 +6,6 @@ export enum Type {
 
 export enum Scope {
   Container,
-  Global,
   Resolution,
   Singleton,
   Transient,
