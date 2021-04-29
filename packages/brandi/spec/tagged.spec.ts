@@ -1,5 +1,5 @@
 import { tag, tagged } from '../src';
-import { tagsRegistry } from '../src/globals';
+import { tagsRegistry } from '../src/registries';
 
 describe('tagged', () => {
   beforeAll(() => {

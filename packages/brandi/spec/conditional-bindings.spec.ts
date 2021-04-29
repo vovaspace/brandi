@@ -3,329 +3,91 @@ import { Container, injected, tag, tagged, token } from '../src';
 import { setEnv } from './utils';
 
 describe('conditional bindings', () => {
-  describe('toInstance', () => {
-    it('creates an instance with an injection that depends on the target', () => {
-      const someValue = 1;
-      const anotherValue = 2;
+  it('creates an instance with an injection that depends on the target', () => {
+    const someValue = 1;
+    const anotherValue = 2;
 
-      class SomeClass {
-        constructor(public value: number) {}
-      }
+    class SomeClass {
+      constructor(public value: number) {}
+    }
 
-      class AnotherClass {
-        constructor(public value: number) {}
-      }
+    class AnotherClass {
+      constructor(public value: number) {}
+    }
 
-      const tokens = {
-        someValue: token<number>('someValue'),
-        someClass: token<SomeClass>('someClass'),
-        anotherClass: token<AnotherClass>('anotherClass'),
-      };
+    const tokens = {
+      someValue: token<number>('someValue'),
+      someClass: token<SomeClass>('someClass'),
+      anotherClass: token<AnotherClass>('anotherClass'),
+    };
 
-      injected(SomeClass, tokens.someValue);
-      injected(AnotherClass, tokens.someValue);
+    injected(SomeClass, tokens.someValue);
+    injected(AnotherClass, tokens.someValue);
 
-      const container = new Container();
+    const container = new Container();
 
-      container.bind(tokens.someValue).toConstant(someValue);
-      container
-        .when(AnotherClass)
-        .bind(tokens.someValue)
-        .toConstant(anotherValue);
+    container.bind(tokens.someValue).toConstant(someValue);
+    container
+      .when(AnotherClass)
+      .bind(tokens.someValue)
+      .toConstant(anotherValue);
 
-      container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
-      container
-        .bind(tokens.anotherClass)
-        .toInstance(AnotherClass)
-        .inTransientScope();
+    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
+    container
+      .bind(tokens.anotherClass)
+      .toInstance(AnotherClass)
+      .inTransientScope();
 
-      const someClassInstance = container.get(tokens.someClass);
-      const anotherClassInstance = container.get(tokens.anotherClass);
+    const someClassInstance = container.get(tokens.someClass);
+    const anotherClassInstance = container.get(tokens.anotherClass);
 
-      expect(someClassInstance.value).toBe(someValue);
-      expect(anotherClassInstance.value).toBe(anotherValue);
-    });
-
-    it('creates an instance with an injection that depends on the tag', () => {
-      const someValue = 1;
-      const anotherValue = 2;
-
-      class SomeClass {
-        constructor(public value: number) {}
-      }
-
-      class AnotherClass {
-        constructor(public value: number) {}
-      }
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-        someClass: token<SomeClass>('someClass'),
-        anotherClass: token<AnotherClass>('anotherClass'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(SomeClass, tokens.someValue);
-
-      injected(AnotherClass, tokens.someValue);
-      tagged(AnotherClass, tags.some);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(someValue);
-      container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
-
-      container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
-      container
-        .bind(tokens.anotherClass)
-        .toInstance(AnotherClass)
-        .inTransientScope();
-
-      const someClassInstance = container.get(tokens.someClass);
-      const anotherClassInstance = container.get(tokens.anotherClass);
-
-      expect(someClassInstance.value).toBe(someValue);
-      expect(anotherClassInstance.value).toBe(anotherValue);
-    });
+    expect(someClassInstance.value).toBe(someValue);
+    expect(anotherClassInstance.value).toBe(anotherValue);
   });
 
-  describe('toCall', () => {
-    it('creates a call result with an injection that depends on the target', () => {
-      const someValue = 1;
-      const anotherValue = 2;
+  it('creates an instance with an injection that depends on the tag', () => {
+    const someValue = 1;
+    const anotherValue = 2;
 
-      interface SomeResult {
-        some: number;
-      }
+    class SomeClass {
+      constructor(public value: number) {}
+    }
 
-      interface AnotherResult {
-        another: number;
-      }
+    class AnotherClass {
+      constructor(public value: number) {}
+    }
 
-      const createSome = (value: number): SomeResult => ({ some: value });
-      const createAnother = (value: number): AnotherResult => ({
-        another: value,
-      });
+    const tokens = {
+      someValue: token<number>('someValue'),
+      someClass: token<SomeClass>('someClass'),
+      anotherClass: token<AnotherClass>('anotherClass'),
+    };
 
-      const tokens = {
-        someValue: token<number>('someValue'),
-        someResult: token<SomeResult>('someResult'),
-        anotherResult: token<AnotherResult>('anotherResult'),
-      };
+    const tags = {
+      some: tag('some'),
+    };
 
-      injected(createSome, tokens.someValue);
-      injected(createAnother, tokens.someValue);
+    injected(SomeClass, tokens.someValue);
 
-      const container = new Container();
+    injected(AnotherClass, tokens.someValue);
+    tagged(AnotherClass, tags.some);
 
-      container.bind(tokens.someValue).toConstant(someValue);
-      container
-        .when(createAnother)
-        .bind(tokens.someValue)
-        .toConstant(anotherValue);
+    const container = new Container();
 
-      container.bind(tokens.someResult).toCall(createSome).inTransientScope();
-      container
-        .bind(tokens.anotherResult)
-        .toCall(createAnother)
-        .inTransientScope();
+    container.bind(tokens.someValue).toConstant(someValue);
+    container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
 
-      const someResult = container.get(tokens.someResult);
-      const anotherResult = container.get(tokens.anotherResult);
+    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
+    container
+      .bind(tokens.anotherClass)
+      .toInstance(AnotherClass)
+      .inTransientScope();
 
-      expect(someResult.some).toBe(someValue);
-      expect(anotherResult.another).toBe(anotherValue);
-    });
+    const someClassInstance = container.get(tokens.someClass);
+    const anotherClassInstance = container.get(tokens.anotherClass);
 
-    it('creates a call result with an injection that depends on the tag', () => {
-      const someValue = 1;
-      const anotherValue = 2;
-
-      interface SomeResult {
-        some: number;
-      }
-
-      interface AnotherResult {
-        another: number;
-      }
-
-      const createSome = (value: number): SomeResult => ({ some: value });
-      const createAnother = (value: number): AnotherResult => ({
-        another: value,
-      });
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-        someResult: token<SomeResult>('someResult'),
-        anotherResult: token<AnotherResult>('anotherResult'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(createSome, tokens.someValue);
-
-      injected(createAnother, tokens.someValue);
-      tagged(createAnother, tags.some);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(someValue);
-      container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
-
-      container.bind(tokens.someResult).toCall(createSome).inTransientScope();
-      container
-        .bind(tokens.anotherResult)
-        .toCall(createAnother)
-        .inTransientScope();
-
-      const someResult = container.get(tokens.someResult);
-      const anotherResult = container.get(tokens.anotherResult);
-
-      expect(someResult.some).toBe(someValue);
-      expect(anotherResult.another).toBe(anotherValue);
-    });
-  });
-
-  describe('Container.get', () => {
-    it('returns a dependency with a condition', () => {
-      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
-
-      const someValue = 1;
-      const anotherValue = 2;
-      const otherValue = 3;
-
-      class SomeClass {
-        constructor(public value: number) {}
-      }
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(SomeClass, tokens.someValue);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(someValue);
-      container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
-      container.when(SomeClass).bind(tokens.someValue).toConstant(otherValue);
-
-      expect(container.get(tokens.someValue)).toBe(someValue);
-      expect(container.get(tokens.someValue, [])).toBe(someValue);
-      expect(container.get(tokens.someValue, [tags.some])).toBe(anotherValue);
-      expect(container.get(tokens.someValue, [SomeClass])).toBe(otherValue);
-      expect(container.get(tokens.someValue, [tags.some, SomeClass])).toBe(
-        anotherValue,
-      );
-      expect(container.get(tokens.someValue, [SomeClass, tags.some])).toBe(
-        otherValue,
-      );
-
-      spy.mockRestore();
-    });
-
-    it('logs a warning when multiple related conditions were passed', () => {
-      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
-
-      class SomeClass {
-        constructor(public value: number) {}
-      }
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(SomeClass, tokens.someValue);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(0);
-      container.when(tags.some).bind(tokens.someValue).toConstant(0);
-      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
-
-      container.get(tokens.someValue, [SomeClass, tags.some]);
-
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
-
-      spy.mockRestore();
-    });
-
-    it('does not log a warning when a single related condition were passed', () => {
-      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
-
-      class SomeClass {
-        constructor(public value: number) {}
-      }
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(SomeClass, tokens.someValue);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(0);
-      container.when(tags.some).bind(tokens.someValue).toConstant(0);
-      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
-
-      container.get(tokens.someValue, [SomeClass]);
-      container.get(tokens.someValue, [tags.some]);
-
-      expect(spy).toHaveBeenCalledTimes(0);
-
-      spy.mockRestore();
-    });
-
-    it("skips the logging in 'production' env", () => {
-      const restoreEnv = setEnv('production');
-      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
-
-      class SomeClass {
-        constructor(public value: number) {}
-      }
-
-      const tokens = {
-        someValue: token<number>('someValue'),
-      };
-
-      const tags = {
-        some: tag('some'),
-      };
-
-      injected(SomeClass, tokens.someValue);
-
-      const container = new Container();
-
-      container.bind(tokens.someValue).toConstant(0);
-      container.when(tags.some).bind(tokens.someValue).toConstant(0);
-      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
-
-      container.get(tokens.someValue, [SomeClass, tags.some]);
-
-      expect(spy).toHaveBeenCalledTimes(0);
-
-      restoreEnv();
-      spy.mockRestore();
-    });
+    expect(someClassInstance.value).toBe(someValue);
+    expect(anotherClassInstance.value).toBe(anotherValue);
   });
 
   it('injects a dependency by the target condition when there are conditions for both the target and the tag', () => {
@@ -616,5 +378,142 @@ describe('conditional bindings', () => {
 
     restoreEnv();
     spy.mockRestore();
+  });
+
+  describe('Container.get', () => {
+    it('returns a dependency with a condition', () => {
+      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+      const someValue = 1;
+      const anotherValue = 2;
+      const otherValue = 3;
+
+      class SomeClass {
+        constructor(public value: number) {}
+      }
+
+      const tokens = {
+        someValue: token<number>('someValue'),
+      };
+
+      const tags = {
+        some: tag('some'),
+      };
+
+      injected(SomeClass, tokens.someValue);
+
+      const container = new Container();
+
+      container.bind(tokens.someValue).toConstant(someValue);
+      container.when(tags.some).bind(tokens.someValue).toConstant(anotherValue);
+      container.when(SomeClass).bind(tokens.someValue).toConstant(otherValue);
+
+      expect(container.get(tokens.someValue)).toBe(someValue);
+      expect(container.get(tokens.someValue, [])).toBe(someValue);
+      expect(container.get(tokens.someValue, [tags.some])).toBe(anotherValue);
+      expect(container.get(tokens.someValue, [SomeClass])).toBe(otherValue);
+      expect(container.get(tokens.someValue, [tags.some, SomeClass])).toBe(
+        anotherValue,
+      );
+      expect(container.get(tokens.someValue, [SomeClass, tags.some])).toBe(
+        otherValue,
+      );
+
+      spy.mockRestore();
+    });
+
+    it('logs a warning when multiple related conditions were passed', () => {
+      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+      class SomeClass {
+        constructor(public value: number) {}
+      }
+
+      const tokens = {
+        someValue: token<number>('someValue'),
+      };
+
+      const tags = {
+        some: tag('some'),
+      };
+
+      injected(SomeClass, tokens.someValue);
+
+      const container = new Container();
+
+      container.bind(tokens.someValue).toConstant(0);
+      container.when(tags.some).bind(tokens.someValue).toConstant(0);
+      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
+
+      container.get(tokens.someValue, [SomeClass, tags.some]);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
+
+      spy.mockRestore();
+    });
+
+    it('does not log a warning when a single related condition were passed', () => {
+      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+      class SomeClass {
+        constructor(public value: number) {}
+      }
+
+      const tokens = {
+        someValue: token<number>('someValue'),
+      };
+
+      const tags = {
+        some: tag('some'),
+      };
+
+      injected(SomeClass, tokens.someValue);
+
+      const container = new Container();
+
+      container.bind(tokens.someValue).toConstant(0);
+      container.when(tags.some).bind(tokens.someValue).toConstant(0);
+      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
+
+      container.get(tokens.someValue, [SomeClass]);
+      container.get(tokens.someValue, [tags.some]);
+
+      expect(spy).toHaveBeenCalledTimes(0);
+
+      spy.mockRestore();
+    });
+
+    it("skips the logging in 'production' env", () => {
+      const restoreEnv = setEnv('production');
+      const spy = jest.spyOn(console, 'warn').mockImplementation(() => null);
+
+      class SomeClass {
+        constructor(public value: number) {}
+      }
+
+      const tokens = {
+        someValue: token<number>('someValue'),
+      };
+
+      const tags = {
+        some: tag('some'),
+      };
+
+      injected(SomeClass, tokens.someValue);
+
+      const container = new Container();
+
+      container.bind(tokens.someValue).toConstant(0);
+      container.when(tags.some).bind(tokens.someValue).toConstant(0);
+      container.when(SomeClass).bind(tokens.someValue).toConstant(0);
+
+      container.get(tokens.someValue, [SomeClass, tags.some]);
+
+      expect(spy).toHaveBeenCalledTimes(0);
+
+      restoreEnv();
+      spy.mockRestore();
+    });
   });
 });

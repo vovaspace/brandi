@@ -2,10 +2,10 @@ import { ResolutionCondition, UnknownCreator } from '../../types';
 import { Token } from '../../pointers';
 
 import {
-  EntityContainerScopedBinding,
-  EntityResolutionScopedBinding,
-  EntitySingletonScopedBinding,
-  EntityTransientScopedBinding,
+  InstanceContainerScopedBinding,
+  InstanceResolutionScopedBinding,
+  InstanceSingletonScopedBinding,
+  InstanceTransientScopedBinding,
 } from '../bindings';
 import { BindingsVault } from '../BindingsVault';
 
@@ -15,7 +15,6 @@ export class ScopeSyntax {
   constructor(
     private readonly vault: BindingsVault,
     private readonly value: UnknownCreator,
-    private readonly isConstructor: boolean,
     private readonly token: Token,
     private readonly condition?: ResolutionCondition,
   ) {
@@ -30,35 +29,31 @@ export class ScopeSyntax {
   }
 
   public inContainerScope(): void {
-    this.set(EntityContainerScopedBinding);
+    this.set(InstanceContainerScopedBinding);
   }
 
   public inResolutionScope(): void {
-    this.set(EntityResolutionScopedBinding);
+    this.set(InstanceResolutionScopedBinding);
   }
 
   public inSingletonScope(): void {
-    this.set(EntitySingletonScopedBinding);
+    this.set(InstanceSingletonScopedBinding);
   }
 
   public inTransientScope(): void {
-    this.set(EntityTransientScopedBinding);
+    this.set(InstanceTransientScopedBinding);
   }
 
   private set(
     Ctor:
-      | typeof EntityContainerScopedBinding
-      | typeof EntityResolutionScopedBinding
-      | typeof EntitySingletonScopedBinding
-      | typeof EntityTransientScopedBinding,
+      | typeof InstanceContainerScopedBinding
+      | typeof InstanceResolutionScopedBinding
+      | typeof InstanceSingletonScopedBinding
+      | typeof InstanceTransientScopedBinding,
   ): void {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.vault.set(
-      new Ctor(this.value, this.isConstructor),
-      this.token,
-      this.condition,
-    );
+    this.vault.set(new Ctor(this.value), this.token, this.condition);
   }
 }

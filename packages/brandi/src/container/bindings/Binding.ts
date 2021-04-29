@@ -1,6 +1,6 @@
 export enum Type {
   Constant,
-  Entity,
+  Instance,
   Factory,
 }
 

@@ -1,5 +1,5 @@
 import { injected, token } from '../src';
-import { injectsRegistry } from '../src/globals';
+import { injectsRegistry } from '../src/registries';
 
 describe('injected', () => {
   beforeAll(() => {

@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`toCall logs a warning when a binding scope setting method was not called 1`] = `"Warning: did you forget to set a scope for 'unknown' token binding? Call 'inTransientScope()', 'inSingletonScope()', 'inContainerScope()' or 'inResolutionScope()'."`;
-
-exports[`toCall throws error when trying to create a call with required arguments when the target function was not injected 1`] = `"Missing required 'injected' registration of 'createSome'"`;

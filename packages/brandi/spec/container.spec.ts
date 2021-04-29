@@ -192,8 +192,8 @@ describe('container', () => {
       // @ts-expect-error: Argument of type 'typeof AnotherClass' is not assignable to parameter of type 'UnknownConstructor<SomeClass>'.
       container.bind(tokens.some).toInstance(AnotherClass).inTransientScope();
 
-      // @ts-expect-error: Argument of type '() => AnotherClass' is not assignable to parameter of type 'UnknownFunction<SomeClass>'.
-      container.bind(tokens.some).toCall(createAnother).inTransientScope();
+      // @ts-expect-error: Argument of type '() => AnotherClass' is not assignable to parameter of type 'UnknownCreator<SomeClass>'.
+      container.bind(tokens.some).toInstance(createAnother).inTransientScope();
     });
 
     it('does not allow to bind an optional token', () => {

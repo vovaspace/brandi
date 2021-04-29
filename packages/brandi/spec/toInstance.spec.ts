@@ -6,227 +6,276 @@ jest.useFakeTimers();
 
 describe('toInstance', () => {
   it('creates instances in transient scope', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
+    const createSome = (): Some => ({});
+
+    const TOKENS = {
+      someInstance: token<Some>('some:instance'),
+      someReturn: token<Some>('some:return'),
     };
 
     const container = new Container();
-    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
+    container.bind(TOKENS.someInstance).toInstance(Some).inTransientScope();
+    container.bind(TOKENS.someReturn).toInstance(createSome).inTransientScope();
 
-    const firstInstance = container.get(tokens.someClass);
-    const secondInstance = container.get(tokens.someClass);
+    const firstInstance = container.get(TOKENS.someInstance);
+    const secondInstance = container.get(TOKENS.someInstance);
 
-    expect(firstInstance).toBeInstanceOf(SomeClass);
-    expect(secondInstance).toBeInstanceOf(SomeClass);
+    const firstReturn = container.get(TOKENS.someReturn);
+    const secondReturn = container.get(TOKENS.someReturn);
+
+    expect(firstInstance).toBeInstanceOf(Some);
+    expect(secondInstance).toBeInstanceOf(Some);
     expect(firstInstance).not.toBe(secondInstance);
+
+    expect(firstReturn).toStrictEqual<Some>({});
+    expect(secondReturn).toStrictEqual<Some>({});
+    expect(firstReturn).not.toBe(secondReturn);
   });
 
   it('creates instances in singleton scope', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
+    const createSome = (): Some => ({});
+
+    const TOKENS = {
+      someInstance: token<Some>('some:instance'),
+      someReturn: token<Some>('some:return'),
     };
 
     const container = new Container();
-    container.bind(tokens.someClass).toInstance(SomeClass).inSingletonScope();
+    container.bind(TOKENS.someInstance).toInstance(Some).inSingletonScope();
+    container.bind(TOKENS.someReturn).toInstance(createSome).inSingletonScope();
 
-    const firstInstance = container.get(tokens.someClass);
-    const secondInstance = container.get(tokens.someClass);
+    const firstInstance = container.get(TOKENS.someInstance);
+    const secondInstance = container.get(TOKENS.someInstance);
 
-    expect(firstInstance).toBeInstanceOf(SomeClass);
-    expect(secondInstance).toBeInstanceOf(SomeClass);
+    const firstReturn = container.get(TOKENS.someReturn);
+    const secondReturn = container.get(TOKENS.someReturn);
+
+    expect(firstInstance).toBeInstanceOf(Some);
+    expect(secondInstance).toBeInstanceOf(Some);
     expect(firstInstance).toBe(secondInstance);
+
+    expect(firstReturn).toStrictEqual<Some>({});
+    expect(secondReturn).toStrictEqual<Some>({});
+    expect(firstReturn).toBe(secondReturn);
+  });
+
+  it("caches the call result in singleton scope if a falsy but not 'undefined' value was returned", () => {
+    const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+    const createUndefined = jest.fn(() => undefined);
+
+    const tokens = {
+      null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      undefined: token<undefined>('undefined'),
+    };
+
+    const container = new Container();
+    container.bind(tokens.null).toInstance(createNull).inSingletonScope();
+    container.bind(tokens.false).toInstance(createFalse).inSingletonScope();
+    container.bind(tokens.zero).toInstance(createZero).inSingletonScope();
+    container
+      .bind(tokens.undefined)
+      .toInstance(createUndefined)
+      .inSingletonScope();
+
+    container.get(tokens.null);
+    container.get(tokens.null);
+    container.get(tokens.false);
+    container.get(tokens.false);
+    container.get(tokens.zero);
+    container.get(tokens.zero);
+    container.get(tokens.undefined);
+    container.get(tokens.undefined);
+
+    expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+    expect(createUndefined).toHaveBeenCalledTimes(2);
   });
 
   it('creates singleton scoped instances unique to its bindings', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
+    const TOKENS = {
+      some: token<Some>('some'),
     };
 
     const parentContainer = new Container();
+    parentContainer.bind(TOKENS.some).toInstance(Some).inSingletonScope();
+
     const childContainer = new Container(parentContainer);
+    childContainer.bind(TOKENS.some).toInstance(Some).inSingletonScope();
 
-    parentContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inSingletonScope();
+    const parentInstance = parentContainer.get(TOKENS.some);
+    const childInstance = childContainer.get(TOKENS.some);
 
-    childContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inSingletonScope();
-
-    const parentInstance = parentContainer.get(tokens.someClass);
-    const childInstance = childContainer.get(tokens.someClass);
-
-    expect(parentInstance).toBeInstanceOf(SomeClass);
-    expect(childInstance).toBeInstanceOf(SomeClass);
+    expect(parentInstance).toBeInstanceOf(Some);
+    expect(childInstance).toBeInstanceOf(Some);
     expect(parentInstance).not.toBe(childInstance);
   });
 
   it('shares a singleton between the original container and its copy', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
+    const TOKENS = {
+      some: token<Some>('some'),
     };
 
     const originalContainer = new Container();
-
-    originalContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inSingletonScope();
+    originalContainer.bind(TOKENS.some).toInstance(Some).inSingletonScope();
 
     const copiedContainer = originalContainer.clone();
 
-    const copiedContainerInstance = copiedContainer.get(tokens.someClass);
-    const originalContainerInstance = originalContainer.get(tokens.someClass);
+    const copiedContainerInstance = copiedContainer.get(TOKENS.some);
+    const originalContainerInstance = originalContainer.get(TOKENS.some);
 
     expect(copiedContainerInstance).toBe(originalContainerInstance);
   });
 
   it('creates instances with injections', () => {
-    const someValue = 1;
+    const value = 1;
 
-    class FirstClass {}
+    class First {}
 
-    class SecondClass {}
+    class Second {}
 
-    class ThirdClass {
+    class Third {
       constructor(
-        public value: number,
-        public first: FirstClass,
-        public second: SecondClass,
+        public num: number,
+        public first: First,
+        public second: Second,
       ) {}
     }
 
-    const tokens = {
-      someValue: token<number>('someValue'),
-      firstClass: token<FirstClass>('firstClass'),
-      secondClass: token<SecondClass>('secondClass'),
-      thirdClass: token<ThirdClass>('thirdClass'),
+    const createThird = (num: number, first: First, second: Second) => ({
+      num,
+      first,
+      second,
+    });
+
+    const TOKENS = {
+      num: token<number>('some'),
+      first: token<First>('first'),
+      second: token<Second>('second'),
+      thirdInstance: token<Third>('third:instance'),
+      thirdReturn: token<Third>('third:return'),
     };
 
-    injected(
-      ThirdClass,
-      tokens.someValue,
-      tokens.firstClass,
-      tokens.secondClass,
-    );
+    injected(Third, TOKENS.num, TOKENS.first, TOKENS.second);
+    injected(createThird, TOKENS.num, TOKENS.first, TOKENS.second);
 
     const container = new Container();
-    container.bind(tokens.someValue).toConstant(someValue);
-    container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
+    container.bind(TOKENS.num).toConstant(value);
+    container.bind(TOKENS.first).toInstance(First).inTransientScope();
+    container.bind(TOKENS.second).toInstance(Second).inSingletonScope();
+    container.bind(TOKENS.thirdInstance).toInstance(Third).inTransientScope();
     container
-      .bind(tokens.secondClass)
-      .toInstance(SecondClass)
-      .inSingletonScope();
-    container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();
+      .bind(TOKENS.thirdReturn)
+      .toInstance(createThird)
+      .inTransientScope();
 
-    const firstThirdClassInstance = container.get(tokens.thirdClass);
-    const secondThirdClassInstance = container.get(tokens.thirdClass);
+    const firstInstance = container.get(TOKENS.thirdInstance);
+    const secondInstance = container.get(TOKENS.thirdInstance);
+    const firstReturn = container.get(TOKENS.thirdReturn);
+    const secondReturn = container.get(TOKENS.thirdReturn);
 
-    expect(firstThirdClassInstance.value).toBe(someValue);
-    expect(secondThirdClassInstance.value).toBe(someValue);
+    expect(firstInstance.num).toBe(value);
+    expect(secondInstance.num).toBe(value);
+    expect(firstReturn.num).toBe(value);
+    expect(secondReturn.num).toBe(value);
 
-    expect(firstThirdClassInstance.first).toBeInstanceOf(FirstClass);
-    expect(secondThirdClassInstance.first).toBeInstanceOf(FirstClass);
-    expect(firstThirdClassInstance.first).not.toBe(
-      secondThirdClassInstance.first,
-    );
+    expect(firstInstance.first).toBeInstanceOf(First);
+    expect(secondInstance.first).toBeInstanceOf(First);
+    expect(firstReturn.first).toBeInstanceOf(First);
+    expect(secondReturn.first).toBeInstanceOf(First);
+    expect(firstInstance.first).not.toBe(secondInstance.first);
+    expect(firstReturn.first).not.toBe(secondReturn.first);
 
-    expect(firstThirdClassInstance.second).toBeInstanceOf(SecondClass);
-    expect(secondThirdClassInstance.second).toBeInstanceOf(SecondClass);
-    expect(firstThirdClassInstance.second).toBe(
-      secondThirdClassInstance.second,
-    );
+    expect(firstInstance.second).toBeInstanceOf(Second);
+    expect(secondInstance.second).toBeInstanceOf(Second);
+    expect(firstReturn.second).toBeInstanceOf(Second);
+    expect(secondReturn.second).toBeInstanceOf(Second);
+    expect(firstInstance.second).toBe(secondInstance.second);
+    expect(firstReturn.second).toBe(secondInstance.second);
   });
 
   it('creates an instance with an injection from the parent container', () => {
-    const someValue = 1;
+    const value = 1;
 
-    class SomeClass {
-      constructor(public value: number) {}
+    class Some {
+      constructor(public num: number) {}
     }
 
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someClass: token<SomeClass>('someClass'),
+    const TOKENS = {
+      value: token<number>('value'),
+      some: token<Some>('some'),
     };
 
-    injected(SomeClass, tokens.someValue);
+    injected(Some, TOKENS.value);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toConstant(someValue);
+    parentContainer.bind(TOKENS.value).toConstant(value);
 
     const childContainer = new Container(parentContainer);
-    childContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inTransientScope();
+    childContainer.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
-    const instance = childContainer.get(tokens.someClass);
+    const instance = childContainer.get(TOKENS.some);
 
-    expect(instance.value).toBe(someValue);
+    expect(instance.num).toBe(value);
   });
 
   it('creates an instance with an injection from the container from which the instance was got', () => {
     const someValue = 1;
     const anotherValue = 2;
 
-    class SomeClass {
-      constructor(public value: number) {}
+    class Some {
+      constructor(public num: number) {}
     }
 
-    const tokens = {
-      someValue: token<number>('someValue'),
-      someClass: token<SomeClass>('someClass'),
+    const TOKENS = {
+      num: token<number>('num'),
+      some: token<Some>('some'),
     };
 
-    injected(SomeClass, tokens.someValue);
+    injected(Some, TOKENS.num);
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toConstant(someValue);
-    parentContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inTransientScope();
+    parentContainer.bind(TOKENS.num).toConstant(someValue);
+    parentContainer.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
     const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.someValue).toConstant(anotherValue);
+    childContainer.bind(TOKENS.num).toConstant(anotherValue);
 
-    const parentContainerInstance = parentContainer.get(tokens.someClass);
-    const childContainerInstance = childContainer.get(tokens.someClass);
+    const parentContainerInstance = parentContainer.get(TOKENS.some);
+    const childContainerInstance = childContainer.get(TOKENS.some);
 
-    expect(parentContainerInstance.value).toBe(someValue);
-    expect(childContainerInstance.value).toBe(anotherValue);
+    expect(parentContainerInstance.num).toBe(someValue);
+    expect(childContainerInstance.num).toBe(anotherValue);
   });
 
   it('creates instances in container scope', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClass: token<SomeClass>('someClass'),
+    const TOKENS = {
+      some: token<Some>('some'),
     };
 
     const parentContainer = new Container();
-    parentContainer
-      .bind(tokens.someClass)
-      .toInstance(SomeClass)
-      .inContainerScope();
+    parentContainer.bind(TOKENS.some).toInstance(Some).inContainerScope();
 
     const childContainer = new Container(parentContainer);
 
-    const parentContainerFirstInstance = parentContainer.get(tokens.someClass);
-    const parentContainerSecondInstance = parentContainer.get(tokens.someClass);
-    const childContainerFirstInstance = childContainer.get(tokens.someClass);
-    const childContainerSecondInstance = childContainer.get(tokens.someClass);
+    const parentContainerFirstInstance = parentContainer.get(TOKENS.some);
+    const parentContainerSecondInstance = parentContainer.get(TOKENS.some);
+    const childContainerFirstInstance = childContainer.get(TOKENS.some);
+    const childContainerSecondInstance = childContainer.get(TOKENS.some);
 
     expect(parentContainerFirstInstance).toBe(parentContainerSecondInstance);
     expect(childContainerFirstInstance).toBe(childContainerSecondInstance);
@@ -234,58 +283,80 @@ describe('toInstance', () => {
     expect(parentContainerFirstInstance).not.toBe(childContainerFirstInstance);
   });
 
+  it("caches the call result in container scope if a falsy but not 'undefined' value was returned", () => {
+    const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+    const createUndefined = jest.fn(() => undefined);
+
+    const tokens = {
+      null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      undefined: token<undefined>('undefined'),
+    };
+
+    const container = new Container();
+    container.bind(tokens.null).toInstance(createNull).inContainerScope();
+    container.bind(tokens.false).toInstance(createFalse).inContainerScope();
+    container.bind(tokens.zero).toInstance(createZero).inContainerScope();
+    container
+      .bind(tokens.undefined)
+      .toInstance(createUndefined)
+      .inContainerScope();
+
+    container.get(tokens.null);
+    container.get(tokens.null);
+    container.get(tokens.false);
+    container.get(tokens.false);
+    container.get(tokens.zero);
+    container.get(tokens.zero);
+    container.get(tokens.undefined);
+    container.get(tokens.undefined);
+
+    expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+    expect(createUndefined).toHaveBeenCalledTimes(2);
+  });
+
   it('creates instances in resolution scope', () => {
-    class FirstClass {}
+    class First {}
 
-    class SecondClass {
-      constructor(public first: FirstClass) {}
+    class Second {
+      constructor(public first: First) {}
     }
 
-    class ThirdClass {
-      constructor(public first: FirstClass, public second: SecondClass) {}
+    class Third {
+      constructor(public first: First, public second: Second) {}
     }
 
-    class FourthClass {
+    class Fourth {
       constructor(
-        public first: FirstClass,
-        public second: SecondClass,
-        public third: ThirdClass,
+        public first: First,
+        public second: Second,
+        public third: Third,
       ) {}
     }
 
-    const tokens = {
-      firstClass: token<FirstClass>('firstClass'),
-      secondClass: token<SecondClass>('secondClass'),
-      thirdClass: token<ThirdClass>('thirdClass'),
-      fourthClass: token<FourthClass>('fourthClass'),
+    const TOKENS = {
+      first: token<First>('first'),
+      second: token<Second>('second'),
+      third: token<Third>('third'),
+      fourth: token<Fourth>('fourth'),
     };
 
-    injected(SecondClass, tokens.firstClass);
-    injected(ThirdClass, tokens.firstClass, tokens.secondClass);
-    injected(
-      FourthClass,
-      tokens.firstClass,
-      tokens.secondClass,
-      tokens.thirdClass,
-    );
+    injected(Second, TOKENS.first);
+    injected(Third, TOKENS.first, TOKENS.second);
+    injected(Fourth, TOKENS.first, TOKENS.second, TOKENS.third);
 
     const container = new Container();
+    container.bind(TOKENS.first).toInstance(First).inResolutionScope();
+    container.bind(TOKENS.second).toInstance(Second).inResolutionScope();
+    container.bind(TOKENS.third).toInstance(Third).inTransientScope();
+    container.bind(TOKENS.fourth).toInstance(Fourth).inTransientScope();
 
-    container
-      .bind(tokens.firstClass)
-      .toInstance(FirstClass)
-      .inResolutionScope();
-    container
-      .bind(tokens.secondClass)
-      .toInstance(SecondClass)
-      .inResolutionScope();
-    container.bind(tokens.thirdClass).toInstance(ThirdClass).inTransientScope();
-    container
-      .bind(tokens.fourthClass)
-      .toInstance(FourthClass)
-      .inTransientScope();
-
-    const instance = container.get(tokens.fourthClass);
+    const instance = container.get(TOKENS.fourth);
 
     expect(instance.first).toBe(instance.second.first);
     expect(instance.first).toBe(instance.third.first);
@@ -293,20 +364,128 @@ describe('toInstance', () => {
     expect(instance.second).toBe(instance.third.second);
   });
 
-  it('throws error when trying to construct an instance with required constructor arguments when the target class was not injected', () => {
-    class SomeClass {
+  it('caches the call result in resolution scope if a falsy value was returned', () => {
+    interface First {
+      n: null;
+      f: boolean;
+      z: number;
+    }
+
+    interface Second {
+      n: null;
+      f: boolean;
+      z: number;
+      first: First;
+    }
+
+    interface Third {
+      n: null;
+      f: boolean;
+      z: number;
+      first: First;
+      second: Second;
+    }
+
+    const createNull = jest.fn(() => null);
+    const createFalse = jest.fn(() => false);
+    const createZero = jest.fn(() => 0);
+
+    const createFirst = (n: null, f: boolean, z: number): First => ({
+      n,
+      f,
+      z,
+    });
+
+    const createSecond = (
+      n: null,
+      f: boolean,
+      z: number,
+      first: First,
+    ): Second => ({
+      n,
+      f,
+      z,
+      first,
+    });
+
+    const createThird = (
+      n: null,
+      f: boolean,
+      z: number,
+      first: First,
+      second: Second,
+    ) => ({
+      n,
+      f,
+      z,
+      first,
+      second,
+    });
+
+    const tokens = {
+      null: token<null>('null'),
+      false: token<boolean>('false'),
+      zero: token<number>('zero'),
+      first: token<First>('first'),
+      second: token<Second>('second'),
+      third: token<Third>('third'),
+    };
+
+    injected(createFirst, tokens.null, tokens.false, tokens.zero);
+    injected(
+      createSecond,
+      tokens.null,
+      tokens.false,
+      tokens.zero,
+      tokens.first,
+    );
+    injected(
+      createThird,
+      tokens.null,
+      tokens.false,
+      tokens.zero,
+      tokens.first,
+      tokens.second,
+    );
+
+    const container = new Container();
+
+    container.bind(tokens.null).toInstance(createNull).inResolutionScope();
+    container.bind(tokens.false).toInstance(createFalse).inResolutionScope();
+    container.bind(tokens.zero).toInstance(createZero).inResolutionScope();
+
+    container.bind(tokens.first).toInstance(createFirst).inTransientScope();
+    container.bind(tokens.second).toInstance(createSecond).inTransientScope();
+    container.bind(tokens.third).toInstance(createThird).inTransientScope();
+
+    container.get(tokens.third);
+
+    expect(createNull).toHaveBeenCalledTimes(1);
+    expect(createFalse).toHaveBeenCalledTimes(1);
+    expect(createZero).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws error when trying to construct an instance with required constructor arguments when the creator was not injected', () => {
+    class Some {
       constructor(public dependency: unknown) {}
     }
 
-    const tokens = {
-      someClass: token('someClass'),
+    const createSome = (dependency: unknown): Some => ({ dependency });
+
+    const TOKENS = {
+      someInstance: token('some:instance'),
+      someReturn: token('some:return'),
     };
 
     const container = new Container();
-    container.bind(tokens.someClass).toInstance(SomeClass).inTransientScope();
+    container.bind(TOKENS.someInstance).toInstance(Some).inTransientScope();
+    container.bind(TOKENS.someReturn).toInstance(createSome).inTransientScope();
 
     expect(() =>
-      container.get(tokens.someClass),
+      container.get(TOKENS.someInstance),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      container.get(TOKENS.someReturn),
     ).toThrowErrorMatchingSnapshot();
   });
 

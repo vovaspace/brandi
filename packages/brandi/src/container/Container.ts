@@ -1,24 +1,15 @@
-import {
-  ResolutionCondition,
-  UnknownConstructor,
-  UnknownCreator,
-  UnknownFunction,
-} from '../types';
+import { ResolutionCondition, UnknownCreator } from '../types';
 import { TokenType, TokenValue } from '../pointers';
-import { injectsRegistry, tagsRegistry } from '../globals';
+import { callableRegistry, injectsRegistry, tagsRegistry } from '../registries';
 
 import {
   Binding,
-  EntityBinding,
-  EntityFunctionBinding,
-  FactoryFunctionBinding,
-  isEntityBinding,
-  isEntityConstructorBinding,
-  isEntityContainerScopedBinding,
-  isEntityResolutionScopedBinding,
-  isEntitySingletonScopedBinding,
+  InstanceBinding,
   isFactoryBinding,
-  isFactoryConstructorBinding,
+  isInstanceBinding,
+  isInstanceContainerScopedBinding,
+  isInstanceResolutionScopedBinding,
+  isInstanceSingletonScopedBinding,
 } from './bindings';
 import { BindingsVault } from './BindingsVault';
 import { WhenSyntax } from './syntax';
@@ -114,86 +105,101 @@ export class Container extends WhenSyntax {
   }
 
   private resolveValue(binding: Binding, context: ResolutionContext): unknown {
-    if (isEntityBinding(binding)) {
-      if (isEntitySingletonScopedBinding(binding)) {
-        return this.resolveEntityCache(
+    if (isInstanceBinding(binding)) {
+      if (isInstanceSingletonScopedBinding(binding)) {
+        return this.resolveInstanceCache(
           binding,
           context,
           () => binding.cache,
-          (entity) => {
+          (instance) => {
             // eslint-disable-next-line no-param-reassign
-            binding.cache = entity;
+            binding.cache = instance;
           },
         );
       }
 
-      if (isEntityContainerScopedBinding(binding)) {
-        return this.resolveEntityCache(
+      if (isInstanceContainerScopedBinding(binding)) {
+        return this.resolveInstanceCache(
           binding,
           context,
           () => binding.cache.get(this),
-          (entity) => {
-            binding.cache.set(this, entity);
+          (instance) => {
+            binding.cache.set(this, instance);
           },
         );
       }
 
-      if (isEntityResolutionScopedBinding(binding)) {
-        return this.resolveEntityCache(
+      if (isInstanceResolutionScopedBinding(binding)) {
+        return this.resolveInstanceCache(
           binding,
           context,
           () => context.get(binding),
-          (entity) => {
-            context.set(binding, entity);
+          (instance) => {
+            context.set(binding, instance);
           },
         );
       }
 
-      return this.resolveEntity(binding, context);
+      return this.resolveInstance(binding.value, context);
     }
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
-        const entity = isFactoryConstructorBinding(binding)
-          ? this.construct(binding.value.creator, context)
-          : this.call(
-              (binding as FactoryFunctionBinding).value.creator,
-              context,
-            );
+        const instance = this.resolveInstance(binding.value.creator, context);
 
         if (binding.value.initializer)
-          binding.value.initializer(entity, ...args);
+          binding.value.initializer(instance, ...args);
 
-        return entity;
+        return instance;
       };
     }
 
     return binding.value;
   }
 
-  private resolveEntityCache(
-    binding: EntityBinding,
+  private resolveInstanceCache(
+    binding: InstanceBinding,
     context: ResolutionContext,
     getCache: () => unknown,
-    setCache: (entity: unknown) => void,
+    setCache: (instance: unknown) => void,
   ) {
     const cache = getCache();
 
     if (cache !== undefined) return cache;
 
-    const entity = this.resolveEntity(binding, context);
-    setCache(entity);
-    return entity;
+    const instance = this.resolveInstance(binding.value, context);
+    setCache(instance);
+    return instance;
   }
 
-  private resolveEntity(
-    binding: EntityBinding,
+  private resolveInstance(
+    creator: UnknownCreator,
     context: ResolutionContext,
   ): unknown {
-    if (isEntityConstructorBinding(binding))
-      return this.construct(binding.value, context);
+    const parameters = this.resolveParameters(creator, context);
+    const isCallable = callableRegistry.get(creator);
 
-    return this.call((binding as EntityFunctionBinding).value, context);
+    if (isCallable !== undefined) {
+      return isCallable
+        ? // @ts-expect-error: This expression is not callable.
+          creator(...parameters)
+        : // @ts-expect-error: This expression is not constructable.
+          // eslint-disable-next-line new-cap
+          new creator(...parameters);
+    }
+
+    try {
+      // @ts-expect-error: This expression is not callable.
+      const instance = creator(...parameters);
+      callableRegistry.set(creator, true);
+      return instance;
+    } catch {
+      // @ts-expect-error: This expression is not constructable.
+      // eslint-disable-next-line new-cap
+      const instance = new creator(...parameters);
+      callableRegistry.set(creator, false);
+      return instance;
+    }
   }
 
   private resolveParameters(
@@ -212,16 +218,5 @@ export class Container extends WhenSyntax {
 
     const tags = tagsRegistry.get(target);
     return this.getMultiple(injects, context, tags, target);
-  }
-
-  private call(func: UnknownFunction, context: ResolutionContext): unknown {
-    return func(...this.resolveParameters(func, context));
-  }
-
-  private construct(
-    Ctor: UnknownConstructor,
-    context: ResolutionContext,
-  ): Object {
-    return new Ctor(...this.resolveParameters(Ctor, context));
   }
 }
