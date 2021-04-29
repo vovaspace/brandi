@@ -11,9 +11,7 @@ export const ContainerProvider: React.FunctionComponent<{
   const parentContainer = useContainer(false);
   const clonedContainer = React.useMemo(() => container.clone(), [container]);
 
-  if (!isolated && parentContainer !== null) {
-    clonedContainer.parent = parentContainer;
-  }
+  if (!isolated) clonedContainer.extend(parentContainer);
 
   return (
     <ContainerContext.Provider value={clonedContainer}>

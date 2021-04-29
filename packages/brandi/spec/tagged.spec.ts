@@ -11,44 +11,41 @@ describe('tagged', () => {
   });
 
   it('registers a single tag', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tags = {
+    const TAGS = {
       some: tag('some'),
     };
 
-    tagged(SomeClass, tags.some);
+    tagged(Some, TAGS.some);
 
-    expect(tagsRegistry.get(SomeClass)).toStrictEqual([tags.some]);
+    expect(tagsRegistry.get(Some)).toStrictEqual([TAGS.some]);
   });
 
   it('registers multiple tags', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tags = {
+    const TAGS = {
       some: tag('some'),
       another: tag('another'),
     };
 
-    tagged(SomeClass, tags.some, tags.another);
+    tagged(Some, TAGS.some, TAGS.another);
 
-    expect(tagsRegistry.get(SomeClass)).toStrictEqual([
-      tags.some,
-      tags.another,
-    ]);
+    expect(tagsRegistry.get(Some)).toStrictEqual([TAGS.some, TAGS.another]);
   });
 
   it('rewrites tags', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tags = {
+    const TAGS = {
       some: tag('some'),
       another: tag('another'),
     };
 
-    tagged(SomeClass, tags.some);
-    tagged(SomeClass, tags.another);
+    tagged(Some, TAGS.some);
+    tagged(Some, TAGS.another);
 
-    expect(tagsRegistry.get(SomeClass)).toStrictEqual([tags.another]);
+    expect(tagsRegistry.get(Some)).toStrictEqual([TAGS.another]);
   });
 });

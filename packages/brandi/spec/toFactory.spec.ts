@@ -247,7 +247,7 @@ describe('toFactory', () => {
       .toInstance(Dependency)
       .inTransientScope();
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer.bind(TOKENS.someConstructorFactory).toFactory(Some);
     childContainer.bind(TOKENS.someCallFactory).toFactory(createSome);
 
@@ -293,7 +293,7 @@ describe('toFactory', () => {
     parentContainer.bind(TOKENS.someConstructorFactory).toFactory(Some);
     parentContainer.bind(TOKENS.someCallFactory).toFactory(createSome);
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer
       .bind(TOKENS.dependency)
       .toInstance(AnotherDependency)

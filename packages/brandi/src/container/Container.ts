@@ -12,21 +12,21 @@ import {
   isInstanceSingletonScopedBinding,
 } from './bindings';
 import { BindingsVault } from './BindingsVault';
-import { WhenSyntax } from './syntax';
+import { DependencyModule } from './DependencyModule';
+import { ResolutionCache } from './ResolutionCache';
 
-type ResolutionCache = Map<Binding, unknown>;
-
-export class Container extends WhenSyntax {
+export class Container extends DependencyModule {
   private snapshot: BindingsVault | null = null;
 
-  constructor(public parent?: Container) {
-    super(new BindingsVault());
+  public extend(container: Container | null): this {
+    this.vault.parent = container === null ? null : container.vault;
+    return this;
   }
 
   public clone(): Container {
-    const newContainer = new Container(this.parent);
-    newContainer.vault = this.vault.clone();
-    return newContainer;
+    const container = new Container();
+    container.vault = this.vault.clone();
+    return container;
   }
 
   public capture(): void {
@@ -59,52 +59,37 @@ export class Container extends WhenSyntax {
     token: T,
     conditions?: ResolutionCondition[],
   ): TokenType<T> {
-    return this.getSingle(token, conditions) as TokenType<T>;
+    return this.resolveToken(token, conditions) as TokenType<T>;
   }
 
-  private getSingle(
-    token: TokenValue,
-    conditions?: ResolutionCondition[],
-    target?: UnknownCreator,
-    cache: ResolutionCache = new Map<Binding, unknown>(),
-  ): unknown {
-    const binding = this.resolveBinding(token, conditions, target);
-
-    if (binding === null) return undefined;
-
-    return this.resolveValue(binding, cache);
-  }
-
-  private getMultiple(
+  private resolveTokens(
     tokens: TokenValue[],
     cache: ResolutionCache,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
   ): unknown[] {
     return tokens.map((token) =>
-      this.getSingle(token, conditions, target, cache),
+      this.resolveToken(token, conditions, target, cache.split()),
     );
   }
 
-  private resolveBinding(
+  private resolveToken(
     token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-  ): Binding | null {
-    const binding = this.vault.get(token, conditions, target);
+    cache: ResolutionCache = new ResolutionCache(),
+  ): unknown {
+    const binding = this.vault.resolve(token, cache, conditions, target);
 
-    if (binding !== undefined) return binding;
-    if (this.parent !== undefined)
-      return this.parent.resolveBinding(token, conditions, target);
-
-    if (token.__isOptional) return null;
+    if (binding !== undefined) return this.resolveBinding(binding, cache);
+    if (token.__isOptional) return undefined;
 
     throw new Error(
       `No matching bindings found for '${token.__symbol.description}' token.`,
     );
   }
 
-  private resolveValue(binding: Binding, cache: ResolutionCache): unknown {
+  private resolveBinding(binding: Binding, cache: ResolutionCache): unknown {
     if (isInstanceBinding(binding)) {
       if (isInstanceSingletonScopedBinding(binding)) {
         return this.resolveInstanceCache(
@@ -133,28 +118,28 @@ export class Container extends WhenSyntax {
         return this.resolveInstanceCache(
           binding,
           cache,
-          () => cache.get(binding),
+          () => cache.instances.get(binding),
           (instance) => {
-            cache.set(binding, instance);
+            cache.instances.set(binding, instance);
           },
         );
       }
 
-      return this.resolveInstance(binding.value, cache);
+      return this.createInstance(binding.impl, cache);
     }
 
     if (isFactoryBinding(binding)) {
       return (...args: unknown[]) => {
-        const instance = this.resolveInstance(binding.value.creator, cache);
+        const instance = this.createInstance(binding.impl.creator, cache);
 
-        if (binding.value.initializer)
-          binding.value.initializer(instance, ...args);
+        if (binding.impl.initializer)
+          binding.impl.initializer(instance, ...args);
 
         return instance;
       };
     }
 
-    return binding.value;
+    return binding.impl;
   }
 
   private resolveInstanceCache(
@@ -167,16 +152,16 @@ export class Container extends WhenSyntax {
 
     if (instanceCache !== undefined) return instanceCache;
 
-    const instance = this.resolveInstance(binding.value, cache);
+    const instance = this.createInstance(binding.impl, cache);
     setCache(instance);
     return instance;
   }
 
-  private resolveInstance(
+  private createInstance(
     creator: UnknownCreator,
     cache: ResolutionCache,
   ): unknown {
-    const parameters = this.resolveParameters(creator, cache);
+    const parameters = this.getParameters(creator, cache);
     const isCallable = callableRegistry.get(creator);
 
     if (isCallable !== undefined) {
@@ -202,7 +187,7 @@ export class Container extends WhenSyntax {
     }
   }
 
-  private resolveParameters(
+  private getParameters(
     target: UnknownCreator,
     cache: ResolutionCache,
   ): unknown[] {
@@ -216,6 +201,6 @@ export class Container extends WhenSyntax {
       );
     }
 
-    return this.getMultiple(injects, cache, tagsRegistry.get(target), target);
+    return this.resolveTokens(injects, cache, tagsRegistry.get(target), target);
   }
 }

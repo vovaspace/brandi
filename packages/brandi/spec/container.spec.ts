@@ -3,47 +3,14 @@ import { Container, createContainer, token } from '../src';
 import { setEnv } from './utils';
 
 describe('container', () => {
-  it('returns a dependency from the parent container', () => {
-    const someValue = 1;
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-    };
-
-    const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toConstant(someValue);
-
-    const childContainer = new Container(parentContainer);
-
-    expect(childContainer.get(tokens.someValue)).toBe(someValue);
-  });
-
-  it("rebinds a parent container's binding in the child container", () => {
-    const someValue = 1;
-    const anotherValue = 2;
-
-    const tokens = {
-      someValue: token<number>('someValue'),
-    };
-
-    const parentContainer = new Container();
-    parentContainer.bind(tokens.someValue).toConstant(someValue);
-
-    const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.someValue).toConstant(anotherValue);
-
-    expect(parentContainer.get(tokens.someValue)).toBe(someValue);
-    expect(childContainer.get(tokens.someValue)).toBe(anotherValue);
-  });
-
   it('throws error when the token was not bound', () => {
-    const tokens = {
+    const TOKENS = {
       some: token<unknown>('some'),
     };
 
     const container = new Container();
 
-    expect(() => container.get(tokens.some)).toThrowErrorMatchingSnapshot();
+    expect(() => container.get(TOKENS.some)).toThrowErrorMatchingSnapshot();
   });
 
   it("returns an unlinked container from 'clone' method", () => {
@@ -52,66 +19,184 @@ describe('container', () => {
     const anotherValue = 3;
     const copiedValue = 4;
 
-    const tokens = {
+    const TOKENS = {
       parent: token<number>('parent'),
       original: token<number>('original'),
       copied: token<number>('copied'),
     };
 
     const parentContainer = new Container();
-    parentContainer.bind(tokens.parent).toConstant(parentValue);
+    parentContainer.bind(TOKENS.parent).toConstant(parentValue);
 
-    const originalContainer = new Container(parentContainer);
-    originalContainer.bind(tokens.original).toConstant(someValue);
+    const originalContainer = new Container().extend(parentContainer);
+    originalContainer.bind(TOKENS.original).toConstant(someValue);
 
     const copiedContainer = originalContainer.clone();
-    copiedContainer.bind(tokens.original).toConstant(anotherValue);
-    copiedContainer.bind(tokens.copied).toConstant(copiedValue);
+    copiedContainer.bind(TOKENS.original).toConstant(anotherValue);
+    copiedContainer.bind(TOKENS.copied).toConstant(copiedValue);
 
-    expect(originalContainer.get(tokens.original)).toBe(someValue);
+    expect(originalContainer.get(TOKENS.original)).toBe(someValue);
     expect(() =>
-      originalContainer.get(tokens.copied),
+      originalContainer.get(TOKENS.copied),
     ).toThrowErrorMatchingSnapshot();
 
-    expect(copiedContainer.get(tokens.parent)).toBe(parentValue);
-    expect(copiedContainer.get(tokens.original)).toBe(anotherValue);
-    expect(copiedContainer.get(tokens.copied)).toBe(copiedValue);
+    expect(copiedContainer.get(TOKENS.parent)).toBe(parentValue);
+    expect(copiedContainer.get(TOKENS.original)).toBe(anotherValue);
+    expect(copiedContainer.get(TOKENS.copied)).toBe(copiedValue);
   });
 
-  it('captures the container state to a snapshot', () => {
+  it('returns a dependency from the parent container', () => {
+    const value = 1;
+
+    const TOKENS = {
+      value: token<number>('value'),
+    };
+
+    const parentContainer = new Container();
+    parentContainer.bind(TOKENS.value).toConstant(value);
+
+    const childContainer = new Container().extend(parentContainer);
+
+    expect(childContainer.get(TOKENS.value)).toBe(value);
+  });
+
+  it('changes parent container', () => {
+    const firstValue = 1;
+    const secondValue = 2;
+
+    const TOKENS = {
+      value: token<number>('value'),
+    };
+
+    const firstContainer = new Container();
+    firstContainer.bind(TOKENS.value).toConstant(firstValue);
+
+    const secondContainer = new Container();
+    secondContainer.bind(TOKENS.value).toConstant(secondValue);
+
+    const container = new Container().extend(firstContainer);
+
+    expect(container.get(TOKENS.value)).toBe(firstValue);
+
+    container.extend(secondContainer);
+
+    expect(container.get(TOKENS.value)).toBe(secondValue);
+  });
+
+  it('clears parent container', () => {
+    const value = 1;
+
+    const TOKENS = {
+      value: token<number>('value'),
+    };
+
+    const parentContainer = new Container();
+    parentContainer.bind(TOKENS.value).toConstant(value);
+
+    const childContainer = new Container().extend(parentContainer);
+
+    expect(childContainer.get(TOKENS.value)).toBe(value);
+
+    childContainer.extend(null);
+
+    expect(() =>
+      childContainer.get(TOKENS.value),
+    ).toThrowErrorMatchingSnapshot();
+  });
+
+  it("rebinds a parent container's binding in the child container", () => {
+    const someValue = 1;
+    const anotherValue = 2;
+
+    const TOKENS = {
+      value: token<number>('value'),
+    };
+
+    const parentContainer = new Container();
+    parentContainer.bind(TOKENS.value).toConstant(someValue);
+
+    const childContainer = new Container().extend(parentContainer);
+    childContainer.bind(TOKENS.value).toConstant(anotherValue);
+
+    expect(parentContainer.get(TOKENS.value)).toBe(someValue);
+    expect(childContainer.get(TOKENS.value)).toBe(anotherValue);
+  });
+
+  it('captures the container bindings to a snapshot', () => {
     const someValue = 1;
     const anotherValue = 2;
     const additionalValue = 3;
 
-    const tokens = {
-      some: token<number>('some'),
+    const TOKENS = {
+      value: token<number>('value'),
       additional: token<number>('additional'),
     };
 
     const container = new Container();
-    container.bind(tokens.some).toConstant(someValue);
+    container.bind(TOKENS.value).toConstant(someValue);
 
     container.capture();
 
-    container.bind(tokens.some).toConstant(anotherValue);
-    container.bind(tokens.additional).toConstant(additionalValue);
+    container.bind(TOKENS.value).toConstant(anotherValue);
+    container.bind(TOKENS.additional).toConstant(additionalValue);
+
+    expect(container.get(TOKENS.value)).toBe(anotherValue);
+    expect(container.get(TOKENS.additional)).toBe(additionalValue);
 
     container.restore();
 
-    expect(container.get(tokens.some)).toBe(someValue);
+    expect(container.get(TOKENS.value)).toBe(someValue);
     expect(() =>
-      container.get(tokens.additional),
+      container.get(TOKENS.additional),
     ).toThrowErrorMatchingSnapshot();
 
-    container.bind(tokens.some).toConstant(anotherValue);
-    container.bind(tokens.additional).toConstant(additionalValue);
+    container.bind(TOKENS.value).toConstant(anotherValue);
+    container.bind(TOKENS.additional).toConstant(additionalValue);
+
+    expect(container.get(TOKENS.value)).toBe(anotherValue);
+    expect(container.get(TOKENS.additional)).toBe(additionalValue);
 
     container.restore();
 
-    expect(container.get(tokens.some)).toBe(someValue);
+    expect(container.get(TOKENS.value)).toBe(someValue);
     expect(() =>
-      container.get(tokens.additional),
+      container.get(TOKENS.additional),
     ).toThrowErrorMatchingSnapshot();
+  });
+
+  it('captures the container parent to a snapshot', () => {
+    const firstValue = 1;
+    const secondValue = 2;
+
+    const TOKENS = {
+      value: token<number>('value'),
+    };
+
+    const firstContainer = new Container();
+    firstContainer.bind(TOKENS.value).toConstant(firstValue);
+
+    const secondContainer = new Container();
+    secondContainer.bind(TOKENS.value).toConstant(secondValue);
+
+    const container = new Container().extend(firstContainer);
+
+    container.capture();
+
+    container.extend(secondContainer);
+
+    expect(container.get(TOKENS.value)).toBe(secondValue);
+
+    container.restore();
+
+    expect(container.get(TOKENS.value)).toBe(firstValue);
+
+    container.extend(secondContainer);
+
+    expect(container.get(TOKENS.value)).toBe(secondValue);
+
+    container.restore();
+
+    expect(container.get(TOKENS.value)).toBe(firstValue);
   });
 
   it('logs an error when trying to restore a non-captured container state', () => {
@@ -151,62 +236,52 @@ describe('container', () => {
     spy.mockRestore();
   });
 
-  describe('createContainer', () => {
-    it('creates a container', () => {
-      const container = createContainer();
-      expect(container).toBeInstanceOf(Container);
-    });
-
-    it('creates a container with arguments', () => {
-      const parentContainer = createContainer();
-      const childContainer = createContainer(parentContainer);
-
-      expect(childContainer.parent).toBe(parentContainer);
-    });
+  it("creates a container by 'createContainer'", () => {
+    expect(createContainer()).toBeInstanceOf(Container);
   });
 
   describe('typings', () => {
     it('requires to bind the same type of dependency and token', () => {
       expect.assertions(0);
 
-      class SomeClass {
+      class Some {
         public some = true;
       }
 
-      class AnotherClass {
+      class Another {
         public another = true;
       }
 
-      const createAnother = (): AnotherClass => new AnotherClass();
+      const createAnother = (): Another => new Another();
 
-      const tokens = {
+      const TOKENS = {
         num: token<number>('num'),
-        some: token<SomeClass>('some'),
+        some: token<Some>('some'),
       };
 
       const container = new Container();
 
       // @ts-expect-error: Argument of type 'string' is not assignable to parameter of type 'number'.
-      container.bind(tokens.num).toConstant('');
+      container.bind(TOKENS.num).toConstant('');
 
-      // @ts-expect-error: Argument of type 'typeof AnotherClass' is not assignable to parameter of type 'UnknownConstructor<SomeClass>'.
-      container.bind(tokens.some).toInstance(AnotherClass).inTransientScope();
+      // @ts-expect-error: Argument of type 'typeof Another' is not assignable to parameter of type 'UnknownConstructor<Some>'.
+      container.bind(TOKENS.some).toInstance(Another).inTransientScope();
 
-      // @ts-expect-error: Argument of type '() => AnotherClass' is not assignable to parameter of type 'UnknownCreator<SomeClass>'.
-      container.bind(tokens.some).toInstance(createAnother).inTransientScope();
+      // @ts-expect-error: Argument of type '() => Another' is not assignable to parameter of type 'UnknownCreator<Some>'.
+      container.bind(TOKENS.some).toInstance(createAnother).inTransientScope();
     });
 
     it('does not allow to bind an optional token', () => {
       expect.assertions(0);
 
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
       const container = new Container();
 
       // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'Token<unknown>'.
-      container.bind(tokens.some.optional);
+      container.bind(TOKENS.some.optional);
     });
   });
 });

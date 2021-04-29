@@ -4,26 +4,26 @@ describe('toConstant', () => {
   it('returns a primitive value', () => {
     const value = 0;
 
-    const tokens = {
+    const TOKENS = {
       value: token<number>('value'),
     };
 
     const container = new Container();
-    container.bind(tokens.value).toConstant(value);
+    container.bind(TOKENS.value).toConstant(value);
 
-    expect(container.get(tokens.value)).toBe(value);
+    expect(container.get(TOKENS.value)).toBe(value);
   });
 
   it('returns a constructor', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      ctor: token<typeof SomeClass>('ctor'),
+    const TOKENS = {
+      SomeCtor: token<typeof Some>('SomeCtor'),
     };
 
     const container = new Container();
-    container.bind(tokens.ctor).toConstant(SomeClass);
+    container.bind(TOKENS.SomeCtor).toConstant(Some);
 
-    expect(container.get(tokens.ctor)).toBe(SomeClass);
+    expect(container.get(TOKENS.SomeCtor)).toBe(Some);
   });
 });

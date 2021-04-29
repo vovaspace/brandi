@@ -8,7 +8,7 @@ export class FactoryBinding implements Binding {
   public readonly scope = Scope.Transient;
 
   constructor(
-    public readonly value: {
+    public readonly impl: {
       creator: UnknownCreator;
       initializer?: (entity: unknown, ...args: unknown[]) => unknown;
     },

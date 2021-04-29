@@ -1,4 +1,9 @@
-export { Container, createContainer } from './container';
+export {
+  Container,
+  DependencyModule,
+  createContainer,
+  createDependencyModule,
+} from './container';
 export type {
   Tag,
   Token,

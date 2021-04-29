@@ -1,9 +1,9 @@
 import { ResolutionCondition } from '../../types';
 
-import { BindSyntax } from './BindSyntax';
+import { BindOrUseSyntax } from './BindOrUseSyntax';
 
-export class WhenSyntax extends BindSyntax {
-  public when(condition: ResolutionCondition): BindSyntax {
-    return new BindSyntax(this.vault, condition);
+export class WhenSyntax extends BindOrUseSyntax {
+  public when(condition: ResolutionCondition): BindOrUseSyntax {
+    return new BindOrUseSyntax(this.vault, condition);
   }
 }

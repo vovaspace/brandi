@@ -2,14 +2,20 @@ import { ResolutionCondition, UnknownCreator } from '../types';
 import { Token, TokenValue, tag as createTag } from '../pointers';
 
 import { Binding } from './bindings';
+import { ResolutionCache } from './ResolutionCache';
 
 export class BindingsVault {
-  private static notag = createTag('notag');
+  private static notag = createTag('NO_TAG');
 
-  private readonly map = new Map<symbol, Map<ResolutionCondition, Binding>>();
+  public parent: BindingsVault | null = null;
+
+  private readonly map = new Map<
+    symbol,
+    Map<ResolutionCondition, Binding | BindingsVault>
+  >();
 
   public set(
-    binding: Binding,
+    binding: Binding | BindingsVault,
     token: Token,
     condition: ResolutionCondition = BindingsVault.notag,
   ): void {
@@ -18,18 +24,21 @@ export class BindingsVault {
     if (current === undefined) {
       this.map.set(
         token.__symbol,
-        new Map<ResolutionCondition, Binding>().set(condition, binding),
+        new Map<ResolutionCondition, Binding | BindingsVault>().set(
+          condition,
+          binding,
+        ),
       );
     } else {
       current.set(condition, binding);
     }
   }
 
-  public get(
+  private get(
     token: TokenValue,
-    conditions: ResolutionCondition[] = [],
+    conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-  ): Binding | undefined {
+  ): Binding | BindingsVault | undefined {
     const bindings = this.map.get(token.__symbol);
 
     if (bindings === undefined) return undefined;
@@ -41,6 +50,7 @@ export class BindingsVault {
 
     if (
       process.env.NODE_ENV !== 'production' &&
+      conditions !== undefined &&
       conditions.reduce(
         (acc, condition) => (bindings.has(condition) ? acc + 1 : acc),
         0,
@@ -65,24 +75,74 @@ export class BindingsVault {
       );
     }
 
-    for (let i = 0, len = conditions.length; i < len; i += 1) {
-      const binding = bindings.get(conditions[i]!);
-      if (binding) return binding;
+    if (conditions !== undefined) {
+      for (let i = 0, len = conditions.length; i < len; i += 1) {
+        const binding = bindings.get(conditions[i]!);
+        if (binding !== undefined) return binding;
+      }
     }
 
     return bindings.get(BindingsVault.notag);
   }
 
+  private resolveOwn(
+    token: TokenValue,
+    cache: ResolutionCache,
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
+  ): Binding | undefined {
+    const binding = this.get(token, conditions, target);
+
+    if (binding !== undefined) {
+      if (binding instanceof BindingsVault) {
+        cache.vaults.push(binding);
+        return binding.resolveOwn(token, cache, conditions, target);
+      }
+
+      return binding;
+    }
+
+    return this.parent === null
+      ? undefined
+      : this.parent.resolveOwn(token, cache, conditions, target);
+  }
+
+  public resolve(
+    token: TokenValue,
+    cache: ResolutionCache,
+    conditions?: ResolutionCondition[],
+    target?: UnknownCreator,
+  ): Binding | undefined {
+    const ownBinding = this.resolveOwn(token, cache, conditions, target);
+
+    if (ownBinding !== undefined) return ownBinding;
+
+    const { vaults } = cache;
+    for (let i = 0, len = vaults.length; i < len; i += 1) {
+      const cacheBinding = vaults[i]!.resolveOwn(
+        token,
+        cache,
+        conditions,
+        target,
+      );
+
+      if (cacheBinding !== undefined) return cacheBinding;
+    }
+
+    return undefined;
+  }
+
   public clone(): BindingsVault {
-    const newBindingsVault = new BindingsVault();
+    const vault = new BindingsVault();
+    vault.parent = this.parent;
 
     this.map.forEach((value, key) => {
-      newBindingsVault.map.set(
+      vault.map.set(
         key,
-        new Map<ResolutionCondition, Binding>(value),
+        new Map<ResolutionCondition, Binding | BindingsVault>(value),
       );
     });
 
-    return newBindingsVault;
+    return vault;
   }
 }

@@ -23,7 +23,7 @@ describe('container', () => {
 
   describe('ContainerProvider', () => {
     it('passes a container clone', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
@@ -31,7 +31,7 @@ describe('container', () => {
       const anotherValue = 2;
 
       const container = createContainer();
-      container.bind(tokens.some).toConstant(someValue);
+      container.bind(TOKENS.some).toConstant(someValue);
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={container}>{children}</ContainerProvider>
@@ -39,15 +39,15 @@ describe('container', () => {
 
       const { result } = renderHook(() => useContainer(), { wrapper });
 
-      container.bind(tokens.some).toConstant(anotherValue);
+      container.bind(TOKENS.some).toConstant(anotherValue);
 
       expect(result.current).not.toBe(container);
       expect(result.current).toBeInstanceOf(Container);
-      expect(result.current.get(tokens.some)).toBe(someValue);
+      expect(result.current.get(TOKENS.some)).toBe(someValue);
     });
 
     it('binds the parent container from the parent context', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
         another: token<number>('another'),
       };
@@ -56,10 +56,10 @@ describe('container', () => {
       const anotherValue = 2;
 
       const parentContainer = createContainer();
-      parentContainer.bind(tokens.some).toConstant(someValue);
+      parentContainer.bind(TOKENS.some).toConstant(someValue);
 
       const childContainer = createContainer();
-      childContainer.bind(tokens.another).toConstant(anotherValue);
+      childContainer.bind(TOKENS.another).toConstant(anotherValue);
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={parentContainer}>
@@ -71,12 +71,12 @@ describe('container', () => {
 
       const { result } = renderHook(() => useContainer(), { wrapper });
 
-      expect(result.current.get(tokens.some)).toBe(someValue);
-      expect(result.current.get(tokens.another)).toBe(anotherValue);
+      expect(result.current.get(TOKENS.some)).toBe(someValue);
+      expect(result.current.get(TOKENS.another)).toBe(anotherValue);
     });
 
     it("keeps the original parent container with 'isolated' prop", () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
@@ -84,12 +84,12 @@ describe('container', () => {
       const anotherValue = 2;
 
       const parentContainer = createContainer();
-      parentContainer.bind(tokens.some).toConstant(someValue);
+      parentContainer.bind(TOKENS.some).toConstant(someValue);
 
       const anotherParentContainer = createContainer();
-      anotherParentContainer.bind(tokens.some).toConstant(anotherValue);
+      anotherParentContainer.bind(TOKENS.some).toConstant(anotherValue);
 
-      const childContainer = createContainer(parentContainer);
+      const childContainer = createContainer().extend(parentContainer);
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={anotherParentContainer}>
@@ -101,7 +101,7 @@ describe('container', () => {
 
       const { result } = renderHook(() => useContainer(), { wrapper });
 
-      expect(result.current.get(tokens.some)).toBe(someValue);
+      expect(result.current.get(TOKENS.some)).toBe(someValue);
     });
   });
 });

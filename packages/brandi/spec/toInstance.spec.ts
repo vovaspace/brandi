@@ -69,7 +69,7 @@ describe('toInstance', () => {
     const createZero = jest.fn(() => 0);
     const createUndefined = jest.fn(() => undefined);
 
-    const tokens = {
+    const TOKENS = {
       null: token<null>('null'),
       false: token<boolean>('false'),
       zero: token<number>('zero'),
@@ -77,22 +77,22 @@ describe('toInstance', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.null).toInstance(createNull).inSingletonScope();
-    container.bind(tokens.false).toInstance(createFalse).inSingletonScope();
-    container.bind(tokens.zero).toInstance(createZero).inSingletonScope();
+    container.bind(TOKENS.null).toInstance(createNull).inSingletonScope();
+    container.bind(TOKENS.false).toInstance(createFalse).inSingletonScope();
+    container.bind(TOKENS.zero).toInstance(createZero).inSingletonScope();
     container
-      .bind(tokens.undefined)
+      .bind(TOKENS.undefined)
       .toInstance(createUndefined)
       .inSingletonScope();
 
-    container.get(tokens.null);
-    container.get(tokens.null);
-    container.get(tokens.false);
-    container.get(tokens.false);
-    container.get(tokens.zero);
-    container.get(tokens.zero);
-    container.get(tokens.undefined);
-    container.get(tokens.undefined);
+    container.get(TOKENS.null);
+    container.get(TOKENS.null);
+    container.get(TOKENS.false);
+    container.get(TOKENS.false);
+    container.get(TOKENS.zero);
+    container.get(TOKENS.zero);
+    container.get(TOKENS.undefined);
+    container.get(TOKENS.undefined);
 
     expect(createNull).toHaveBeenCalledTimes(1);
     expect(createFalse).toHaveBeenCalledTimes(1);
@@ -110,7 +110,7 @@ describe('toInstance', () => {
     const parentContainer = new Container();
     parentContainer.bind(TOKENS.some).toInstance(Some).inSingletonScope();
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer.bind(TOKENS.some).toInstance(Some).inSingletonScope();
 
     const parentInstance = parentContainer.get(TOKENS.some);
@@ -223,7 +223,7 @@ describe('toInstance', () => {
     const parentContainer = new Container();
     parentContainer.bind(TOKENS.value).toConstant(value);
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
     const instance = childContainer.get(TOKENS.some);
@@ -250,7 +250,7 @@ describe('toInstance', () => {
     parentContainer.bind(TOKENS.num).toConstant(someValue);
     parentContainer.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer.bind(TOKENS.num).toConstant(anotherValue);
 
     const parentContainerInstance = parentContainer.get(TOKENS.some);
@@ -270,7 +270,7 @@ describe('toInstance', () => {
     const parentContainer = new Container();
     parentContainer.bind(TOKENS.some).toInstance(Some).inContainerScope();
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
 
     const parentContainerFirstInstance = parentContainer.get(TOKENS.some);
     const parentContainerSecondInstance = parentContainer.get(TOKENS.some);
@@ -289,7 +289,7 @@ describe('toInstance', () => {
     const createZero = jest.fn(() => 0);
     const createUndefined = jest.fn(() => undefined);
 
-    const tokens = {
+    const TOKENS = {
       null: token<null>('null'),
       false: token<boolean>('false'),
       zero: token<number>('zero'),
@@ -297,22 +297,22 @@ describe('toInstance', () => {
     };
 
     const container = new Container();
-    container.bind(tokens.null).toInstance(createNull).inContainerScope();
-    container.bind(tokens.false).toInstance(createFalse).inContainerScope();
-    container.bind(tokens.zero).toInstance(createZero).inContainerScope();
+    container.bind(TOKENS.null).toInstance(createNull).inContainerScope();
+    container.bind(TOKENS.false).toInstance(createFalse).inContainerScope();
+    container.bind(TOKENS.zero).toInstance(createZero).inContainerScope();
     container
-      .bind(tokens.undefined)
+      .bind(TOKENS.undefined)
       .toInstance(createUndefined)
       .inContainerScope();
 
-    container.get(tokens.null);
-    container.get(tokens.null);
-    container.get(tokens.false);
-    container.get(tokens.false);
-    container.get(tokens.zero);
-    container.get(tokens.zero);
-    container.get(tokens.undefined);
-    container.get(tokens.undefined);
+    container.get(TOKENS.null);
+    container.get(TOKENS.null);
+    container.get(TOKENS.false);
+    container.get(TOKENS.false);
+    container.get(TOKENS.zero);
+    container.get(TOKENS.zero);
+    container.get(TOKENS.undefined);
+    container.get(TOKENS.undefined);
 
     expect(createNull).toHaveBeenCalledTimes(1);
     expect(createFalse).toHaveBeenCalledTimes(1);
@@ -422,7 +422,7 @@ describe('toInstance', () => {
       second,
     });
 
-    const tokens = {
+    const TOKENS = {
       null: token<null>('null'),
       false: token<boolean>('false'),
       zero: token<number>('zero'),
@@ -431,34 +431,34 @@ describe('toInstance', () => {
       third: token<Third>('third'),
     };
 
-    injected(createFirst, tokens.null, tokens.false, tokens.zero);
+    injected(createFirst, TOKENS.null, TOKENS.false, TOKENS.zero);
     injected(
       createSecond,
-      tokens.null,
-      tokens.false,
-      tokens.zero,
-      tokens.first,
+      TOKENS.null,
+      TOKENS.false,
+      TOKENS.zero,
+      TOKENS.first,
     );
     injected(
       createThird,
-      tokens.null,
-      tokens.false,
-      tokens.zero,
-      tokens.first,
-      tokens.second,
+      TOKENS.null,
+      TOKENS.false,
+      TOKENS.zero,
+      TOKENS.first,
+      TOKENS.second,
     );
 
     const container = new Container();
 
-    container.bind(tokens.null).toInstance(createNull).inResolutionScope();
-    container.bind(tokens.false).toInstance(createFalse).inResolutionScope();
-    container.bind(tokens.zero).toInstance(createZero).inResolutionScope();
+    container.bind(TOKENS.null).toInstance(createNull).inResolutionScope();
+    container.bind(TOKENS.false).toInstance(createFalse).inResolutionScope();
+    container.bind(TOKENS.zero).toInstance(createZero).inResolutionScope();
 
-    container.bind(tokens.first).toInstance(createFirst).inTransientScope();
-    container.bind(tokens.second).toInstance(createSecond).inTransientScope();
-    container.bind(tokens.third).toInstance(createThird).inTransientScope();
+    container.bind(TOKENS.first).toInstance(createFirst).inTransientScope();
+    container.bind(TOKENS.second).toInstance(createSecond).inTransientScope();
+    container.bind(TOKENS.third).toInstance(createThird).inTransientScope();
 
-    container.get(tokens.third);
+    container.get(TOKENS.third);
 
     expect(createNull).toHaveBeenCalledTimes(1);
     expect(createFalse).toHaveBeenCalledTimes(1);

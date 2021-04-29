@@ -5,5 +5,5 @@ export class ConstantBinding implements Binding {
 
   public readonly scope = Scope.Transient;
 
-  constructor(public readonly value: unknown) {}
+  constructor(public readonly impl: unknown) {}
 }

@@ -12,7 +12,7 @@ export enum Scope {
 }
 
 export interface Binding {
-  readonly value: unknown;
+  readonly impl: unknown;
   readonly type: Type;
   readonly scope: Scope;
 }
