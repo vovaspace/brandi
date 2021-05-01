@@ -329,4 +329,28 @@ describe('toFactory', () => {
     );
     expect(childCallInstance.dependency).toBeInstanceOf(AnotherDependency);
   });
+
+  it('creates an instance caching factory', () => {
+    class Some {}
+
+    const TOKENS = {
+      some: token<Some>('some'),
+      someFactory: token<Factory<Some>>('Factory<Some>'),
+    };
+
+    const container = new Container();
+    container.bind(TOKENS.some).toInstance(Some).inSingletonScope();
+    container
+      .bind(TOKENS.someFactory)
+      .toFactory(() => container.get(TOKENS.some));
+
+    const factory = container.get(TOKENS.someFactory);
+
+    const firstInstance = factory();
+    const secondInstance = factory();
+
+    expect(firstInstance).toBeInstanceOf(Some);
+    expect(secondInstance).toBeInstanceOf(Some);
+    expect(firstInstance).toBe(secondInstance);
+  });
 });
