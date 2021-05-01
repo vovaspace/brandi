@@ -7,16 +7,6 @@
   --ifm-color-primary-lighter: #59baea;
   --ifm-color-primary-lightest: #7fc9ef;
 
-  --ifm-color-gray-100: #f7f7f5;
-  --ifm-color-gray-200: #f0efeb;
-  --ifm-color-gray-300: #e1e0da;
-  --ifm-color-gray-400: #d5d4cc;
-  --ifm-color-gray-500: #c9c7be;
-  --ifm-color-gray-600: #9e9b8d;
-  --ifm-color-gray-700: #706e65;
-  --ifm-color-gray-800: #504f48;
-  --ifm-color-gray-900: #21211f;
-
   --ifm-code-font-size: 95%;
   --ifm-code-border-radius: 0.3rem;
 }
@@ -28,25 +18,24 @@
   padding: 0 var(--ifm-pre-padding);
 }
 
-.header-github-link:hover {
-  opacity: 0.6;
-}
-
-.navbar__brand {
-  height: 2.2rem;
-}
-
 .navbar__logo {
-  margin-top: -0.1rem;
-  margin-right: 0.6rem;
+  margin-top: -0.12rem;
 }
 
 .navbar__toggle {
   margin-right: 1rem;
 }
 
+.footer__links {
+  margin-bottom: 2rem;
+}
+
 .footer__logo {
   max-width: 3.2rem;
+}
+
+.footer__copyright {
+  margin-top: 0.8rem;
 }
 
 .menu--responsive .menu__button {
