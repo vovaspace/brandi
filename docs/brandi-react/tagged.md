@@ -7,7 +7,7 @@ hide_title: true
 
 # `tagged`
 
-The `tagged(...tags)(Component, [isolated])` HoC attaches tags to the component and its child components.
+The `tagged(...tags)(Component, [options])` HoC attaches tags to the component and its child components.
 
 Conditional Bindings are detailed
 in [Conditional Bindings](../reference/conditional-bindings.md) section of the documentation.
@@ -21,8 +21,9 @@ in [Conditional Bindings](../reference/conditional-bindings.md) section of the d
 ### tagged(...tags)(Component, [isolated])
 
 1. `Component`: `React.ComponentType` — component to be wrapped.
-2. `isolated?`: `boolean` — by default, the wrapped component and its child components inherit tags
-   from from the upstream tagged components. You can use `isolated` option to disable this behavior.
+2. `[options]`: `TaggedOptions`
+   - `isolated`: `boolean` — by default, the wrapped component and its child components inherit tags
+     from from the upstream tagged components. You can use `isolated` option to disable this behavior.
 
 ## Returns
 

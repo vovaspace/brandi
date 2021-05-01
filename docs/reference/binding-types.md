@@ -8,11 +8,11 @@ sidebar_label: Binding Types
 
 Binds the token to the constant value.
 
-#### Arguments
+### Arguments
 
 1. `value`: `TokenType<Token>` — the value that will be bound to the token.
 
-#### Example
+### Example
 
 ```typescript
 import { Container, token } from 'brandi';
@@ -31,15 +31,16 @@ expect(key).toBe('#key9428');
 
 ---
 
-## `toInstance(ctor)`
+## `toInstance(creator)`
 
-Binds the token to an class instance in one of the [scopes](./binding-scopes.md).
+Binds the token to an instance in one of the [scopes](./binding-scopes.md).
 
-#### Arguments
+### Arguments
 
-1. `ctor`: `new (...args: any[]) => TokenType<Token>` — the instance constructor that will be bound to the token.
+1. `creator`: `(new (...args: any[]) => TokenType<Token>) | ((...args: any[]) => TokenType<Token>)` —
+   the instance creator that will be bound to the token.
 
-#### Returns
+### Returns
 
 [Binding Scope](./binding-scopes.md) syntax:
 
@@ -47,14 +48,17 @@ Binds the token to an class instance in one of the [scopes](./binding-scopes.md)
 - [`inTransientScope()`](./binding-scopes.md#intransientscope)
 - [`inContainerScope()`](./binding-scopes.md#incontainerscope)
 - [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
-- [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
 
-#### Example
+### Examples
+
+#### Class Instance
 
 ```typescript
 import { Container, token } from 'brandi';
 
-class ApiService {}
+class ApiService {
+  /* ... */
+}
 
 const TOKENS = {
   apiService: token<ApiService>('apiService'),
@@ -68,10 +72,40 @@ const apiService = container.get(TOKENS.apiService);
 expect(apiService).toBeInstanceOf(ApiService);
 ```
 
-### Constructor Injetion
+#### Function Call Result
 
-If the constructor has arguments you need to inject dependencies
-by [`injected`](./pointers-and-registrators#injectedtargettokens) registrator.
+```typescript
+import { Container, token } from 'brandi';
+
+interface ApiService {
+  /* ... */
+}
+
+const createApiService = (): ApiService => {
+  /* ... */
+};
+
+const TOKENS = {
+  apiService: token<ApiService>('apiService'),
+};
+
+const container = new Container();
+container
+  .bind(TOKENS.apiService)
+  .toInstance(createApiService)
+  .inTransientScope();
+
+const apiService = container.get(TOKENS.apiService);
+
+expect(apiService).toStrictEqual<ApiService>({
+  /* ... */
+});
+```
+
+### Injetions
+
+If the constructor or function has arguments you need to inject dependencies
+by [`injected`](./pointers-and-registrators.md#injectedtarget-tokens) registrator.
 
 ```typescript
 import { injected } from 'brandi';
@@ -88,98 +122,25 @@ injected(ApiService, TOKENS.httpClient);
 
 ---
 
-## `toCall(func)`
-
-The logic of `toCall` is similar to [`toInstance`](#toinstance),
-except that it binds the token to a function call result instead of a class instance.
-
-#### Arguments
-
-1. `func`: `(...args: any[]) => TokenType<Token>` — function whose call result will be bound to the token.
-
-#### Returns
-
-[Binding Scope](./binding-scopes.md) syntax:
-
-- [`inSingletonScope()`](./binding-scopes.md#insingletonscope)
-- [`inTransientScope()`](./binding-scopes.md#intransientscope)
-- [`inContainerScope()`](./binding-scopes.md#incontainerscope)
-- [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
-- [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
-
-#### Example
-
-```typescript
-import { Container, token } from 'brandi';
-
-interface API {
-  /* API Logic */
-}
-
-const createApi: API = () => ({
-  /* API Logic */
-});
-
-const TOKENS = {
-  api: token<API>('API'),
-};
-
-const container = new Container();
-container.bind(TOKENS.api).toCall(createApi).inTransientScope();
-
-const api = container.get(TOKENS.api);
-
-expect(api).toStrictEqual<API>({
-  /* API Logic */
-});
-```
-
-### Function Injetion
-
-Just as with the [constructor injetion](#constructor-injetion), if the function has arguments
-you need to inject dependencies by [`injected`](./pointers-and-registrators#injectedtargettokens) registrator.
-
-```typescript
-import { injected } from 'brandi';
-
-import { TOKENS } from './tokens';
-
-export const createApi = (apiKey: string) => ({
-  /* API Logic */
-});
-
-injected(createApi, TOKENS.apiKey);
-
-/* OR */
-
-export const createApi = injected(
-  (apiKey: string) => ({
-    /* API Logic */
-  }),
-  TOKENS.apiKey,
-);
-```
-
----
-
-## `toFactory(ctor, [initializer])`
+## `toFactory(creator, [initializer])`
 
 Binds the token to the factory.
 
-#### Arguments
+### Arguments
 
-1. `ctor` — the instance constructor which the factory will use;
-2. `[initializer]` — function called after the instance is constructed.
-   The logic of this function is explained in the examples below.
+1. `creator` — the instance creator which the factory will use;
+2. `[initializer]` — function called after the instance is created.
 
-#### Example
+### Examples
 
-##### Factory without arguments
+#### Factory Without Arguments
 
 ```typescript
 import { Container, Factory, token } from 'brandi';
 
-class ApiService {}
+class ApiService {
+  /* ... */
+}
 
 const TOKENS = {
   apiServiceFactory: token<Factory<ApiService>>('Factory<ApiService>'),
@@ -187,7 +148,7 @@ const TOKENS = {
 
 const container = new Container();
 
-/*                                       ↓ Binds the simple factory. */
+/*                                       ↓ Binds the factory. */
 container.bind(TOKENS.apiServiceFactory).toFactory(ApiService);
 
 /* OR */
@@ -203,12 +164,20 @@ const apiService = apiServiceFactory();
 expect(apiService).toBeInstanceOf(ApiService);
 ```
 
-##### Factory with arguments
+#### Factory With Arguments
 
 ```typescript
 import { Container, Factory, token } from 'brandi';
 
-class ApiService {}
+class ApiService {
+  public key: string;
+
+  public setKey(key: string) {
+    this.key = key;
+  }
+
+  /* ... */
+}
 
 const TOKENS = {
   /*                       ↓ `Factory` generic with second argument. */
@@ -231,19 +200,64 @@ expect(apiService).toBeInstanceOf(ApiService);
 expect(apiService.key).toBe('#key9124');
 ```
 
----
+#### Functional Factory
 
-## `toCreator(func, [initializer])`
+```typescript
+import { Container, Factory, token } from 'brandi';
 
-The logic of `toCreator` is similar to [`toFactory`](#tofactoryctor-initializer)
-(like [`toInstance`](#toinstancector) and [`toCall`](#tocallfunc)),
-except that it binds the token to a creator function instead of a factory.
+interface ApiService {
+  /* ... */
+}
 
-You can use the same `Factory` generic to describe the token type
-or use `Creator` alias.
+const createApiService = (): ApiService => {
+  /* ... */
+};
 
-#### Arguments
+const TOKENS = {
+  apiServiceFactory: token<Factory<ApiService>>('Factory<ApiService>'),
+};
 
-1. `func` — the function which the creator will use;
-2. `[initializer]` — function called after the entity is created.
-   The logic of this function is same as `toFactory`'s initializer.
+const container = new Container();
+
+container.bind(TOKENS.apiServiceFactory).toFactory(createApiService);
+
+const apiServiceFactory = container.get(TOKENS.apiService);
+const apiService = apiServiceFactory();
+
+expect(apiService).toStrictEqual<ApiService>({
+  /* ... */
+});
+```
+
+#### Instance Caching Factory
+
+```typescript
+import { Container, Factory, token } from 'brandi';
+
+class ApiService {
+  /* ... */
+}
+
+const TOKENS = {
+  apiService: token<ApiService>('apiService'),
+  apiServiceFactory: token<Factory<ApiService>>('Factory<ApiService>'),
+};
+
+const container = new Container();
+
+container
+  .bind(TOKENS.apiService)
+  .toInstance(ApiService)
+  .inSingletonScope() /* Binds the token to `ApiService` instance in singleton scope. */;
+
+container
+  .bind(TOKENS.apiServiceFactory)
+  .toFactory(() => container.get(TOKENS.apiService));
+
+const apiServiceFactory = container.get(TOKENS.apiService);
+
+const firstApiService = apiServiceFactory();
+const secondApiService = apiServiceFactory();
+
+expect(firstApiService).toBe(secondApiService);
+```

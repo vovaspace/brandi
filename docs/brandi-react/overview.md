@@ -36,4 +36,4 @@ Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:m
   makes the Brandi container available to any nested components that need to use injections.
 - [`useInjection(token)`](./use-injection.md) — allows you to get a dependency from a container.
 - [`createInjectionHooks(...tokens)`](./create-injection-hooks.md) — creates hooks for getting dependencies more easily.
-- [`tagged(...tags)(Component, [isolated])`](./tagged.md) — attaches tags to the component and all nested components.
+- [`tagged(...tags)(Component, [options])`](./tagged.md) — attaches tags to the component and all nested components.

@@ -36,7 +36,7 @@ Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:m
   allows you to get a dependency from a container.
 - [`createInjectionHooks(...tokens)`](https://brandi.js.org/brandi-react/create-injection-hooks) —
   creates hooks for getting dependencies more easily.
-- [`tagged(...tags)(Component, [isolated])`](https://brandi.js.org/brandi-react/tagged) —
+- [`tagged(...tags)(Component, [options])`](https://brandi.js.org/brandi-react/tagged) —
   attaches tags to the component and all nested components.
 
 You can find the full Brandi documentation on the [website](https://brandi.js.org).

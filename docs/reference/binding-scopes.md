@@ -44,7 +44,7 @@ expect(apiServiceFirst).not.toBe(apiServiceSecond);
 
 The container will return the same instance with each getting.
 This is similar to being a singleton,
-however if the container has a [child container](./hierarchical-containers.md) or a [clone](./container-api#clone),
+however if the container has a [child container](./hierarchical-containers.md) or a [clone](./container#clone),
 that child container or clone will get an instance unique to it.
 
 #### Example
@@ -126,43 +126,3 @@ const userService = container.get(TOKENS.userService);
 /* `EmailService` instances are the same for this resolution chain. */
 expect(userService.emailService).toBe(userService.settingsService.emailService);
 ```
-
----
-
-## `inGlobalScope()`
-
-Each getting from any container will return the same instance.
-
-#### Example
-
-<!-- prettier-ignore-start -->
-```typescript
-const parentContainer = new Container();
-const childContainer = new Container(parentContainer);
-const independentContainer = new Container();
-
-parentContainer
-  .bind(TOKENS.apiService)
-  .toInstance(ApiService)
-  .inGlobalScope();
-
-childContainer
-  .bind(TOKENS.apiService)
-  .toInstance(ApiService)
-  .inGlobalScope();
-
-independentContainer
-  .bind(TOKENS.apiService)
-  .toInstance(ApiService)
-  .inGlobalScope();
-
-const apiServiceParent = parentContainer.get(TOKENS.apiService);
-const apiServiceChild = childContainer.get(TOKENS.apiService);
-const apiServiceIndependent = independentContainer.get(TOKENS.apiService);
-
-/* The instances are the same. */
-expect(apiServiceParent).toBe(apiServiceChild);
-expect(apiServiceParent).toBe(apiServiceIndependent);
-expect(apiServiceChild).toBe(apiServiceIndependent);
-```
-<!-- prettier-ignore-end -->
