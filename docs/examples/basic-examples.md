@@ -74,7 +74,7 @@ expect(originalKey).toBe('#key9428');
 <!-- prettier-ignore-end -->
 
 Other `Container` methods are detailed
-in [Container API](../reference/container-api.md) section of the documentation.
+in [Container](../reference/container.md) section of the documentation.
 
 ## Hierarchical Containers
 
@@ -98,7 +98,7 @@ parentContainer
   .inTransientScope();
 
 /*                     ↓ Creates a container with the parent. */
-const childContainer = new Container(parentContainer);
+const childContainer = new Container().extend(parentContainer);
 
 /**                ↓ That container can't satisfy the getting request,
  *                   it passes it along to its parent container.

@@ -1,6 +1,6 @@
 import { Tag } from '../pointers';
 import { UnknownCreator } from '../types';
-import { tagsRegistry } from '../globals';
+import { tagsRegistry } from '../registries';
 
 export const tagged = <T extends UnknownCreator>(
   target: T,

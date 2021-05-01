@@ -3,12 +3,16 @@ import { Tag } from 'brandi';
 
 import { ConditionsProvider } from './ConditionsProvider';
 
+export interface TaggedOptions {
+  isolated?: boolean;
+}
+
 export const tagged = (...tags: Tag[]) => <P extends unknown>(
   Component: React.ComponentType<P>,
-  isolated?: boolean,
+  options: TaggedOptions = {},
 ): React.FunctionComponent<P> => {
   const Wrapper: React.FunctionComponent<P> = (props) => (
-    <ConditionsProvider conditions={tags} isolated={isolated}>
+    <ConditionsProvider conditions={tags} isolated={options.isolated}>
       <Component {...props} />
     </ConditionsProvider>
   );

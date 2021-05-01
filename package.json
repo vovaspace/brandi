@@ -6,6 +6,9 @@
   ],
   "scripts": {
     "test": "jest --colors",
+    "build:brandi": "cd packages/brandi && npm run build",
+    "build:brandi-react": "cd packages/brandi-react && npm run build",
+    "build": "npm run build:brandi && npm run build:brandi-react",
     "code:lint": "prettier --check . && eslint .",
     "code:fix": "prettier --write . && eslint --fix ."
   },

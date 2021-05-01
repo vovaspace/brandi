@@ -21,9 +21,9 @@ Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:m
 
 The core library.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi.svg?style=flat)](https://www.npmjs.com/package/brandi)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi)](https://bundlephobia.com/result?p=brandi)
+[![License](https://img.shields.io/npm/l/brandi.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi.svg)](https://www.npmjs.com/package/brandi)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi.svg)](https://bundlephobia.com/result?p=brandi)
 
 ```bash
 # NPM
@@ -39,9 +39,9 @@ yarn add brandi
 
 The React bindings layer. It lets your React components get dependencies from Brandi containers.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg?style=flat)](https://www.npmjs.com/package/brandi-react)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi-react)](https://bundlephobia.com/result?p=brandi-react)
+[![License](https://img.shields.io/npm/l/brandi-react.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg)](https://www.npmjs.com/package/brandi-react)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi-react.svg)](https://bundlephobia.com/result?p=brandi-react)
 
 Brandi-React requires **React 16.8 or later**.
 You'll also need to [install](https://brandi.js.org/getting-started/installation) Brandi.
@@ -81,10 +81,11 @@ The documentation is divided into several sections:
 - Reference
   - [API Reference](https://brandi.js.org/reference)
   - [Pointers and Registrators](https://brandi.js.org/reference/pointers-and-registrators)
-  - [Container API](https://brandi.js.org/reference/container-api)
+  - [Container](https://brandi.js.org/reference/container)
   - [Binding Types](https://brandi.js.org/reference/binding-types)
   - [Binding Scopes](https://brandi.js.org/reference/binding-scopes)
   - [Optional Dependencies](https://brandi.js.org/reference/optional-dependencies)
+  - [Dependency Modules](https://brandi.js.org/reference/dependency-modules)
   - [Hierarchical Containers](https://brandi.js.org/reference/hierarchical-containers)
   - [Conditional Bindings](https://brandi.js.org/reference/conditional-bindings)
 - Brandi-React
@@ -169,7 +170,7 @@ expect(originalKey).toBe('#key9428');
 <!-- prettier-ignore-end -->
 
 Other `Container` methods are detailed
-in [Container API](https://brandi.js.org/reference/container-api) section of the documentation.
+in [Container](https://brandi.js.org/reference/container) section of the documentation.
 
 ### Hierarchical Containers
 
@@ -193,7 +194,7 @@ parentContainer
   .inTransientScope();
 
 /*                     ↓ Creates a container with the parent. */
-const childContainer = new Container(parentContainer);
+const childContainer = new Container().extend(parentContainer);
 
 /**                ↓ That container can't satisfy the getting request,
  *                   it passes it along to its parent container.

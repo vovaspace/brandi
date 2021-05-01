@@ -2,211 +2,355 @@ import { Container, Factory, injected, token } from '../src';
 
 describe('toFactory', () => {
   it('creates an factory without arguments', () => {
-    class SomeClass {}
+    class Some {}
 
-    const tokens = {
-      someClassFactory: token<Factory<SomeClass>>('someClassFactory'),
+    const createSome = (): Some => ({});
+
+    const TOKENS = {
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
     const container = new Container();
-    container.bind(tokens.someClassFactory).toFactory(SomeClass);
+    container.bind(TOKENS.someConstructorFactory).toFactory(Some);
+    container.bind(TOKENS.someCallFactory).toFactory(createSome);
 
-    const factory = container.get(tokens.someClassFactory);
-    const firstInstance = factory();
-    const secondInstance = factory();
+    const constructorFactory = container.get(TOKENS.someConstructorFactory);
+    const callFactory = container.get(TOKENS.someCallFactory);
 
-    expect(firstInstance).toBeInstanceOf(SomeClass);
-    expect(secondInstance).toBeInstanceOf(SomeClass);
-    expect(firstInstance).not.toBe(secondInstance);
+    const firstConstructorInstance = constructorFactory();
+    const secondConstructorInstance = constructorFactory();
+    const firstCallInstance = callFactory();
+    const secondCallInstance = callFactory();
+
+    expect(firstConstructorInstance).toBeInstanceOf(Some);
+    expect(secondConstructorInstance).toBeInstanceOf(Some);
+    expect(firstConstructorInstance).not.toBe(secondConstructorInstance);
+
+    expect(firstCallInstance).not.toBeInstanceOf(Some);
+    expect(secondCallInstance).not.toBeInstanceOf(Some);
+    expect(firstCallInstance).toStrictEqual<Some>({});
+    expect(secondCallInstance).toStrictEqual<Some>({});
+    expect(firstCallInstance).not.toBe(secondCallInstance);
   });
 
   it('creates an factory without arguments but with a initializer that returns void', () => {
-    class SomeClass {
+    class Some {
       public num: number = 0;
 
-      public init() {
+      public init(): void {
         this.num += 1;
       }
     }
 
-    const tokens = {
-      someClassFactory: token<Factory<SomeClass>>('someClassFactory'),
+    const createSome = (): Some => {
+      const instance = {
+        num: 0,
+        init: (): void => {
+          instance.num += 1;
+        },
+      };
+      return instance;
+    };
+
+    const TOKENS = {
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
     const container = new Container();
-
     container
-      .bind(tokens.someClassFactory)
-      .toFactory(SomeClass, (instance) => instance.init());
+      .bind(TOKENS.someConstructorFactory)
+      .toFactory(Some, (instance) => instance.init());
+    container
+      .bind(TOKENS.someCallFactory)
+      .toFactory(createSome, (instance) => instance.init());
 
-    const factory = container.get(tokens.someClassFactory);
-    const instance = factory();
+    const constructorFactory = container.get(TOKENS.someConstructorFactory);
+    const callFactory = container.get(TOKENS.someCallFactory);
 
-    expect(instance).toBeInstanceOf(SomeClass);
-    expect(instance.num).toBe(1);
+    const constructorInstance = constructorFactory();
+    const callInstance = callFactory();
+
+    expect(constructorInstance).toBeInstanceOf(Some);
+    expect(constructorInstance.num).toBe(1);
+
+    expect(callInstance).not.toBeInstanceOf(Some);
+    expect(callInstance.num).toBe(1);
   });
 
   it('creates an factory without arguments but with a initializer that returns a value and ignores the returned value', () => {
-    class SomeClass {
+    class Some {
       public num: number = 0;
 
-      public init() {
+      public init(): void {
         this.num += 1;
       }
     }
 
-    const tokens = {
-      someClassFactory: token<Factory<SomeClass>>('someClassFactory'),
+    const createSome = (): Some => {
+      const instance = {
+        num: 0,
+        init: (): void => {
+          instance.num += 1;
+        },
+      };
+      return instance;
+    };
+
+    const TOKENS = {
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
     const container = new Container();
-
-    container.bind(tokens.someClassFactory).toFactory(SomeClass, (instance) => {
+    container
+      .bind(TOKENS.someConstructorFactory)
+      .toFactory(Some, (instance) => {
+        instance.init();
+        return 1;
+      });
+    container.bind(TOKENS.someCallFactory).toFactory(createSome, (instance) => {
       instance.init();
       return 1;
     });
 
-    const factory = container.get(tokens.someClassFactory);
-    const instance = factory();
+    const constructorFactory = container.get(TOKENS.someConstructorFactory);
+    const callFactory = container.get(TOKENS.someCallFactory);
 
-    expect(instance).toBeInstanceOf(SomeClass);
-    expect(instance.num).toBe(1);
+    const constructorInstance = constructorFactory();
+    const callInstance = callFactory();
+
+    expect(constructorInstance).toBeInstanceOf(Some);
+    expect(constructorInstance.num).toBe(1);
+
+    expect(callInstance).not.toBeInstanceOf(Some);
+    expect(callInstance.num).toBe(1);
   });
 
   it('creates an factory with arguments', () => {
-    class SomeClass {
+    class Some {
       public str: string = '';
 
       public num: number = 0;
 
-      public init(str: string, num: number) {
+      public init(str: string, num: number): void {
         this.str = str;
         this.num = num;
       }
     }
 
-    const tokens = {
-      someClassFactory: token<Factory<SomeClass, [str: string, num: number]>>(
-        'someClassFactory',
+    const createSome = (): Some => {
+      const instance = {
+        str: '',
+        num: 0,
+        init: (str: string, num: number): void => {
+          instance.str = str;
+          instance.num = num;
+        },
+      };
+      return instance;
+    };
+
+    const TOKENS = {
+      someConstructorFactory: token<Factory<Some, [str: string, num: number]>>(
+        'ConstructorFactory<Some>',
+      ),
+      someCallFactory: token<Factory<Some, [str: string, num: number]>>(
+        'CallFactory<Some>',
       ),
     };
 
     const container = new Container();
-
     container
-      .bind(tokens.someClassFactory)
-      .toFactory(SomeClass, (instance, str, num) => instance.init(str, num));
+      .bind(TOKENS.someConstructorFactory)
+      .toFactory(Some, (instance, str, num) => instance.init(str, num));
+    container
+      .bind(TOKENS.someCallFactory)
+      .toFactory(createSome, (instance, str, num) => instance.init(str, num));
 
     const str = '1';
     const num = 1;
 
-    const factory = container.get(tokens.someClassFactory);
-    const instance = factory(str, num);
+    const constructorFactory = container.get(TOKENS.someConstructorFactory);
+    const callFactory = container.get(TOKENS.someCallFactory);
 
-    expect(instance).toBeInstanceOf(SomeClass);
-    expect(instance.str).toBe(str);
-    expect(instance.num).toBe(num);
+    const constructorInstance = constructorFactory(str, num);
+    const callInstance = callFactory(str, num);
+
+    expect(constructorInstance).toBeInstanceOf(Some);
+    expect(constructorInstance.str).toBe(str);
+    expect(constructorInstance.num).toBe(num);
+
+    expect(callInstance).not.toBeInstanceOf(Some);
+    expect(callInstance.str).toBe(str);
+    expect(callInstance.num).toBe(num);
   });
 
   it('creates an factory which injects dependencies', () => {
-    class FirstClass {}
+    class Dependency {}
 
-    class SecondClass {
-      constructor(public first: FirstClass) {}
+    class Some {
+      constructor(public dependency: Dependency) {}
     }
 
-    const tokens = {
-      firstClass: token<FirstClass>('FirstClass'),
-      secondClassFactory: token<Factory<SecondClass>>('secondClassFactory'),
+    const createSome = (dependency: Dependency) => ({ dependency });
+
+    const TOKENS = {
+      dependency: token<Dependency>('FirstClass'),
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
-    injected(SecondClass, tokens.firstClass);
+    injected(Some, TOKENS.dependency);
+    injected(createSome, TOKENS.dependency);
 
     const container = new Container();
-    container.bind(tokens.firstClass).toInstance(FirstClass).inTransientScope();
-    container.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    container.bind(TOKENS.dependency).toInstance(Dependency).inTransientScope();
+    container.bind(TOKENS.someConstructorFactory).toFactory(Some);
+    container.bind(TOKENS.someCallFactory).toFactory(createSome);
 
-    const secondClassFactory = container.get(tokens.secondClassFactory);
-    const secondClassInstance = secondClassFactory();
+    const constructorFactory = container.get(TOKENS.someConstructorFactory);
+    const callFactory = container.get(TOKENS.someCallFactory);
 
-    expect(secondClassInstance).toBeInstanceOf(SecondClass);
-    expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
+    const constructorInstance = constructorFactory();
+    const callInstance = callFactory();
+
+    expect(constructorInstance).toBeInstanceOf(Some);
+    expect(constructorInstance.dependency).toBeInstanceOf(Dependency);
+
+    expect(callInstance).not.toBeInstanceOf(Some);
+    expect(callInstance.dependency).toBeInstanceOf(Dependency);
   });
 
   it('creates an factory which gets an injection from parent container', () => {
-    class FirstClass {}
+    class Dependency {}
 
-    class SecondClass {
-      constructor(public first: FirstClass) {}
+    class Some {
+      constructor(public dependency: Dependency) {}
     }
 
-    const tokens = {
-      firstClass: token<FirstClass>('FirstClass'),
-      secondClassFactory: token<Factory<SecondClass>>('secondClassFactory'),
+    const createSome = (dependency: Dependency) => ({ dependency });
+
+    const TOKENS = {
+      dependency: token<Dependency>('FirstClass'),
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
-    injected(SecondClass, tokens.firstClass);
+    injected(Some, TOKENS.dependency);
+    injected(createSome, TOKENS.dependency);
 
     const parentContainer = new Container();
     parentContainer
-      .bind(tokens.firstClass)
-      .toInstance(FirstClass)
+      .bind(TOKENS.dependency)
+      .toInstance(Dependency)
       .inTransientScope();
 
-    const childContainer = new Container(parentContainer);
-    childContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    const childContainer = new Container().extend(parentContainer);
+    childContainer.bind(TOKENS.someConstructorFactory).toFactory(Some);
+    childContainer.bind(TOKENS.someCallFactory).toFactory(createSome);
 
-    const secondClassFactory = childContainer.get(tokens.secondClassFactory);
-    const secondClassInstance = secondClassFactory();
+    const constructorFactory = childContainer.get(
+      TOKENS.someConstructorFactory,
+    );
+    const callFactory = childContainer.get(TOKENS.someCallFactory);
 
-    expect(secondClassInstance).toBeInstanceOf(SecondClass);
-    expect(secondClassInstance.first).toBeInstanceOf(FirstClass);
+    const constructorInstance = constructorFactory();
+    const callInstance = callFactory();
+
+    expect(constructorInstance).toBeInstanceOf(Some);
+    expect(constructorInstance.dependency).toBeInstanceOf(Dependency);
+
+    expect(callInstance).not.toBeInstanceOf(Some);
+    expect(callInstance.dependency).toBeInstanceOf(Dependency);
   });
 
   it('creates an factory which gets an injection from the container from which the factory was got', () => {
-    class FirstClass {}
-    class AnotherFirstClass {}
+    class Dependency {}
+    class AnotherDependency {}
 
-    class SecondClass {
-      constructor(public first: FirstClass) {}
+    class Some {
+      constructor(public dependency: Dependency) {}
     }
 
-    const tokens = {
-      firstClass: token<FirstClass>('FirstClass'),
-      secondClassFactory: token<Factory<SecondClass>>('secondClassFactory'),
+    const createSome = (dependency: Dependency) => ({ dependency });
+
+    const TOKENS = {
+      dependency: token<Dependency>('FirstClass'),
+      someConstructorFactory: token<Factory<Some>>('ConstructorFactory<Some>'),
+      someCallFactory: token<Factory<Some>>('CallFactory<Some>'),
     };
 
-    injected(SecondClass, tokens.firstClass);
+    injected(Some, TOKENS.dependency);
+    injected(createSome, TOKENS.dependency);
 
     const parentContainer = new Container();
     parentContainer
-      .bind(tokens.firstClass)
-      .toInstance(FirstClass)
+      .bind(TOKENS.dependency)
+      .toInstance(Dependency)
       .inTransientScope();
-    parentContainer.bind(tokens.secondClassFactory).toFactory(SecondClass);
+    parentContainer.bind(TOKENS.someConstructorFactory).toFactory(Some);
+    parentContainer.bind(TOKENS.someCallFactory).toFactory(createSome);
 
-    const childContainer = new Container(parentContainer);
+    const childContainer = new Container().extend(parentContainer);
     childContainer
-      .bind(tokens.firstClass)
-      .toInstance(AnotherFirstClass)
+      .bind(TOKENS.dependency)
+      .toInstance(AnotherDependency)
       .inTransientScope();
 
-    const parentContainerSecondClassFactory = parentContainer.get(
-      tokens.secondClassFactory,
+    const parentContainerConstructorFactory = parentContainer.get(
+      TOKENS.someConstructorFactory,
     );
-    const childContainerSecondClassFactory = childContainer.get(
-      tokens.secondClassFactory,
+    const parentContainerCallFactory = parentContainer.get(
+      TOKENS.someCallFactory,
+    );
+    const childContainerConstructorFactory = childContainer.get(
+      TOKENS.someConstructorFactory,
+    );
+    const childContainerCallFactory = childContainer.get(
+      TOKENS.someCallFactory,
     );
 
-    const parentContainerSecondClassInstance = parentContainerSecondClassFactory();
-    const childContainerSecondClassInstance = childContainerSecondClassFactory();
+    const parentConstructorInstance = parentContainerConstructorFactory();
+    const parentCallInstance = parentContainerCallFactory();
+    const childConstructorInstance = childContainerConstructorFactory();
+    const childCallInstance = childContainerCallFactory();
 
-    expect(parentContainerSecondClassInstance).toBeInstanceOf(SecondClass);
-    expect(childContainerSecondClassInstance).toBeInstanceOf(SecondClass);
+    expect(parentConstructorInstance).toBeInstanceOf(Some);
+    expect(parentCallInstance).not.toBeInstanceOf(Some);
+    expect(childConstructorInstance).toBeInstanceOf(Some);
+    expect(childCallInstance).not.toBeInstanceOf(Some);
 
-    expect(parentContainerSecondClassInstance.first).toBeInstanceOf(FirstClass);
-    expect(childContainerSecondClassInstance.first).toBeInstanceOf(
-      AnotherFirstClass,
+    expect(parentConstructorInstance.dependency).toBeInstanceOf(Dependency);
+    expect(parentCallInstance.dependency).toBeInstanceOf(Dependency);
+    expect(childConstructorInstance.dependency).toBeInstanceOf(
+      AnotherDependency,
     );
+    expect(childCallInstance.dependency).toBeInstanceOf(AnotherDependency);
+  });
+
+  it('creates an instance caching factory', () => {
+    class Some {}
+
+    const TOKENS = {
+      some: token<Some>('some'),
+      someFactory: token<Factory<Some>>('Factory<Some>'),
+    };
+
+    const container = new Container();
+    container.bind(TOKENS.some).toInstance(Some).inSingletonScope();
+    container
+      .bind(TOKENS.someFactory)
+      .toFactory(() => container.get(TOKENS.some));
+
+    const factory = container.get(TOKENS.someFactory);
+
+    const firstInstance = factory();
+    const secondInstance = factory();
+
+    expect(firstInstance).toBeInstanceOf(Some);
+    expect(secondInstance).toBeInstanceOf(Some);
+    expect(firstInstance).toBe(secondInstance);
   });
 });

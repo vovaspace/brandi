@@ -1,19 +1,18 @@
 export enum Type {
   Constant,
-  Entity,
+  Instance,
   Factory,
 }
 
 export enum Scope {
   Container,
-  Global,
   Resolution,
   Singleton,
   Transient,
 }
 
 export interface Binding {
-  readonly value: unknown;
+  readonly impl: unknown;
   readonly type: Type;
   readonly scope: Scope;
 }

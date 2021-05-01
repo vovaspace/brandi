@@ -9,21 +9,21 @@ hide_title: true
 
 The `ContainerProvider` component makes the Brandi container available to any nested components that need to use injections.
 
-The [`useInjection`](./use-injection.md) hook can then access the provided container via React's Context mechanism.
+The [`useInjection`](./use-injection.md) hook can then access the provided container via React's Context.
 
 ## Props
 
-1. `container`: [`Container`](../reference/container-api.md#container) — the provider will not pass the orginal container,
-   but its clone received from the [`Container.clone()`](../reference/container-api.md#clone) method
-   (This can be useful together with using the [container scope](../reference/binding-scopes.md#incontainerscope)).
-   This behavior is implemented so that the provider can safely set the container
-   received from the upstream provider to the `Container.parent`.
-   In this way, we can implement a [hierarchical DI system](../reference/hierarchical-containers.md)
-   based on a hierarchy of React components.
-2. `isolated?`: `boolean` — as mentioned above, the provider sets the container
-   received from the upstream provider to the `Container.parent`.
-   `isolated` prop disables this behavior and saves original `Container.parent` value.
-3. `children`: `ReactNode`.
+- `container`: [`Container`](../reference/container.md#container) — the provider will not pass the orginal container,
+  but its clone received from the [`Container.clone()`](../reference/container.md#clone) method
+  (This can be useful together with using the [container scope](../reference/binding-scopes.md#incontainerscope)).
+  This behavior is implemented so that the provider can safely [extends](../reference/container#extendcontainer) the container
+  with a container received from the upstream provider.
+  In this way, we can implement a [hierarchical DI system](../reference/hierarchical-containers.md)
+  based on a hierarchy of React components.
+- `[isolated]`: `boolean` — as mentioned above, the provider extends the container
+  with a container received from the upstream provider.
+  `isolated` prop disables this behavior.
+- `children`: `ReactNode`.
 
 ## Examples
 

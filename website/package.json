@@ -29,15 +29,15 @@
     ]
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.72",
-    "@docusaurus/preset-classic": "2.0.0-alpha.72",
+    "@docusaurus/core": "2.0.0-alpha.75",
+    "@docusaurus/preset-classic": "2.0.0-alpha.75",
     "@mdx-js/react": "^1.6.21",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-alpha.71",
-    "@types/react": "^17.0.3",
+    "@docusaurus/module-type-aliases": "^2.0.0-alpha.75",
+    "@types/react": "^17.0.1",
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.7"
   }

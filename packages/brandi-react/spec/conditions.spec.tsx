@@ -48,7 +48,9 @@ describe('conditions', () => {
 
   it('does not pass parent tags throw a isolated tagged component', () => {
     const ParentTaggedComponent = tagged(tags.some, tags.other)(TestComponent);
-    const ChildTaggedComponent = tagged(tags.another)(TestComponent, true);
+    const ChildTaggedComponent = tagged(tags.another)(TestComponent, {
+      isolated: true,
+    });
 
     const wrapper: React.FunctionComponent = ({ children }) => (
       <ParentTaggedComponent>

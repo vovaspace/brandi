@@ -1,26 +1,13 @@
 ---
-id: container-api
-title: Container API
-sidebar_label: Container API
+id: container
+title: Container
+sidebar_label: Container
 ---
-
-This section documents `Container` creation and the top-level `Container` methods.
-
-## `Container`
 
 `Container` is a Brandi class whose instances store information about dependencies,
 resolve dependencies, and inject dependencies into targets.
 
-#### Constructor Arguments
-
-1. `parent`: `Container` — a parent container.
-   For more information, see [Hierarchical Containers](./hierarchical-containers.md) section.
-
-### `createContainer(parent)`
-
-`createContainer(parent)` — is alias for `new Container(parent)`.
-
-## Top-Level Container Methods
+## `Container` Methods
 
 ### `bind(token)`
 
@@ -35,22 +22,55 @@ Binds the token to the dependency.
 [Binding Type](./binding-types.md) syntax:
 
 - [`toConstant(value)`](./binding-types.md#toconstantvalue)
-- [`toInstance(ctor)`](./binding-types.md#toinstancector)
-- [`toCall(func)`](./binding-types.md#tocallfunc)
-- [`toFactory(ctor, [initializer])`](./binding-types.md#tofactoryctor-initializer)
-- [`toCreator(func, [initializer])`](./binding-types.md#tocreatorfunc-initializer)
+- [`toInstance(creator)`](./binding-types.md#toinstancecreator)
+- [`toFactory(creator, [initializer])`](./binding-types.md#tofactorycreator-initializer)
 
-### `when(condition)`
+---
 
-Creates a conditional binding. For more information, see [Conditional Bindings](./conditional-bindings.md) section.
+### `use(...tokens).from(module)`
+
+Uses bindings from a [dependency module](./dependency-modules.md).
 
 #### Arguments
 
-1. `condition`: [`Tag`](./pointers-and-registrators.md#tag) | `UnknownConstructor` | `UnknownFunction`.
+##### `use(...tokens)`
+
+1. `...tokens`: `Token[]` — tokens to be used from the dependency module.
+
+##### `use(...tokens).from(module)`
+
+1. `module`: [`DependencyModule`](./dependency-modules.md) — the dependency module.
+
+---
+
+### `when(condition)`
+
+Creates a [conditional binding](./conditional-bindings.md).
+
+#### Arguments
+
+1. `condition`: [`Tag`](./pointers-and-registrators.md#tagdescription) | `UnknownCreator`.
 
 #### Returns
 
-[`bind(token)`](#bindtoken) syntax.
+`bind` or `use` syntax:
+
+- [`bind(token)`](#bindtoken)
+- [`use(...tokens)`](#usetokensfrommodule)
+
+---
+
+### `extend(container)`
+
+Sets the parent container. For more information, see [Hierarchical Containers](./hierarchical-containers.md) section.
+
+#### Arguments
+
+1. `container`: `Container | null`.
+
+#### Returns
+
+`this` — the container.
 
 ---
 
@@ -123,3 +143,7 @@ const originalKey = container.get(TOKENS.apiKey);
 expect(testKey).toBe('#testKey');
 expect(originalKey).toBe('#key9428');
 ```
+
+## `createContainer()`
+
+`createContainer()` — is alias for `new Container()`.

@@ -7,10 +7,11 @@ module.exports = {
     'Reference': [
       'reference/api-reference',
       'reference/pointers-and-registrators',
-      'reference/container-api',
+      'reference/container',
       'reference/binding-types',
       'reference/binding-scopes',
       'reference/optional-dependencies',
+      'reference/dependency-modules',
       'reference/hierarchical-containers',
       'reference/conditional-bindings',
     ],

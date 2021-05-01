@@ -38,7 +38,7 @@ Creating two types of cacher with a common interface:
 
 ```typescript title="Cacher.ts"
 export interface Cacher {
-  put(key: string, value: unknown): void;
+  /* ... */
 }
 
 export class OnlineCacher implements Cacher {
@@ -59,7 +59,9 @@ import { TOKENS } from './tokens';
 import { Cacher } from './Cacher';
 
 export class UserService {
-  constructor(public cacher: Cacher) {}
+  constructor(private cacher: Cacher) {}
+
+  /* ... */
 }
 
 injected(UserService, TOKENS.cacher);
@@ -72,7 +74,9 @@ import { TOKENS } from './tokens';
 import { Cacher } from './Cacher';
 
 export class SettingsService {
-  constructor(public cacher: Cacher) {}
+  constructor(private cacher: Cacher) {}
+
+  /* ... */
 }
 
 injected(SettingsService, TOKENS.cacher);
@@ -85,7 +89,9 @@ import { TOKENS } from './tokens';
 import { Cacher } from './Cacher';
 
 export class AdminService {
-  constructor(public cacher: Cacher) {}
+  constructor(private cacher: Cacher) {}
+
+  /* ... */
 }
 
 injected(AdminService, TOKENS.cacher);

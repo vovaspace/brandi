@@ -12,20 +12,20 @@ import {
 describe('injection', () => {
   describe('useInjection', () => {
     it('uses a dependency', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
       const value = 1;
 
       const container = createContainer();
-      container.bind(tokens.some).toConstant(value);
+      container.bind(TOKENS.some).toConstant(value);
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={container}>{children}</ContainerProvider>
       );
 
-      const { result } = renderHook(() => useInjection(tokens.some), {
+      const { result } = renderHook(() => useInjection(TOKENS.some), {
         wrapper,
       });
 
@@ -33,7 +33,7 @@ describe('injection', () => {
     });
 
     it('uses a tagged dependency', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
@@ -45,8 +45,8 @@ describe('injection', () => {
       const anotherValue = 2;
 
       const container = createContainer();
-      container.bind(tokens.some).toConstant(value);
-      container.when(tags.some).bind(tokens.some).toConstant(anotherValue);
+      container.bind(TOKENS.some).toConstant(value);
+      container.when(tags.some).bind(TOKENS.some).toConstant(anotherValue);
 
       const TaggedComponent = tagged(tags.some)(({ children }) => (
         <div>{children}</div>
@@ -58,7 +58,7 @@ describe('injection', () => {
         </ContainerProvider>
       );
 
-      const { result } = renderHook(() => useInjection(tokens.some), {
+      const { result } = renderHook(() => useInjection(TOKENS.some), {
         wrapper,
       });
 
@@ -66,7 +66,7 @@ describe('injection', () => {
     });
 
     it('uses an optional dependency', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
       };
 
@@ -76,7 +76,7 @@ describe('injection', () => {
         <ContainerProvider container={container}>{children}</ContainerProvider>
       );
 
-      const { result } = renderHook(() => useInjection(tokens.some.optional), {
+      const { result } = renderHook(() => useInjection(TOKENS.some.optional), {
         wrapper,
       });
 
@@ -86,19 +86,19 @@ describe('injection', () => {
     it('keeps the same transient scoped dependency between renderers', () => {
       class Some {}
 
-      const tokens = {
+      const TOKENS = {
         some: token<Some>('some'),
       };
 
       const container = createContainer();
-      container.bind(tokens.some).toInstance(Some).inTransientScope();
+      container.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={container}>{children}</ContainerProvider>
       );
 
       const { result, rerender } = renderHook(
-        () => useInjection(tokens.some.optional),
+        () => useInjection(TOKENS.some.optional),
         {
           wrapper,
         },
@@ -114,26 +114,26 @@ describe('injection', () => {
     it('returns individual transient scoped dependencies for separate renders', () => {
       class Some {}
 
-      const tokens = {
+      const TOKENS = {
         some: token<Some>('some'),
       };
 
       const container = createContainer();
-      container.bind(tokens.some).toInstance(Some).inTransientScope();
+      container.bind(TOKENS.some).toInstance(Some).inTransientScope();
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={container}>{children}</ContainerProvider>
       );
 
       const { result: firstResult } = renderHook(
-        () => useInjection(tokens.some.optional),
+        () => useInjection(TOKENS.some.optional),
         {
           wrapper,
         },
       );
 
       const { result: secondResult } = renderHook(
-        () => useInjection(tokens.some.optional),
+        () => useInjection(TOKENS.some.optional),
         {
           wrapper,
         },
@@ -147,20 +147,20 @@ describe('injection', () => {
 
   describe('createInjectionHooks', () => {
     it('creates injection hooks', () => {
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
         another: token<string>('another'),
       };
 
-      const hooks = createInjectionHooks(tokens.some, tokens.another);
+      const hooks = createInjectionHooks(TOKENS.some, TOKENS.another);
       const [useSome, useAnother] = hooks;
 
       const someValue = 1;
       const anotherValue = '2';
 
       const container = createContainer();
-      container.bind(tokens.some).toConstant(someValue);
-      container.bind(tokens.another).toConstant(anotherValue);
+      container.bind(TOKENS.some).toConstant(someValue);
+      container.bind(TOKENS.another).toConstant(anotherValue);
 
       const wrapper: React.FunctionComponent = ({ children }) => (
         <ContainerProvider container={container}>{children}</ContainerProvider>

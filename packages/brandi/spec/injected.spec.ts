@@ -1,5 +1,5 @@
 import { injected, token } from '../src';
-import { injectsRegistry } from '../src/globals';
+import { injectsRegistry } from '../src/registries';
 
 describe('injected', () => {
   beforeAll(() => {
@@ -11,93 +11,89 @@ describe('injected', () => {
   });
 
   it('registers a single token', () => {
-    class SomeClass {
-      constructor(public some: number) {}
+    class Some {
+      constructor(public value: number) {}
     }
 
-    const tokens = {
-      some: token<number>('some'),
+    const TOKENS = {
+      value: token<number>('value'),
     };
 
-    injected(SomeClass, tokens.some);
+    injected(Some, TOKENS.value);
 
-    expect(injectsRegistry.get(SomeClass)).toStrictEqual([tokens.some]);
+    expect(injectsRegistry.get(Some)).toStrictEqual([TOKENS.value]);
   });
 
   it('registers multiple tokens', () => {
-    class SomeClass {
-      constructor(public some: number, public another: string) {}
+    class Some {
+      constructor(public num: number, public str: string) {}
     }
 
-    const tokens = {
-      some: token<number>('some'),
-      another: token<string>('another'),
+    const TOKENS = {
+      num: token<number>('num'),
+      str: token<string>('value'),
     };
 
-    injected(SomeClass, tokens.some, tokens.another);
+    injected(Some, TOKENS.num, TOKENS.str);
 
-    expect(injectsRegistry.get(SomeClass)).toStrictEqual([
-      tokens.some,
-      tokens.another,
-    ]);
+    expect(injectsRegistry.get(Some)).toStrictEqual([TOKENS.num, TOKENS.str]);
   });
 
   it('registers an optional token', () => {
-    class SomeClass {
-      constructor(public some: number, public another?: string) {}
+    class Some {
+      constructor(public required: number, public optional?: string) {}
     }
 
-    const tokens = {
+    const TOKENS = {
       some: token<number>('some'),
       another: token<string>('another'),
     };
 
-    injected(SomeClass, tokens.some, tokens.another.optional);
+    injected(Some, TOKENS.some, TOKENS.another.optional);
 
-    expect(injectsRegistry.get(SomeClass)).toStrictEqual([
-      tokens.some,
-      tokens.another.optional,
+    expect(injectsRegistry.get(Some)).toStrictEqual([
+      TOKENS.some,
+      TOKENS.another.optional,
     ]);
   });
 
   it('rewrites tokens', () => {
-    class SomeClass {
-      constructor(public some: number) {}
+    class Some {
+      constructor(public value: number) {}
     }
 
-    const tokens = {
+    const TOKENS = {
       some: token<number>('some'),
       another: token<number>('another'),
     };
 
-    injected(SomeClass, tokens.some);
-    injected(SomeClass, tokens.another);
+    injected(Some, TOKENS.some);
+    injected(Some, TOKENS.another);
 
-    expect(injectsRegistry.get(SomeClass)).toStrictEqual([tokens.another]);
+    expect(injectsRegistry.get(Some)).toStrictEqual([TOKENS.another]);
   });
 
   describe('typings', () => {
     it('requires to pass dependencies', () => {
       expect.assertions(0);
 
-      class SomeClass {
-        constructor(public some: number) {}
+      class Some {
+        constructor(public value: number) {}
       }
 
-      class AnotherClass {
-        constructor(public some?: number) {}
+      class Another {
+        constructor(public value?: number) {}
       }
 
-      const createSome = (some: number): SomeClass => new SomeClass(some);
+      const createSome = (value: number): Some => new Some(value);
 
-      const createAnother = (some?: number): AnotherClass =>
-        new AnotherClass(some);
-
-      // @ts-expect-error: Arguments for the rest parameter 'tokens' were not provided.
-      injected(SomeClass);
+      const createAnother = (value?: number): Another => new Another(value);
 
       // @ts-expect-error: Arguments for the rest parameter 'tokens' were not provided.
-      injected(AnotherClass);
+      injected(Some);
+
+      // @ts-expect-error: Arguments for the rest parameter 'tokens' were not provided.
+      injected(Another);
 
       // @ts-expect-error: Arguments for the rest parameter 'tokens' were not provided.
       injected(createSome);
@@ -109,94 +105,94 @@ describe('injected', () => {
     it('requires to pass the same type of dependency and token', () => {
       expect.assertions(0);
 
-      class SomeClass {
+      class Some {
         constructor(public num: number, public str?: string) {}
       }
 
-      const createSome = (num: number, str?: string): SomeClass =>
-        new SomeClass(num, str);
+      const createSome = (num: number, str?: string): Some =>
+        new Some(num, str);
 
-      const tokens = {
+      const TOKENS = {
         num: token<number>('num'),
         str: token<string>('str'),
       };
 
       // @ts-expect-error: Argument of type 'Token<number>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(SomeClass, tokens.num, tokens.num);
+      injected(Some, TOKENS.num, TOKENS.num);
 
       // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(SomeClass, tokens.num, tokens.num.optional);
+      injected(Some, TOKENS.num, TOKENS.num.optional);
 
       // @ts-expect-error: Argument of type 'Token<number>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(createSome, tokens.num, tokens.num);
+      injected(createSome, TOKENS.num, TOKENS.num);
 
       // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(createSome, tokens.num, tokens.num.optional);
+      injected(createSome, TOKENS.num, TOKENS.num.optional);
     });
 
     it('requires to separate required and optional dependencies', () => {
       expect.assertions(0);
 
-      class SomeClass {
+      class Some {
         constructor(public required: number, public optional?: string) {}
       }
 
-      const createSome = (required: number, optional?: string): SomeClass =>
-        new SomeClass(required, optional);
+      const createSome = (required: number, optional?: string): Some =>
+        new Some(required, optional);
 
-      const tokens = {
+      const TOKENS = {
         some: token<number>('some'),
         another: token<string>('another'),
       };
 
       // @ts-expect-error: Argument of type 'Token<string>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(SomeClass, tokens.some, tokens.another);
+      injected(Some, TOKENS.some, TOKENS.another);
 
       // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'RequiredToken<number>'.
-      injected(SomeClass, tokens.some.optional, tokens.another.optional);
+      injected(Some, TOKENS.some.optional, TOKENS.another.optional);
 
       // @ts-expect-error: Argument of type 'Token<string>' is not assignable to parameter of type 'OptionalToken<string>'.
-      injected(createSome, tokens.some, tokens.another);
+      injected(createSome, TOKENS.some, TOKENS.another);
 
       // @ts-expect-error: Argument of type 'OptionalToken<number>' is not assignable to parameter of type 'RequiredToken<number>'.
-      injected(createSome, tokens.some.optional, tokens.another.optional);
+      injected(createSome, TOKENS.some.optional, TOKENS.another.optional);
     });
 
     it("requires to pass optional token for 'unknown' and 'any' dependencies", () => {
       expect.assertions(0);
 
-      class SomeClass {
+      class Some {
         constructor(public any: any, public unknown: unknown) {}
       }
 
-      const createSome = (any: any, unknown: unknown): SomeClass =>
-        new SomeClass(any, unknown);
+      const createSome = (any: any, unknown: unknown): Some =>
+        new Some(any, unknown);
 
-      const tokens = {
+      const TOKENS = {
         any: token<any>('any'),
         unknown: token<unknown>('unknown'),
       };
 
       // @ts-expect-error: Argument of type 'Token<any>' is not assignable to parameter of type 'OptionalToken<any>'.
-      injected(SomeClass, tokens.any, tokens.unknown);
+      injected(Some, TOKENS.any, TOKENS.unknown);
 
       // @ts-expect-error: Argument of type 'Token<unknown>' is not assignable to parameter of type 'OptionalToken<unknown>'.
-      injected(SomeClass, tokens.any.optional, tokens.unknown);
+      injected(Some, TOKENS.any.optional, TOKENS.unknown);
 
       // @ts-expect-error: Argument of type 'Token<any>' is not assignable to parameter of type 'OptionalToken<any>'.
-      injected(SomeClass, tokens.any, tokens.unknown.optional);
+      injected(Some, TOKENS.any, TOKENS.unknown.optional);
 
       // @ts-expect-error: Argument of type 'Token<any>' is not assignable to parameter of type 'OptionalToken<any>'.
-      injected(createSome, tokens.any, tokens.unknown);
+      injected(createSome, TOKENS.any, TOKENS.unknown);
 
       // @ts-expect-error: Argument of type 'Token<unknown>' is not assignable to parameter of type 'OptionalToken<unknown>'.
-      injected(createSome, tokens.any.optional, tokens.unknown);
+      injected(createSome, TOKENS.any.optional, TOKENS.unknown);
 
       // @ts-expect-error: Argument of type 'Token<any>' is not assignable to parameter of type 'OptionalToken<any>'.
-      injected(createSome, tokens.any, tokens.unknown.optional);
+      injected(createSome, TOKENS.any, TOKENS.unknown.optional);
 
-      injected(SomeClass, tokens.any.optional, tokens.unknown.optional);
-      injected(createSome, tokens.any.optional, tokens.unknown.optional);
+      injected(Some, TOKENS.any.optional, TOKENS.unknown.optional);
+      injected(createSome, TOKENS.any.optional, TOKENS.unknown.optional);
     });
   });
 });

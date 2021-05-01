@@ -11,32 +11,32 @@ This section documents the complete Brandi API.
 
 ## Container
 
-- [`Container`](./container-api.md)
-- [`createContainer`](./container-api.md#createcontainerparent)
+- [`Container`](./container.md)
+- [`createContainer()`](./container.md#createcontainer)
 
-### Container Methods
+### `Container` Methods
 
-- [`bind(token)`](./container-api.md#bindtoken)
+- [`bind(token)`](./container.md#bindtoken)
   - [`toConstant(value)`](./binding-types.md#toconstantvalue)
-  - [`toInstance(ctor)`](./binding-types.md#toinstancector)
+  - [`toFactory(creator, [initializer])`](./binding-types.md#tofactorycreator-initializer)
+  - [`toInstance(creator)`](./binding-types.md#toinstancecreator)
     - [`inContainerScope()`](./binding-scopes.md#incontainerscope)
-    - [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
     - [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
     - [`inSingletonScope()`](./binding-scopes.md#insingletonscope)
     - [`inTransientScope()`](./binding-scopes.md#intransientscope)
-  - [`toCall(func)`](./binding-types.md#tocallfunc)
-    - [`inContainerScope()`](./binding-scopes.md#incontainerscope)
-    - [`inGlobalScope()`](./binding-scopes.md#inglobalscope)
-    - [`inResolutionScope()`](./binding-scopes.md#inresolutionscope)
-    - [`inSingletonScope()`](./binding-scopes.md#insingletonscope)
-    - [`inTransientScope()`](./binding-scopes.md#intransientscope)
-  - [`toFactory(ctor, [initializer])`](./binding-types.md#tofactoryctor-initializer)
-  - [`toCreator(func, [initializer])`](./binding-types.md#tocreatorfunc-initializer)
-- [`capture()`](./container-api.md#capture)
-- [`clone()`](./container-api.md#clone)
-- [`get(token)`](./container-api.md#gettoken)
-- [`restore()`](./container-api.md#restore)
-- [`when(condition)`](./container-api.md#whencondition)
+- [`capture()`](./container.md#capture)
+- [`clone()`](./container.md#clone)
+- [`extend(container)`](./container.md#extendcontainer)
+- [`get(token)`](./container.md#gettoken)
+- [`restore()`](./container.md#restore)
+- [`use(...tokens)`](./container.md#usetokensfrommodule)
+  - [`from(module)`](./container.md#usetokensfrommodule)
+- [`when(condition)`](./container.md#whencondition)
+
+## Dependency Modules
+
+- [`DependencyModule`](./dependency-modules.md)
+- [`createDependencyModule()`](./dependency-modules.md#createdependencymodule)
 
 ## Pointers
 
@@ -45,5 +45,5 @@ This section documents the complete Brandi API.
 
 ## Registrators
 
-- [`injected(target, ...tokens)`](./pointers-and-registrators.md#injectedtargettokens)
-- [`tagged(target, ...tags)`](./pointers-and-registrators.md#taggedtargettags)
+- [`injected(target, ...tokens)`](./pointers-and-registrators.md#injectedtarget-tokens)
+- [`tagged(target, ...tags)`](./pointers-and-registrators.md#taggedtarget-tags)

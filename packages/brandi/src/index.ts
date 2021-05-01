@@ -1,4 +1,9 @@
-export { Container, createContainer } from './container';
+export {
+  Container,
+  DependencyModule,
+  createContainer,
+  createDependencyModule,
+} from './container';
 export type {
   Tag,
   Token,
@@ -10,4 +15,4 @@ export type {
 } from './pointers';
 export { tag, token } from './pointers';
 export { injected, tagged } from './registrators';
-export type { Creator, Factory, ResolutionCondition } from './types';
+export type { Factory, ResolutionCondition } from './types';

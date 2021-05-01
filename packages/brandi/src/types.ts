@@ -1,10 +1,11 @@
 import { Tag } from './pointers';
 
-export type UnknownConstructor<T extends Object = Object> = new (
-  ...args: any[]
-) => T;
-export type UnknownFunction<T = unknown> = (...args: any[]) => T;
-export type UnknownCreator = UnknownConstructor | UnknownFunction;
+type UnknownConstructor<T extends Object = Object> = new (...args: any[]) => T;
+type UnknownFunction<T = unknown> = (...args: any[]) => T;
+
+export type UnknownCreator<T = unknown> =
+  | UnknownConstructor<T>
+  | UnknownFunction<T>;
 
 export type UnknownCreatorParameters<
   T extends UnknownCreator
@@ -19,4 +20,3 @@ export type ResolutionCondition = Tag | UnknownCreator;
 export type Factory<T extends unknown, A extends unknown[] = []> = (
   ...args: A
 ) => T;
-export type Creator<T, A extends unknown[] = []> = Factory<T, A>;

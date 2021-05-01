@@ -4,7 +4,7 @@ import { Equal, Expect } from './utils';
 
 describe('TokenTypeMap', () => {
   it('returns token type map', () => {
-    const tokens = {
+    const TOKENS = {
       num: token<number>('num'),
       str: token<string>('str'),
       nested: {
@@ -15,7 +15,7 @@ describe('TokenTypeMap', () => {
 
     type Result = Expect<
       Equal<
-        TokenTypeMap<typeof tokens>,
+        TokenTypeMap<typeof TOKENS>,
         {
           num: number;
           str: string;

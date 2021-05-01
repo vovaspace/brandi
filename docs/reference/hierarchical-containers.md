@@ -30,7 +30,7 @@ parentContainer
   .toInstance(ApiService)
   .inTransientScope();
 
-const childContainer = new Container(parentContainer);
+const childContainer = new Container().extend(parentContainer);
 
 const apiService = childContainer.get(TOKENS.apiService);
 

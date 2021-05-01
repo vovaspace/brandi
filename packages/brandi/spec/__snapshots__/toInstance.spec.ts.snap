@@ -2,4 +2,6 @@
 
 exports[`toInstance logs a warning when a binding scope setting method was not called 1`] = `"Warning: did you forget to set a scope for 'unknown' token binding? Call 'inTransientScope()', 'inSingletonScope()', 'inContainerScope()' or 'inResolutionScope()'."`;
 
-exports[`toInstance throws error when trying to construct an instance with required constructor arguments when the target class was not injected 1`] = `"Missing required 'injected' registration of 'SomeClass'"`;
+exports[`toInstance throws error when trying to construct an instance with required constructor arguments when the creator was not injected 1`] = `"Missing required 'injected' registration of 'Some'"`;
+
+exports[`toInstance throws error when trying to construct an instance with required constructor arguments when the creator was not injected 2`] = `"Missing required 'injected' registration of 'createSome'"`;
