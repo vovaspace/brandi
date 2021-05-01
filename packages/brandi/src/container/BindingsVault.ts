@@ -19,38 +19,36 @@ export class BindingsVault {
     token: Token,
     condition: ResolutionCondition = BindingsVault.notag,
   ): void {
-    const current = this.map.get(token.__symbol);
+    const current = this.map.get(token.__s);
 
-    if (current === undefined) {
+    if (current) current.set(condition, binding);
+    else
       this.map.set(
-        token.__symbol,
+        token.__s,
         new Map<ResolutionCondition, Binding | BindingsVault>().set(
           condition,
           binding,
         ),
       );
-    } else {
-      current.set(condition, binding);
-    }
   }
 
-  private get(
+  private find(
     token: TokenValue,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
   ): Binding | BindingsVault | undefined {
-    const bindings = this.map.get(token.__symbol);
+    const bindings = this.map.get(token.__s);
 
     if (bindings === undefined) return undefined;
 
-    if (target !== undefined) {
+    if (target) {
       const targetBinding = bindings.get(target);
       if (targetBinding) return targetBinding;
     }
 
     if (
       process.env.NODE_ENV !== 'production' &&
-      conditions !== undefined &&
+      conditions &&
       conditions.reduce(
         (acc, condition) => (bindings.has(condition) ? acc + 1 : acc),
         0,
@@ -66,7 +64,7 @@ export class BindingsVault {
 
       console.warn(
         'Warning: ' +
-          `When resolving a binding by '${token.__symbol.description}' token with [${conditionsDisplayString}] conditions, ` +
+          `When resolving a binding by '${token.__d}' token with [${conditionsDisplayString}] conditions, ` +
           'more than one binding was found. ' +
           "In this case, Brandi resolves the binding by the first tag assigned by 'tagged(target, ...tags)' function " +
           "or, if you explicitly passed conditions through 'Container.get(token, conditions)' method, " +
@@ -75,61 +73,53 @@ export class BindingsVault {
       );
     }
 
-    if (conditions !== undefined) {
+    if (conditions) {
       for (let i = 0, len = conditions.length; i < len; i += 1) {
         const binding = bindings.get(conditions[i]!);
-        if (binding !== undefined) return binding;
+        if (binding) return binding;
       }
     }
 
     return bindings.get(BindingsVault.notag);
   }
 
-  private resolveOwn(
+  private resolve(
     token: TokenValue,
     cache: ResolutionCache,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-  ): Binding | undefined {
-    const binding = this.get(token, conditions, target);
+  ): Binding | null {
+    const binding = this.find(token, conditions, target);
 
-    if (binding !== undefined) {
-      if (binding instanceof BindingsVault) {
-        cache.vaults.push(binding);
-        return binding.resolveOwn(token, cache, conditions, target);
-      }
+    if (binding === undefined)
+      return this.parent
+        ? this.parent.resolve(token, cache, conditions, target)
+        : null;
 
-      return binding;
+    if (binding instanceof BindingsVault) {
+      cache.vaults.push(binding);
+      return binding.resolve(token, cache, conditions, target);
     }
 
-    return this.parent === null
-      ? undefined
-      : this.parent.resolveOwn(token, cache, conditions, target);
+    return binding;
   }
 
-  public resolve(
+  public get(
     token: TokenValue,
     cache: ResolutionCache,
     conditions?: ResolutionCondition[],
     target?: UnknownCreator,
-  ): Binding | undefined {
-    const ownBinding = this.resolveOwn(token, cache, conditions, target);
+  ): Binding | null {
+    const ownBinding = this.resolve(token, cache, conditions, target);
 
-    if (ownBinding !== undefined) return ownBinding;
+    if (ownBinding) return ownBinding;
 
-    const { vaults } = cache;
-    for (let i = 0, len = vaults.length; i < len; i += 1) {
-      const cacheBinding = vaults[i]!.resolveOwn(
-        token,
-        cache,
-        conditions,
-        target,
-      );
-
-      if (cacheBinding !== undefined) return cacheBinding;
+    for (let i = 0, v = cache.vaults, len = v.length; i < len; i += 1) {
+      const cacheBinding = v[i]!.resolve(token, cache, conditions, target);
+      if (cacheBinding) return cacheBinding;
     }
 
-    return undefined;
+    return null;
   }
 
   public clone(): BindingsVault {

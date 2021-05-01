@@ -34,7 +34,7 @@ export class Container extends DependencyModule {
   }
 
   public restore(): void {
-    if (this.snapshot !== null) {
+    if (this.snapshot) {
       this.vault = this.snapshot.clone();
     } else if (process.env.NODE_ENV !== 'production') {
       console.error(
@@ -79,20 +79,18 @@ export class Container extends DependencyModule {
     target?: UnknownCreator,
     cache: ResolutionCache = new ResolutionCache(),
   ): unknown {
-    const binding = this.vault.resolve(token, cache, conditions, target);
+    const binding = this.vault.get(token, cache, conditions, target);
 
-    if (binding !== undefined) return this.resolveBinding(binding, cache);
-    if (token.__isOptional) return undefined;
+    if (binding) return this.resolveBinding(binding, cache);
+    if (token.__o) return undefined;
 
-    throw new Error(
-      `No matching bindings found for '${token.__symbol.description}' token.`,
-    );
+    throw new Error(`No matching bindings found for '${token.__d}' token.`);
   }
 
   private resolveBinding(binding: Binding, cache: ResolutionCache): unknown {
     if (isInstanceBinding(binding)) {
       if (isInstanceSingletonScopedBinding(binding)) {
-        return this.resolveInstanceCache(
+        return this.resolveCache(
           binding,
           cache,
           () => binding.cache,
@@ -104,7 +102,7 @@ export class Container extends DependencyModule {
       }
 
       if (isInstanceContainerScopedBinding(binding)) {
-        return this.resolveInstanceCache(
+        return this.resolveCache(
           binding,
           cache,
           () => binding.cache.get(this),
@@ -115,7 +113,7 @@ export class Container extends DependencyModule {
       }
 
       if (isInstanceResolutionScopedBinding(binding)) {
-        return this.resolveInstanceCache(
+        return this.resolveCache(
           binding,
           cache,
           () => cache.instances.get(binding),
@@ -142,7 +140,7 @@ export class Container extends DependencyModule {
     return binding.impl;
   }
 
-  private resolveInstanceCache(
+  private resolveCache(
     binding: InstanceBinding,
     cache: ResolutionCache,
     getCache: () => unknown,
@@ -193,14 +191,18 @@ export class Container extends DependencyModule {
   ): unknown[] {
     const injects = injectsRegistry.get(target);
 
-    if (injects === undefined) {
-      if (target.length === 0) return [];
-
-      throw new Error(
-        `Missing required 'injected' registration of '${target.name}'`,
+    if (injects)
+      return this.resolveTokens(
+        injects,
+        cache,
+        tagsRegistry.get(target),
+        target,
       );
-    }
 
-    return this.resolveTokens(injects, cache, tagsRegistry.get(target), target);
+    if (target.length === 0) return [];
+
+    throw new Error(
+      `Missing required 'injected' registration of '${target.name}'`,
+    );
   }
 }
