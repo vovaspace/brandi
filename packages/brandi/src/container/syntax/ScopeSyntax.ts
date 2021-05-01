@@ -14,7 +14,7 @@ export class ScopeSyntax {
 
   constructor(
     private readonly vault: BindingsVault,
-    private readonly value: UnknownCreator,
+    private readonly impl: UnknownCreator,
     private readonly token: Token,
     private readonly condition?: ResolutionCondition,
   ) {
@@ -54,6 +54,6 @@ export class ScopeSyntax {
     if (process.env.NODE_ENV !== 'production')
       clearTimeout(this.warningTimeout!);
 
-    this.vault.set(new Ctor(this.value), this.token, this.condition);
+    this.vault.set(new Ctor(this.impl), this.token, this.condition);
   }
 }
