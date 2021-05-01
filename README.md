@@ -21,9 +21,9 @@ Additionally, we provide builds precompiled to **ESNext** by `esnext`, `esnext:m
 
 The core library.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi.svg?style=flat)](https://www.npmjs.com/package/brandi)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi)](https://bundlephobia.com/result?p=brandi)
+[![License](https://img.shields.io/npm/l/brandi.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi.svg)](https://www.npmjs.com/package/brandi)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi.svg)](https://bundlephobia.com/result?p=brandi)
 
 ```bash
 # NPM
@@ -39,9 +39,9 @@ yarn add brandi
 
 The React bindings layer. It lets your React components get dependencies from Brandi containers.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg?style=flat)](https://www.npmjs.com/package/brandi-react)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi-react)](https://bundlephobia.com/result?p=brandi-react)
+[![License](https://img.shields.io/npm/l/brandi-react.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg)](https://www.npmjs.com/package/brandi-react)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi-react.svg)](https://bundlephobia.com/result?p=brandi-react)
 
 Brandi-React requires **React 16.8 or later**.
 You'll also need to [install](https://brandi.js.org/getting-started/installation) Brandi.

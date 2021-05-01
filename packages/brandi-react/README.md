@@ -3,9 +3,9 @@
 **Brandi-React** is the React bindings layer
 for [Brandi](https://github.com/vovaspace/brandi/tree/main/packages/brandi) — the dependency injection container. It lets your React components get dependencies from Brandi containers.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg?style=flat)](https://www.npmjs.com/package/brandi-react)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi-react)](https://bundlephobia.com/result?p=brandi-react)
+[![License](https://img.shields.io/npm/l/brandi-react.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi-react/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi-react.svg)](https://www.npmjs.com/package/brandi-react)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi-react.svg)](https://bundlephobia.com/result?p=brandi-react)
 
 ## Installation
 

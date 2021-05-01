@@ -2,9 +2,9 @@
 
 **Brandi** is a dependency injection container powered by TypeScript.
 
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/brandi.svg?style=flat)](https://www.npmjs.com/package/brandi)
-[![Minzipped Size](https://badgen.net/bundlephobia/minzip/brandi)](https://bundlephobia.com/result?p=brandi)
+[![License](https://img.shields.io/npm/l/brandi.svg)](https://github.com/vovaspace/brandi/blob/main/packages/brandi/LICENSE)
+[![NPM Version](https://img.shields.io/npm/v/brandi.svg)](https://www.npmjs.com/package/brandi)
+[![Minzipped Size](https://img.shields.io/bundlephobia/minzip/brandi.svg)](https://bundlephobia.com/result?p=brandi)
 
 - **Framework agnostic.** Can work with any UI or server framework.
 - **Lightweight and Effective.** It is tiny and designed for maximum performance.
