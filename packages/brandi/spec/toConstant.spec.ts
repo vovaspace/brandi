@@ -26,4 +26,19 @@ describe('toConstant', () => {
 
     expect(container.get(TOKENS.SomeCtor)).toBe(Some);
   });
+
+  describe('typings', () => {
+    it('requires to bind the same type of dependency and token', () => {
+      expect.assertions(0);
+
+      const TOKENS = {
+        num: token<number>('num'),
+      };
+
+      const container = new Container();
+
+      // @ts-expect-error: Argument of type 'string' is not assignable to parameter of type 'number'.
+      container.bind(TOKENS.num).toConstant('');
+    });
+  });
 });

@@ -1,67 +1,71 @@
-import { Factory, ResolutionCondition, UnknownCreator } from '../../types';
+import {
+  AsyncFactory,
+  Factory,
+  ResolutionCondition,
+  UnknownCreator,
+} from '../../types';
 import { Token } from '../../pointers';
 
-import { ConstantBinding, FactoryBinding } from '../bindings';
+import {
+  ConstantBinding,
+  FactoryBinding,
+  FactoryInitializer,
+} from '../bindings';
 import { BindingsVault } from '../BindingsVault';
 
 import { ScopeSyntax } from './ScopeSyntax';
 
-export class TypeSyntax<T> {
+export class TypeSyntax<Dependency> {
   constructor(
     private readonly vault: BindingsVault,
     private readonly token: Token,
     private readonly condition?: ResolutionCondition,
   ) {}
 
-  public toConstant(value: T): void {
+  public toConstant(value: Dependency): void {
     this.vault.set(new ConstantBinding(value), this.token, this.condition);
   }
 
-  /**
-   * @example <caption>Example usage of factory without arguments.</caption>
-   * const someClassFactoryToken = token<Factory<SomeClass>>('Factory<SomeClass>');
-   *
-   * container
-   * .bind(someClassFactoryToken)
-   * .toFactory(SomeClass);
-   * // OR
-   * container
-   * .bind(someClassFactoryToken)
-   * .toFactory(SomeClass, (instance) => instance.init());
-   *
-   * const someClassFactory = container.get(someClassFactoryToken);
-   * const someClassInstance = someClassFactory();
-   *
-   * console.log(someClassInstance instanceof SomeClass); // -> true
-   */
   public toFactory(
-    creator: T extends Factory<infer R> ? UnknownCreator<R> : never,
-    initializer?: T extends Factory<infer R> ? (instance: R) => unknown : never,
+    creator: Dependency extends AsyncFactory<infer Instance, never[]>
+      ? UnknownCreator<Promise<Instance>>
+      : never,
+    initializer?: Dependency extends AsyncFactory<
+      infer Instance,
+      infer Arguments
+    >
+      ? (instance: Instance, ...args: Arguments) => unknown
+      : never,
   ): void;
 
-  /**
-   * @example <caption>Example usage of factory with arguments.</caption>
-   * const someClassFactoryToken = token<Factory<SomeClass, [name: string]>>('Factory<SomeClass>');
-   *
-   * container
-   * .bind(someClassFactoryToken)
-   * .toFactory(SomeClass, (instance, name) => instance.setName(name));
-   *
-   * const someClassFactory = container.get(someClassFactoryToken);
-   * const someClassInstance = someClassFactory('Olivia');
-   *
-   * console.log(someClassInstance instanceof SomeClass); // -> true
-   */
   public toFactory(
-    creator: T extends Factory<infer R, never[]> ? UnknownCreator<R> : never,
-    initializer: T extends Factory<infer R, infer A>
-      ? (instance: R, ...args: A) => unknown
+    creator: Dependency extends AsyncFactory<infer Instance, never[]>
+      ? UnknownCreator<Instance>
+      : never,
+    initializer: Dependency extends AsyncFactory<
+      infer Instance,
+      infer Arguments
+    >
+      ? (instance: Instance, ...args: Arguments) => Promise<unknown>
+      : never,
+  ): void;
+
+  public toFactory<InitializerReturnType>(
+    creator: Dependency extends Factory<infer Instance, never[]>
+      ? Instance extends Promise<unknown>
+        ? never
+        : UnknownCreator<Instance>
+      : never,
+    initializer?: Dependency extends Factory<infer Instance, infer Arguments>
+      ? InitializerReturnType extends Promise<unknown>
+        ? never
+        : (instance: Instance, ...args: Arguments) => InitializerReturnType
       : never,
   ): void;
 
   public toFactory(
     creator: UnknownCreator,
-    initializer?: (instance: unknown, ...args: unknown[]) => unknown,
+    initializer?: FactoryInitializer,
   ): void {
     this.vault.set(
       new FactoryBinding({ creator, initializer }),
@@ -70,7 +74,7 @@ export class TypeSyntax<T> {
     );
   }
 
-  public toInstance<K extends UnknownCreator<T>>(creator: K): ScopeSyntax {
+  public toInstance(creator: UnknownCreator<Dependency>): ScopeSyntax {
     return new ScopeSyntax(this.vault, creator, this.token, this.condition);
   }
 }

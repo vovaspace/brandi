@@ -4,6 +4,7 @@ import { callableRegistry, injectsRegistry, tagsRegistry } from '../registries';
 
 import {
   Binding,
+  FactoryInitializer,
   InstanceBinding,
   isFactoryBinding,
   isInstanceBinding,
@@ -130,10 +131,19 @@ export class Container extends DependencyModule {
       return (...args: unknown[]) => {
         const instance = this.createInstance(binding.impl.creator, cache);
 
-        if (binding.impl.initializer)
-          binding.impl.initializer(instance, ...args);
-
-        return instance;
+        return instance instanceof Promise
+          ? instance.then((i) =>
+              Container.resolveInitialization(
+                i,
+                args,
+                binding.impl.initializer,
+              ),
+            )
+          : Container.resolveInitialization(
+              instance,
+              args,
+              binding.impl.initializer,
+            );
       };
     }
 
@@ -204,5 +214,16 @@ export class Container extends DependencyModule {
     throw new Error(
       `Missing required 'injected' registration of '${target.name}'`,
     );
+  }
+
+  private static resolveInitialization<T>(
+    instance: T,
+    args: unknown[],
+    initializer?: FactoryInitializer,
+  ) {
+    const initialization = initializer?.(instance, ...args);
+    return initialization instanceof Promise
+      ? initialization.then(() => instance)
+      : instance;
   }
 }

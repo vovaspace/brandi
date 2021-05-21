@@ -241,36 +241,6 @@ describe('container', () => {
   });
 
   describe('typings', () => {
-    it('requires to bind the same type of dependency and token', () => {
-      expect.assertions(0);
-
-      class Some {
-        public some = true;
-      }
-
-      class Another {
-        public another = true;
-      }
-
-      const createAnother = (): Another => new Another();
-
-      const TOKENS = {
-        num: token<number>('num'),
-        some: token<Some>('some'),
-      };
-
-      const container = new Container();
-
-      // @ts-expect-error: Argument of type 'string' is not assignable to parameter of type 'number'.
-      container.bind(TOKENS.num).toConstant('');
-
-      // @ts-expect-error: Argument of type 'typeof Another' is not assignable to parameter of type 'UnknownConstructor<Some>'.
-      container.bind(TOKENS.some).toInstance(Another).inTransientScope();
-
-      // @ts-expect-error: Argument of type '() => Another' is not assignable to parameter of type 'UnknownCreator<Some>'.
-      container.bind(TOKENS.some).toInstance(createAnother).inTransientScope();
-    });
-
     it('does not allow to bind an optional token', () => {
       expect.assertions(0);
 

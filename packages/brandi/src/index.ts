@@ -15,4 +15,4 @@ export type {
 } from './pointers';
 export { tag, token } from './pointers';
 export { injected, tagged } from './registrators';
-export type { Factory, ResolutionCondition } from './types';
+export type { AsyncFactory, Factory, ResolutionCondition } from './types';

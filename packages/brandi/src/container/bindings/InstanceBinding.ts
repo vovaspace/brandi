@@ -4,45 +4,32 @@ import type { Container } from '../Container';
 
 import { Binding, Scope, Type } from './Binding';
 
-export interface InstanceBinding extends Binding {
-  readonly impl: UnknownCreator;
-  readonly type: Type.Instance;
-}
-
-export class InstanceContainerScopedBinding implements InstanceBinding {
+export abstract class InstanceBinding implements Binding {
   public readonly type = Type.Instance;
 
+  public abstract readonly scope: Scope;
+
+  constructor(public readonly impl: UnknownCreator) {}
+}
+
+export class InstanceContainerScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Container;
 
   public readonly cache = new WeakMap<Container, unknown>();
-
-  constructor(public readonly impl: UnknownCreator) {}
 }
 
-export class InstanceResolutionScopedBinding implements InstanceBinding {
-  public readonly type = Type.Instance;
-
+export class InstanceResolutionScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Resolution;
-
-  constructor(public readonly impl: UnknownCreator) {}
 }
 
-export class InstanceSingletonScopedBinding implements InstanceBinding {
-  public readonly type = Type.Instance;
-
+export class InstanceSingletonScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Singleton;
 
   public cache?: unknown;
-
-  constructor(public readonly impl: UnknownCreator) {}
 }
 
-export class InstanceTransientScopedBinding implements InstanceBinding {
-  public readonly type = Type.Instance;
-
+export class InstanceTransientScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Transient;
-
-  constructor(public readonly impl: UnknownCreator) {}
 }
 
 export const isInstanceBinding = (
