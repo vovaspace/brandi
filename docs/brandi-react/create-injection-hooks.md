@@ -2,10 +2,7 @@
 id: create-injection-hooks
 title: createInjectionHooks
 sidebar_label: createInjectionHooks
-hide_title: true
 ---
-
-# `createInjectionHooks`
 
 The `createInjectionHooks(...tokens)` creates hooks for getting dependencies more easily.
 

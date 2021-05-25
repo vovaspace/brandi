@@ -2,10 +2,7 @@
 id: use-injection
 title: useInjection
 sidebar_label: useInjection
-hide_title: true
 ---
-
-# `useInjection`
 
 The `useInjection(token)` hook allows you to get a dependency
 from a container provided through [`ContainerProvider`](./container-provider.md).

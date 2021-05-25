@@ -2,10 +2,7 @@
 id: container-provider
 title: ContainerProvider
 sidebar_label: ContainerProvider
-hide_title: true
 ---
-
-# `ContainerProvider`
 
 The `ContainerProvider` component makes the Brandi container available to any nested components that need to use injections.
 

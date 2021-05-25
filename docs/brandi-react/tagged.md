@@ -2,10 +2,7 @@
 id: tagged
 title: tagged
 sidebar_label: tagged
-hide_title: true
 ---
-
-# `tagged`
 
 The `tagged(...tags)(Component, [options])` HoC attaches tags to the component and its child components.
 
