@@ -104,7 +104,7 @@ expect(apiService).toStrictEqual<ApiService>({
 
 ### Injetions
 
-If the constructor or function has arguments you need to inject dependencies
+If the constructor or function has arguments you need to register dependencies
 by [`injected`](./pointers-and-registrators.md#injectedtarget-tokens) registrator.
 
 ```typescript
@@ -129,11 +129,11 @@ Binds the token to the factory.
 ### Arguments
 
 1. `creator` — the instance creator which the factory will use;
-2. `[initializer]` — function called after the instance is created.
+2. `[initializer]` — optional function called after the instance is created.
 
 ### Examples
 
-#### Factory Without Arguments
+#### Simple Factory
 
 ```typescript
 import { Container, Factory, token } from 'brandi';
@@ -151,7 +151,30 @@ const container = new Container();
 /*                                       ↓ Binds the factory. */
 container.bind(TOKENS.apiServiceFactory).toFactory(ApiService);
 
-/* OR */
+const apiServiceFactory = container.get(TOKENS.apiService);
+const apiService = apiServiceFactory();
+
+expect(apiService).toBeInstanceOf(ApiService);
+```
+
+#### Factory With Initializer
+
+```typescript
+import { Container, Factory, token } from 'brandi';
+
+class ApiService {
+  init() {
+    /* ... */
+  }
+
+  /* ... */
+}
+
+const TOKENS = {
+  apiServiceFactory: token<Factory<ApiService>>('Factory<ApiService>'),
+};
+
+const container = new Container();
 
 container
   .bind(TOKENS.apiServiceFactory)
@@ -159,6 +182,8 @@ container
   .toFactory(ApiService, (instance) => instance.init());
 
 const apiServiceFactory = container.get(TOKENS.apiService);
+
+/*                 ↓ The initializer will be called after the instance is created. */
 const apiService = apiServiceFactory();
 
 expect(apiService).toBeInstanceOf(ApiService);
@@ -248,7 +273,7 @@ const container = new Container();
 container
   .bind(TOKENS.apiService)
   .toInstance(ApiService)
-  .inSingletonScope() /* Binds the token to `ApiService` instance in singleton scope. */;
+  .inSingletonScope() /* ← Binds the token to `ApiService` instance in singleton scope. */;
 
 container
   .bind(TOKENS.apiServiceFactory)
@@ -260,4 +285,77 @@ const firstApiService = apiServiceFactory();
 const secondApiService = apiServiceFactory();
 
 expect(firstApiService).toBe(secondApiService);
+```
+
+#### Factory With Async Creator
+
+```typescript
+import { AsyncFactory, Container, token } from 'brandi';
+
+interface ApiService {
+  /* ... */
+}
+
+/*                       ↓ Async creator. */
+const createApiService = async (): Promise<ApiService> => {
+  /* ... */
+};
+
+const TOKENS = {
+  /*                 ↓ Token with `AsyncFactory` type. */
+  apiServiceFactory: token<AsyncFactory<ApiService>>(
+    'AsyncFactory<ApiService>',
+  ),
+};
+
+const container = new Container();
+
+container.bind(TOKENS.apiServiceFactory).toFactory(createApiService);
+
+const apiServiceFactory = container.get(TOKENS.apiService);
+
+/**
+ *                 ↓ Will wait for the creation resolution
+ *                   and then call the initializer, if there is one.
+ */
+const apiService = await apiServiceFactory();
+
+expect(apiService).toStrictEqual<ApiService>({
+  /* ... */
+});
+```
+
+#### Factory With Async Initializer
+
+```typescript
+import { AsyncFactory, Container, token } from 'brandi';
+
+class ApiService {
+  init(): Promise<unknown> {
+    /* ... */
+  }
+
+  /* ... */
+}
+
+const TOKENS = {
+  /*                 ↓ Token with `AsyncFactory` type. */
+  apiServiceFactory: token<AsyncFactory<ApiService>>(
+    'AsyncFactory<ApiService>',
+  ),
+};
+
+const container = new Container();
+
+container
+  .bind(TOKENS.apiServiceFactory)
+  /*                                         ↓ Returns a `Promise`. */
+  .toFactory(createApiService, (instance) => instance.init());
+
+const apiServiceFactory = container.get(TOKENS.apiService);
+
+/*                 ↓ Will wait for the initialization resolution. */
+const apiService = await apiServiceFactory();
+
+expect(apiService).toBeInstanceOf(ApiService);
 ```

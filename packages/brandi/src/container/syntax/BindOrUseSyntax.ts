@@ -18,9 +18,9 @@ export class BindOrUseSyntax {
 
   /**
    * @description
-   * Binds the token to the implementation.
+   * Binds the token to an implementation.
    *
-   * @param token - the token to be bound.
+   * @param token - a token to be bound.
    *
    * @returns
    * Binding Type syntax:
@@ -38,7 +38,7 @@ export class BindOrUseSyntax {
    * @description
    * Uses bindings from a dependency module.
    *
-   * @param tokens - tokens to be used from the dependency module.
+   * @param tokens - tokens to be used from a dependency module.
    * @returns `.from(module)` syntax.
    *
    * @link https://brandi.js.org/reference/container#usetokensfrommodule

@@ -7,7 +7,7 @@ export class WhenSyntax extends BindOrUseSyntax {
    * @description
    * Creates a conditional binding.
    *
-   * @param condition
+   * @param condition - a condition.
    * @returns `bind` or `use` syntax.
    *
    * @link https://brandi.js.org/reference/conditional-bindings

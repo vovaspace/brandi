@@ -77,7 +77,7 @@ export class Container extends DependencyModule {
    * @description
    * Gets a dependency bound to the token.
    *
-   * @param token
+   * @param token - token for which a dependence will be got.
    * @returns `TokenType<TokenValue>`.
    *
    * @link https://brandi.js.org/reference/container#gettoken
