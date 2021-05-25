@@ -14,6 +14,14 @@ export class FromSyntax {
     private readonly condition?: ResolutionCondition,
   ) {}
 
+  /**
+   * @description
+   * Uses bindings from the dependency module.
+   *
+   * @param dependencyModule - the dependency module from which the tokens will be used.
+   *
+   * @link https://brandi.js.org/reference/container#usetokensfrommodule
+   */
   public from(dependencyModule: DependencyModule): void {
     const { tokens } = this;
     for (let i = 0, len = tokens.length; i < len; i += 1) {
