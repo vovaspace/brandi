@@ -28,18 +28,44 @@ export class ScopeSyntax {
     }
   }
 
+  /**
+   * @description
+   * The container will return the same instance with each getting.
+   * This is similar to being a singleton, however if the container has a child container or a clone,
+   * that child container or clone will get an instance unique to it.
+   *
+   * @link https://brandi.js.org/reference/binding-scopes#incontainerscope
+   */
   public inContainerScope(): void {
     this.set(InstanceContainerScopedBinding);
   }
 
+  /**
+   * @description
+   * The same instance will be got for each getting of this dependency during a single resolution chain.
+   *
+   * @link https://brandi.js.org/reference/binding-scopes#inresolutionscope
+   */
   public inResolutionScope(): void {
     this.set(InstanceResolutionScopedBinding);
   }
 
+  /**
+   * @description
+   * Each getting will return the same instance.
+   *
+   * @link https://brandi.js.org/reference/binding-scopes#insingletonscope
+   */
   public inSingletonScope(): void {
     this.set(InstanceSingletonScopedBinding);
   }
 
+  /**
+   * @description
+   * New instance will be created with each getting.
+   *
+   * @link https://brandi.js.org/reference/binding-scopes#intransientscope
+   */
   public inTransientScope(): void {
     this.set(InstanceTransientScopedBinding);
   }

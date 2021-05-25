@@ -14,3 +14,10 @@ export const setEnv = (value: string): (() => void) => {
     process.env = { ...env };
   };
 };
+
+export const wait = <T>(callback: () => T): Promise<T> =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(callback());
+    }, 20);
+  });

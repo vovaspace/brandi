@@ -1,16 +1,19 @@
 import { UnknownCreator } from '../../types';
 
-import { Binding, Scope, Type } from './Binding';
+import { Binding, Type } from './Binding';
+
+export type FactoryInitializer = (
+  instance: unknown,
+  ...args: unknown[]
+) => unknown;
 
 export class FactoryBinding implements Binding {
   public readonly type = Type.Factory;
 
-  public readonly scope = Scope.Transient;
-
   constructor(
     public readonly impl: {
       creator: UnknownCreator;
-      initializer?: (entity: unknown, ...args: unknown[]) => unknown;
+      initializer?: FactoryInitializer;
     },
   ) {}
 }

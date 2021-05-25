@@ -4,6 +4,7 @@ import { callableRegistry, injectsRegistry, tagsRegistry } from '../registries';
 
 import {
   Binding,
+  FactoryInitializer,
   InstanceBinding,
   isFactoryBinding,
   isInstanceBinding,
@@ -18,21 +19,50 @@ import { ResolutionCache } from './ResolutionCache';
 export class Container extends DependencyModule {
   private snapshot: BindingsVault | null = null;
 
+  /**
+   * @description
+   * Sets the parent container.
+   *
+   * @param container - a `Container` or `null` that will be set as the parent container.
+   * @returns `this`.
+   *
+   * @link https://brandi.js.org/reference/container#extendcontainer
+   */
   public extend(container: Container | null): this {
     this.vault.parent = container === null ? null : container.vault;
     return this;
   }
 
+  /**
+   * @description
+   * Creates an unlinked clone of the container.
+   *
+   * @returns `Container`.
+   *
+   * @link https://brandi.js.org/reference/container#clone
+   */
   public clone(): Container {
     const container = new Container();
     container.vault = this.vault.clone();
     return container;
   }
 
+  /**
+   * @description
+   * Captures (snapshots) the current container state.
+   *
+   * @link https://brandi.js.org/reference/container#capture
+   */
   public capture(): void {
     this.snapshot = this.vault.clone();
   }
 
+  /**
+   * @description
+   * Restores the captured container state.
+   *
+   * @link https://brandi.js.org/reference/container#restore
+   */
   public restore(): void {
     if (this.snapshot) {
       this.vault = this.snapshot.clone();
@@ -43,12 +73,22 @@ export class Container extends DependencyModule {
     }
   }
 
+  /**
+   * @description
+   * Gets a dependency bound to the token.
+   *
+   * @param token - token for which a dependence will be got.
+   * @returns `TokenType<TokenValue>`.
+   *
+   * @link https://brandi.js.org/reference/container#gettoken
+   */
   public get<T extends TokenValue>(token: T): TokenType<T>;
 
   /**
    * @access package
-   * @deprecated `conditions` argument is added for internal use.
-   *              Use it if you really understand that it is necessary.
+   * @deprecated
+   * `conditions` argument is added for internal use.
+   * Use it if you really understand that it is necessary.
    */
   public get<T extends TokenValue>(
     token: T,
@@ -130,10 +170,19 @@ export class Container extends DependencyModule {
       return (...args: unknown[]) => {
         const instance = this.createInstance(binding.impl.creator, cache);
 
-        if (binding.impl.initializer)
-          binding.impl.initializer(instance, ...args);
-
-        return instance;
+        return instance instanceof Promise
+          ? instance.then((i) =>
+              Container.resolveInitialization(
+                i,
+                args,
+                binding.impl.initializer,
+              ),
+            )
+          : Container.resolveInitialization(
+              instance,
+              args,
+              binding.impl.initializer,
+            );
       };
     }
 
@@ -204,5 +253,16 @@ export class Container extends DependencyModule {
     throw new Error(
       `Missing required 'injected' registration of '${target.name}'`,
     );
+  }
+
+  private static resolveInitialization<T>(
+    instance: T,
+    args: unknown[],
+    initializer?: FactoryInitializer,
+  ) {
+    const initialization = initializer?.(instance, ...args);
+    return initialization instanceof Promise
+      ? initialization.then(() => instance)
+      : instance;
   }
 }

@@ -11,11 +11,11 @@ resolve dependencies, and inject dependencies into targets.
 
 ### `bind(token)`
 
-Binds the token to the dependency.
+Binds the token to an implementation.
 
 #### Arguments
 
-1. `token`: [`Token`](./pointers-and-registrators.md#tokentdescription).
+1. `token`: [`Token`](./pointers-and-registrators.md#tokentdescription) — a token to be bound.
 
 #### Returns
 
@@ -35,11 +35,11 @@ Uses bindings from a [dependency module](./dependency-modules.md).
 
 ##### `use(...tokens)`
 
-1. `...tokens`: `Token[]` — tokens to be used from the dependency module.
+1. `...tokens`: `Token[]` — tokens to be used from a dependency module.
 
 ##### `use(...tokens).from(module)`
 
-1. `module`: [`DependencyModule`](./dependency-modules.md) — the dependency module.
+1. `module`: [`DependencyModule`](./dependency-modules.md) — a dependency module.
 
 ---
 
@@ -49,7 +49,7 @@ Creates a [conditional binding](./conditional-bindings.md).
 
 #### Arguments
 
-1. `condition`: [`Tag`](./pointers-and-registrators.md#tagdescription) | `UnknownCreator`.
+1. `condition`: [`Tag`](./pointers-and-registrators.md#tagdescription) | `UnknownCreator` — a condition.
 
 #### Returns
 
@@ -66,7 +66,7 @@ Sets the parent container. For more information, see [Hierarchical Containers](.
 
 #### Arguments
 
-1. `container`: `Container | null`.
+1. `container`: `Container | null` — a `Container` or `null` that will be set as the parent container.
 
 #### Returns
 
@@ -80,7 +80,7 @@ Gets a dependency bound to the token.
 
 #### Arguments
 
-1. `token`: [`TokenValue`](./pointers-and-registrators.md#tokentdescription).
+1. `token`: [`TokenValue`](./pointers-and-registrators.md#tokentdescription) — token for which a dependence will be got.
 
 #### Returns
 
@@ -143,6 +143,8 @@ const originalKey = container.get(TOKENS.apiKey);
 expect(testKey).toBe('#testKey');
 expect(originalKey).toBe('#key9428');
 ```
+
+---
 
 ## `createContainer()`
 

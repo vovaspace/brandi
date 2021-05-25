@@ -45,6 +45,15 @@ export type ToToken<T> = undefined extends T
   ? OptionalToken<Exclude<T, undefined>>
   : RequiredToken<T>;
 
+/**
+ * @description
+ * Creates a unique token with the type.
+ *
+ * @param {string} description - a description of the token to be used in logs and error messages.
+ * @returns a unique `Token<T>` token with the type.
+ *
+ * @link https://brandi.js.org/reference/pointers-and-registrators#tokentdescription
+ */
 export const token = <T>(description: string): Token<T> => {
   const s = Symbol(description);
   return {
