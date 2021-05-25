@@ -30,9 +30,7 @@ import { Container, token } from 'brandi';
 const TOKENS = {
   apiKey: token<string>('API Key') /* ← The token with `string` type.  */,
 };
-```
 
-```typescript
 const container = new Container();
 
 /*                            ↓ Binding the `string` type value. It's OK. */
@@ -44,9 +42,7 @@ container.bind(TOKENS.apiKey).toConstant('#key9428');
  *                                         to parameter of type 'string'. ts(2345)`.
  */
 container.bind(TOKENS.apiKey).toConstant(9428);
-```
 
-```typescript
 const key = container.get(TOKENS.apiKey);
 
 type Key = typeof key; /* ← The type is derived from the token. `type Key = string;`. */
@@ -68,6 +64,8 @@ Creates a unique tag.
 #### Returns
 
 `Tag` — a unique tag.
+
+---
 
 ## Registrators
 

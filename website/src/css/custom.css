@@ -9,6 +9,13 @@
 
   --ifm-code-font-size: 95%;
   --ifm-code-border-radius: 0.3rem;
+
+  --ifm-hr-margin-vertical: 3rem;
+  --ifm-hr-border-color: var(--ifm-color-emphasis-200);
+}
+
+.markdown {
+  --ifm-h2-vertical-rhythm-top: 2.4;
 }
 
 .docusaurus-highlight-code-line {

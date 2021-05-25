@@ -144,6 +144,8 @@ expect(testKey).toBe('#testKey');
 expect(originalKey).toBe('#key9428');
 ```
 
+---
+
 ## `createContainer()`
 
 `createContainer()` — is alias for `new Container()`.
