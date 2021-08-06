@@ -1,6 +1,6 @@
 import { UnknownCreator } from '../../types';
 
-import type { Container } from '../Container';
+import type { BindingsVault } from '../BindingsVault';
 
 import { Binding, Scope, Type } from './Binding';
 
@@ -15,7 +15,7 @@ export abstract class InstanceBinding implements Binding {
 export class InstanceContainerScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Container;
 
-  public readonly cache = new WeakMap<Container, unknown>();
+  public readonly cache = new WeakMap<BindingsVault, unknown>();
 }
 
 export class InstanceResolutionScopedBinding extends InstanceBinding {
@@ -26,6 +26,20 @@ export class InstanceSingletonScopedBinding extends InstanceBinding {
   public readonly scope = Scope.Singleton;
 
   public cache?: unknown;
+
+  public clone?(): InstanceSingletonScopedBinding;
+
+  constructor(public readonly impl: UnknownCreator) {
+    super(impl);
+
+    if (process.env.NODE_ENV !== 'production') {
+      this.clone = (): InstanceSingletonScopedBinding => {
+        const binding = new InstanceSingletonScopedBinding(this.impl);
+        binding.cache = this.cache;
+        return binding;
+      };
+    }
+  }
 }
 
 export class InstanceTransientScopedBinding extends InstanceBinding {

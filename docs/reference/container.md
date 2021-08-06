@@ -114,9 +114,25 @@ expect(containerClone).not.toBe(originalContainer);
 
 Captures (snapshots) the current container state.
 
+:::note
+
+The `capture()` method works only in development mode (`process.env.NODE_ENV !== 'production'`).
+
+`Container.capture` is `undefined` in production mode.
+
+:::
+
 ### `restore()`
 
 Restores the [captured](#capture) container state.
+
+:::note
+
+The `restore()` method works only in development mode (`process.env.NODE_ENV !== 'production'`).
+
+`Container.restore` is `undefined` in production mode.
+
+:::
 
 #### Example
 

@@ -135,7 +135,7 @@ describe('container', () => {
     const container = new Container();
     container.bind(TOKENS.value).toConstant(someValue);
 
-    container.capture();
+    container.capture!();
 
     container.bind(TOKENS.value).toConstant(anotherValue);
     container.bind(TOKENS.additional).toConstant(additionalValue);
@@ -143,7 +143,7 @@ describe('container', () => {
     expect(container.get(TOKENS.value)).toBe(anotherValue);
     expect(container.get(TOKENS.additional)).toBe(additionalValue);
 
-    container.restore();
+    container.restore!();
 
     expect(container.get(TOKENS.value)).toBe(someValue);
     expect(() =>
@@ -156,7 +156,7 @@ describe('container', () => {
     expect(container.get(TOKENS.value)).toBe(anotherValue);
     expect(container.get(TOKENS.additional)).toBe(additionalValue);
 
-    container.restore();
+    container.restore!();
 
     expect(container.get(TOKENS.value)).toBe(someValue);
     expect(() =>
@@ -180,13 +180,13 @@ describe('container', () => {
 
     const container = new Container().extend(firstContainer);
 
-    container.capture();
+    container.capture!();
 
     container.extend(secondContainer);
 
     expect(container.get(TOKENS.value)).toBe(secondValue);
 
-    container.restore();
+    container.restore!();
 
     expect(container.get(TOKENS.value)).toBe(firstValue);
 
@@ -194,16 +194,76 @@ describe('container', () => {
 
     expect(container.get(TOKENS.value)).toBe(secondValue);
 
-    container.restore();
+    container.restore!();
 
     expect(container.get(TOKENS.value)).toBe(firstValue);
+  });
+
+  it('captures a singleton scoped binding state to a snapshot', () => {
+    class Singleton {}
+
+    const TOKENS = {
+      some: token<Singleton>('some'),
+      another: token<Singleton>('another'),
+    };
+
+    const container = new Container();
+    container.bind(TOKENS.some).toInstance(Singleton).inSingletonScope();
+    container.bind(TOKENS.another).toInstance(Singleton).inSingletonScope();
+
+    const firstSomeInstance = container.get(TOKENS.some);
+
+    container.capture!();
+
+    const secondSomeInstance = container.get(TOKENS.some);
+    const firstAnotherInstance = container.get(TOKENS.another);
+
+    container.restore!();
+    container.capture!();
+
+    const thirdSomeInstance = container.get(TOKENS.some);
+    const secondAnotherInstance = container.get(TOKENS.another);
+
+    expect(firstSomeInstance).toBe(secondSomeInstance);
+    expect(secondSomeInstance).toBe(thirdSomeInstance);
+    expect(firstAnotherInstance).not.toBe(secondAnotherInstance);
+  });
+
+  it('captures a container scoped binding state to a snapshot', () => {
+    class Some {}
+
+    const TOKENS = {
+      some: token<Some>('some'),
+      another: token<Some>('another'),
+    };
+
+    const container = new Container();
+    container.bind(TOKENS.some).toInstance(Some).inContainerScope();
+    container.bind(TOKENS.another).toInstance(Some).inContainerScope();
+
+    const firstSomeInstance = container.get(TOKENS.some);
+
+    container.capture!();
+
+    const secondSomeInstance = container.get(TOKENS.some);
+    const firstAnotherInstance = container.get(TOKENS.another);
+
+    container.restore!();
+    container.capture!();
+
+    const thirdSomeInstance = container.get(TOKENS.some);
+    const secondAnotherInstance = container.get(TOKENS.another);
+
+    expect(firstSomeInstance).toBe(secondSomeInstance);
+    expect(secondSomeInstance).not.toBe(thirdSomeInstance);
+    expect(firstAnotherInstance).not.toBe(secondAnotherInstance);
   });
 
   it('logs an error when trying to restore a non-captured container state', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
-    container.restore();
+    container.restore!();
 
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy.mock.calls[0]?.[0]).toMatchSnapshot();
@@ -215,25 +275,23 @@ describe('container', () => {
     const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
-    container.capture();
-    container.restore();
+    container.capture!();
+    container.restore!();
 
     expect(spy).toHaveBeenCalledTimes(0);
 
     spy.mockRestore();
   });
 
-  it("skips the logging in 'production' env", () => {
+  it("does not include capturing in 'production' env", () => {
     const restoreEnv = setEnv('production');
-    const spy = jest.spyOn(console, 'error').mockImplementation(() => null);
 
     const container = new Container();
-    container.restore();
 
-    expect(spy).toHaveBeenCalledTimes(0);
+    expect(container.capture).toBeUndefined();
+    expect(container.restore).toBeUndefined();
 
     restoreEnv();
-    spy.mockRestore();
   });
 
   it("creates a container by 'createContainer'", () => {

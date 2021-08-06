@@ -14,4 +14,6 @@ export enum Scope {
 export interface Binding {
   readonly impl: unknown;
   readonly type: Type;
+
+  clone?: () => Binding;
 }

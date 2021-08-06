@@ -21,6 +21,42 @@ export class Container extends DependencyModule {
 
   /**
    * @description
+   * Captures (snapshots) the current container state.
+   *
+   * @link https://brandi.js.org/reference/container#capture
+   */
+  public capture?(): void;
+
+  /**
+   * @description
+   * Restores the captured container state.
+   *
+   * @link https://brandi.js.org/reference/container#restore
+   */
+  public restore?(): void;
+
+  constructor() {
+    super();
+
+    if (process.env.NODE_ENV !== 'production') {
+      this.capture = (): void => {
+        this.snapshot = this.vault.copy!();
+      };
+
+      this.restore = (): void => {
+        if (this.snapshot) {
+          this.vault = this.snapshot.clone();
+        } else {
+          console.error(
+            "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
+          );
+        }
+      };
+    }
+  }
+
+  /**
+   * @description
    * Sets the parent container.
    *
    * @param container - a `Container` or `null` that will be set as the parent container.
@@ -45,32 +81,6 @@ export class Container extends DependencyModule {
     const container = new Container();
     container.vault = this.vault.clone();
     return container;
-  }
-
-  /**
-   * @description
-   * Captures (snapshots) the current container state.
-   *
-   * @link https://brandi.js.org/reference/container#capture
-   */
-  public capture(): void {
-    this.snapshot = this.vault.clone();
-  }
-
-  /**
-   * @description
-   * Restores the captured container state.
-   *
-   * @link https://brandi.js.org/reference/container#restore
-   */
-  public restore(): void {
-    if (this.snapshot) {
-      this.vault = this.snapshot.clone();
-    } else if (process.env.NODE_ENV !== 'production') {
-      console.error(
-        "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
-      );
-    }
   }
 
   /**
@@ -145,9 +155,9 @@ export class Container extends DependencyModule {
         return this.resolveCache(
           binding,
           cache,
-          () => binding.cache.get(this),
+          () => binding.cache.get(this.vault),
           (instance) => {
-            binding.cache.set(this, instance);
+            binding.cache.set(this.vault, instance);
           },
         );
       }
