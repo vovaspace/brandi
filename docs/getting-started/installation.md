@@ -33,7 +33,8 @@ Brandi has no dependencies, but requires the following globals in order to work:
 
 ## Production
 
-By default, Brandi will be in development mode. The development mode includes warnings about common mistakes.
+By default, Brandi will be in development mode. The development mode includes warnings about common mistakes
+and `capture()/resotre()` `Container` methods.
 
 Don't forget to set `process.env.NODE_ENV` to `production` when deploying your application.
 

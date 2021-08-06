@@ -4,15 +4,33 @@ import { Token, TokenValue, tag as createTag } from '../pointers';
 import { Binding } from './bindings';
 import { ResolutionCache } from './ResolutionCache';
 
+type BindingsMap = Map<ResolutionCondition, Binding | BindingsVault>;
+
 export class BindingsVault {
   private static notag = createTag('NO_TAG');
 
   public parent: BindingsVault | null = null;
 
-  private readonly map = new Map<
-    symbol,
-    Map<ResolutionCondition, Binding | BindingsVault>
-  >();
+  private readonly map = new Map<symbol, BindingsMap>();
+
+  public copy?(): BindingsVault;
+
+  constructor() {
+    if (process.env.NODE_ENV !== 'production') {
+      this.copy = (): BindingsVault =>
+        this.from((prev) => {
+          const next = new Map<ResolutionCondition, Binding | BindingsVault>();
+          prev.forEach((binding, key) => {
+            if (binding instanceof BindingsVault) {
+              next.set(key, binding.copy!());
+            } else {
+              next.set(key, binding.clone?.() ?? binding);
+            }
+          });
+          return next;
+        });
+    }
+  }
 
   public set(
     binding: Binding | BindingsVault,
@@ -122,17 +140,22 @@ export class BindingsVault {
     return null;
   }
 
-  public clone(): BindingsVault {
+  private from(
+    callback: (bindings: BindingsMap) => BindingsMap,
+  ): BindingsVault {
     const vault = new BindingsVault();
     vault.parent = this.parent;
 
-    this.map.forEach((value, key) => {
-      vault.map.set(
-        key,
-        new Map<ResolutionCondition, Binding | BindingsVault>(value),
-      );
+    this.map.forEach((bindings, key) => {
+      vault.map.set(key, callback(bindings));
     });
 
     return vault;
+  }
+
+  public clone(): BindingsVault {
+    return this.from(
+      (prev) => new Map<ResolutionCondition, Binding | BindingsVault>(prev),
+    );
   }
 }
