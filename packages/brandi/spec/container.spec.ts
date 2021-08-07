@@ -1,4 +1,4 @@
-import { Container, createContainer, token } from '../src';
+import { Container, DependencyModule, createContainer, token } from '../src';
 
 import { setEnv } from './utils';
 
@@ -224,9 +224,24 @@ describe('container', () => {
     const thirdSomeInstance = container.get(TOKENS.some);
     const secondAnotherInstance = container.get(TOKENS.another);
 
+    container.restore!();
+
+    const fourthSomeInstance = container.get(TOKENS.some);
+    const thirdAnotherInstance = container.get(TOKENS.another);
+
+    container.restore!();
+
+    const fifthSomeInstance = container.get(TOKENS.some);
+    const fourthAnotherInstance = container.get(TOKENS.another);
+
     expect(firstSomeInstance).toBe(secondSomeInstance);
     expect(secondSomeInstance).toBe(thirdSomeInstance);
+    expect(thirdSomeInstance).toBe(fourthSomeInstance);
+    expect(fourthSomeInstance).toBe(fifthSomeInstance);
+
     expect(firstAnotherInstance).not.toBe(secondAnotherInstance);
+    expect(secondAnotherInstance).not.toBe(thirdAnotherInstance);
+    expect(thirdAnotherInstance).not.toBe(fourthAnotherInstance);
   });
 
   it('captures a container scoped binding state to a snapshot', () => {
@@ -254,9 +269,55 @@ describe('container', () => {
     const thirdSomeInstance = container.get(TOKENS.some);
     const secondAnotherInstance = container.get(TOKENS.another);
 
+    container.restore!();
+
+    const fourthSomeInstance = container.get(TOKENS.some);
+    const thirdAnotherInstance = container.get(TOKENS.another);
+
+    container.restore!();
+
+    const fifthSomeInstance = container.get(TOKENS.some);
+    const fourthAnotherInstance = container.get(TOKENS.another);
+
     expect(firstSomeInstance).toBe(secondSomeInstance);
     expect(secondSomeInstance).not.toBe(thirdSomeInstance);
+    expect(thirdSomeInstance).not.toBe(fourthSomeInstance);
+    expect(fourthSomeInstance).not.toBe(fifthSomeInstance);
+
     expect(firstAnotherInstance).not.toBe(secondAnotherInstance);
+    expect(secondAnotherInstance).not.toBe(thirdAnotherInstance);
+    expect(thirdAnotherInstance).not.toBe(fourthAnotherInstance);
+  });
+
+  it('captures a dependency module state to a snapshot', () => {
+    class Some {}
+
+    const TOKENS = {
+      some: token<Some>('some'),
+    };
+
+    const dependencyModule = new DependencyModule();
+    dependencyModule.bind(TOKENS.some).toInstance(Some).inSingletonScope();
+
+    const container = new Container();
+    container.use(TOKENS.some).from(dependencyModule);
+
+    container.capture!();
+    const firstSomeInstance = container.get(TOKENS.some);
+
+    container.restore!();
+    container.capture!();
+    const secondSomeInstance = container.get(TOKENS.some);
+
+    container.restore!();
+    const thirdSomeInstance = container.get(TOKENS.some);
+
+    container.restore!();
+    const fourthSomeInstance = container.get(TOKENS.some);
+
+    expect(firstSomeInstance).not.toBe(secondSomeInstance);
+    expect(secondSomeInstance).not.toBe(thirdSomeInstance);
+    expect(thirdSomeInstance).not.toBe(fourthSomeInstance);
   });
 
   it('logs an error when trying to restore a non-captured container state', () => {
