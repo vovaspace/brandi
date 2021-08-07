@@ -45,7 +45,7 @@ export class Container extends DependencyModule {
 
       this.restore = (): void => {
         if (this.snapshot) {
-          this.vault = this.snapshot.clone();
+          this.vault = this.snapshot.copy!();
         } else {
           console.error(
             "Error: It looks like a trying to restore a non-captured container state. Did you forget to call 'capture()' method?",
