@@ -5,6 +5,7 @@ import { ContainerContext } from './ContainerContext';
 import { useContainer } from './useContainer';
 
 export const ContainerProvider: React.FunctionComponent<{
+  children?: React.ReactNode;
   container: Container;
   isolated?: boolean;
 }> = ({ children, container, isolated = false }) => {
