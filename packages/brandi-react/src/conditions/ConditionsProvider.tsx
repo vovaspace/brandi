@@ -5,6 +5,7 @@ import { ConditionsContext } from './ConditionsContext';
 import { useConditions } from './useConditions';
 
 export const ConditionsProvider: React.FunctionComponent<{
+  children?: React.ReactNode;
   conditions: ResolutionCondition[];
   isolated?: boolean;
 }> = ({ children, conditions, isolated = false }) => {
