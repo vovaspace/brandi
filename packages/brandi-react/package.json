@@ -10,7 +10,8 @@
   "exports": {
     "import": "./lib/brandi-react.mjs",
     "require": "./lib/brandi-react.js",
-    "default": "./lib/brandi-react.js"
+    "default": "./lib/brandi-react.js",
+    "types": "./lib/typings/index.d.ts"
   },
   "typings": "./lib/typings/index.d.ts",
   "sideEffects": false,
