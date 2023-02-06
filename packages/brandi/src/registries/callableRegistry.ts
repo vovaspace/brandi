@@ -1,3 +1,3 @@
 import { UnknownCreator } from '../types';
 
-export const callableRegistry = new Map<UnknownCreator, boolean>();
+export const callableRegistry = new WeakMap<UnknownCreator, boolean>();
