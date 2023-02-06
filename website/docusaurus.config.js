@@ -94,11 +94,10 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     algolia: {
-      apiKey: 'de05f6a0bc7656dcc33b32c4f34f45fd',
-      indexName: 'brandi',
+      appId: 'ZJ99TQS6KK',
+      apiKey: '4ca1bea483527bfd468f79bf940899cb',
+      indexName: 'brandi-js',
     },
-    sidebarCollapsible: false,
-    hideableSidebar: false,
   },
   presets: [
     [

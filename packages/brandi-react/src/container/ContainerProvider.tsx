@@ -10,9 +10,15 @@ export const ContainerProvider: React.FunctionComponent<{
   isolated?: boolean;
 }> = ({ children, container, isolated = false }) => {
   const parentContainer = useContainer(false);
-  const clonedContainer = React.useMemo(() => container.clone(), [container]);
 
-  if (!isolated) clonedContainer.extend(parentContainer);
+  const extend = !isolated ? parentContainer : null;
+
+  const clonedContainer = React.useMemo(() => {
+    const cloned = container.clone()
+    if (extend) cloned.extend(extend)
+    return cloned
+  }, [container, extend]);
+
 
   return (
     <ContainerContext.Provider value={clonedContainer}>
