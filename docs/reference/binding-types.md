@@ -151,7 +151,7 @@ const container = new Container();
 /*                                       ↓ Binds the factory. */
 container.bind(TOKENS.apiServiceFactory).toFactory(ApiService);
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 const apiService = apiServiceFactory();
 
 expect(apiService).toBeInstanceOf(ApiService);
@@ -181,7 +181,7 @@ container
   /*                     ↓ Binds the factory with the initializer. */
   .toFactory(ApiService, (instance) => instance.init());
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 
 /*                 ↓ The initializer will be called after the instance is created. */
 const apiService = apiServiceFactory();
@@ -218,7 +218,7 @@ container
   /*                     ↓ Binds the factory with `apiKey` argument. */
   .toFactory(ApiService, (instance, apiKey) => instance.setKey(apiKey));
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 const apiService = apiServiceFactory('#key9124');
 
 expect(apiService).toBeInstanceOf(ApiService);
@@ -246,7 +246,7 @@ const container = new Container();
 
 container.bind(TOKENS.apiServiceFactory).toFactory(createApiService);
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 const apiService = apiServiceFactory();
 
 expect(apiService).toStrictEqual<ApiService>({
@@ -312,7 +312,7 @@ const container = new Container();
 
 container.bind(TOKENS.apiServiceFactory).toFactory(createApiService);
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 
 /**
  *                 ↓ Will wait for the creation resolution
@@ -352,7 +352,7 @@ container
   /*                                         ↓ Returns a `Promise`. */
   .toFactory(createApiService, (instance) => instance.init());
 
-const apiServiceFactory = container.get(TOKENS.apiService);
+const apiServiceFactory = container.get(TOKENS.apiServiceFactory);
 
 /*                 ↓ Will wait for the initialization resolution. */
 const apiService = await apiServiceFactory();
