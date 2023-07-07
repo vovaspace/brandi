@@ -2,7 +2,7 @@ import { Tag } from './pointers';
 
 export type ResolutionCondition = Tag | UnknownCreator;
 
-type UnknownConstructor<T extends Object = Object> = new (
+type UnknownConstructor<T> = new (
   ...args: never[]
 ) => T;
 
@@ -14,7 +14,7 @@ export type UnknownCreator<T = unknown> =
 
 export type UnknownCreatorParameters<
   T extends UnknownCreator
-> = T extends UnknownConstructor
+> = T extends UnknownConstructor<T>
   ? ConstructorParameters<T>
   : T extends UnknownFunction
   ? Parameters<T>
