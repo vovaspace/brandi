@@ -35,6 +35,6 @@ describe('common container error', () => {
   it('fail to retrieve a module with understandable error', () => {
     expect(() => {
       container.get(TOKENS.adder)
-    }).toThrow(new TypeError('creator is not a constructor'))
+    }).toThrow(new Error("Failed to resolve the binding for 'adder' token."))
   })
 })
