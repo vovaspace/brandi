@@ -260,7 +260,9 @@ export class Container extends DependencyModule {
       callableRegistry.set(creator, !isCreatorClass);
       return instance;
     } catch (e) {
-      throw new Error(`Failed to create ${creator.name}`, { cause: e })
+      const error = e as Error
+      error.message = `Failed to instantiate ${creator.name}: ${error.message}`
+      throw error
     }
   }
 
