@@ -109,7 +109,18 @@ export class Container extends DependencyModule {
     token: T,
     conditions?: ResolutionCondition[],
   ): TokenType<T> {
-    return this.resolveToken(token, conditions) as TokenType<T>;
+    try {
+      return this.resolveToken(token, conditions) as TokenType<T>;
+    } catch(e) {
+      let error = e as Error
+      const causes: Error[] = []
+      while (error) {
+        causes.push(error)
+        error = error.cause as Error
+      }
+      const message = causes.map((c, idx) => `${idx}. ${c.message}`).join('\n')
+      throw new Error(`Failed to get token '${token.__d}':\n${message}`)
+    }
   }
 
   private resolveTokens(
