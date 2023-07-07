@@ -135,7 +135,9 @@ export class Container extends DependencyModule {
       try {
         return this.resolveBinding(binding, cache);
       } catch (e) {
-        throw new Error(`Failed to resolve the binding for '${token.__d}' token.`)
+        // @ts-ignore
+        // throw new Error(`Failed to resolve the binding for '${token.__d}' token.`, { cause: e })
+        throw new Error(`Failed to resolve the binding for '${token.__d}' token. ${e.message}`)
       }
     }
     if (token.__o) return undefined;

@@ -32,6 +32,8 @@ describe('common container error', () => {
   container.bind(TOKENS.adder).toInstance(createAdderModule).inSingletonScope()
   container.bind(TOKENS.logger).toInstance(createLoggerModule).inSingletonScope()
 
+  // container.get(TOKENS.adder)
+
   it('fail to retrieve a module with understandable error', () => {
     expect(() => {
       container.get(TOKENS.adder)
