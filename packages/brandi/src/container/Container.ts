@@ -253,7 +253,7 @@ export class Container extends DependencyModule {
       const instance = creator(...parameters);
       callableRegistry.set(creator, true);
       return instance;
-    } catch {
+    } catch (e) {
       // @ts-expect-error: This expression is not constructable.
       // eslint-disable-next-line new-cap
       const instance = new creator(...parameters);
