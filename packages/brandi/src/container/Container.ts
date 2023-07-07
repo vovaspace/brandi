@@ -131,7 +131,13 @@ export class Container extends DependencyModule {
   ): unknown {
     const binding = this.vault.get(token, cache, conditions, target);
 
-    if (binding) return this.resolveBinding(binding, cache);
+    if (binding) {
+      try {
+        return this.resolveBinding(binding, cache);
+      } catch (e) {
+        throw new Error(`Failed to resolve the binding for '${token.__d}' token.`)
+      }
+    }
     if (token.__o) return undefined;
 
     throw new Error(`No matching bindings found for '${token.__d}' token.`);
