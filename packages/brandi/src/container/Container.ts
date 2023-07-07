@@ -15,6 +15,7 @@ import {
 import { BindingsVault } from './BindingsVault';
 import { DependencyModule } from './DependencyModule';
 import { ResolutionCache } from './ResolutionCache';
+import { isClass } from "../lib";
 
 export class Container extends DependencyModule {
   private snapshot: BindingsVault | null = null;
@@ -249,16 +250,17 @@ export class Container extends DependencyModule {
     }
 
     try {
-      // @ts-expect-error: This expression is not callable.
-      const instance = creator(...parameters);
-      callableRegistry.set(creator, true);
+      const isCreatorClass = isClass(creator)
+      const instance = isCreatorClass
+          ? // @ts-expect-error: This expression is not constructable.
+          // eslint-disable-next-line new-cap
+          new creator(...parameters)
+          // @ts-expect-error: This expression is not callable.
+          : creator(...parameters);
+      callableRegistry.set(creator, !isCreatorClass);
       return instance;
     } catch (e) {
-      // @ts-expect-error: This expression is not constructable.
-      // eslint-disable-next-line new-cap
-      const instance = new creator(...parameters);
-      callableRegistry.set(creator, false);
-      return instance;
+      throw new Error(`Failed to create ${creator.name}`, { cause: e })
     }
   }
 
