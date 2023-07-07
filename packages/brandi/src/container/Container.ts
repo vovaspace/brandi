@@ -12,10 +12,10 @@ import {
   isInstanceResolutionScopedBinding,
   isInstanceSingletonScopedBinding,
 } from './bindings';
+import { failedToGetTokenErrorMessage, isClass } from "../lib";
 import { BindingsVault } from './BindingsVault';
 import { DependencyModule } from './DependencyModule';
 import { ResolutionCache } from './ResolutionCache';
-import { isClass } from "../lib";
 
 export class Container extends DependencyModule {
   private snapshot: BindingsVault | null = null;
@@ -113,14 +113,7 @@ export class Container extends DependencyModule {
     try {
       return this.resolveToken(token, conditions) as TokenType<T>;
     } catch(e) {
-      let error = e as Error
-      const causes: Error[] = []
-      while (error) {
-        causes.push(error)
-        error = error.cause as Error
-      }
-      const message = causes.map((c, idx) => `${idx}. ${c.message}`).join('\n')
-      throw new Error(`Failed to get token '${token.__d}':\n${message}`)
+      throw new Error(`Failed to get token '${token.__d}':\n${failedToGetTokenErrorMessage(e as Error)}`)
     }
   }
 
