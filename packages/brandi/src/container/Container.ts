@@ -242,14 +242,14 @@ export class Container extends DependencyModule {
     }
 
     try {
-      const isCreatorClass = isClass(creator)
-      const instance = isCreatorClass
+      const creatorIsClass = isClass(creator)
+      const instance = creatorIsClass
           ? // @ts-expect-error: This expression is not constructable.
           // eslint-disable-next-line new-cap
           new creator(...parameters)
           // @ts-expect-error: This expression is not callable.
           : creator(...parameters);
-      callableRegistry.set(creator, !isCreatorClass);
+      callableRegistry.set(creator, !creatorIsClass);
       return instance;
     } catch (e) {
       const error = e as Error
