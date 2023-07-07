@@ -12,6 +12,7 @@ import {
   isInstanceResolutionScopedBinding,
   isInstanceSingletonScopedBinding,
 } from './bindings';
+import { failedToGetTokenErrorMessage, isClass } from "../lib";
 import { BindingsVault } from './BindingsVault';
 import { DependencyModule } from './DependencyModule';
 import { ResolutionCache } from './ResolutionCache';
@@ -109,7 +110,11 @@ export class Container extends DependencyModule {
     token: T,
     conditions?: ResolutionCondition[],
   ): TokenType<T> {
-    return this.resolveToken(token, conditions) as TokenType<T>;
+    try {
+      return this.resolveToken(token, conditions) as TokenType<T>;
+    } catch(e) {
+      throw new Error(`Failed to get token '${token.__d}':\n${failedToGetTokenErrorMessage(e as Error)}`)
+    }
   }
 
   private resolveTokens(
@@ -131,7 +136,13 @@ export class Container extends DependencyModule {
   ): unknown {
     const binding = this.vault.get(token, cache, conditions, target);
 
-    if (binding) return this.resolveBinding(binding, cache);
+    if (binding) {
+      try {
+        return this.resolveBinding(binding, cache);
+      } catch (e) {
+        throw new Error(`Failed to resolve the binding for '${token.__d}' token.`, { cause: e })
+      }
+    }
     if (token.__o) return undefined;
 
     throw new Error(`No matching bindings found for '${token.__d}' token.`);
@@ -231,16 +242,19 @@ export class Container extends DependencyModule {
     }
 
     try {
-      // @ts-expect-error: This expression is not callable.
-      const instance = creator(...parameters);
-      callableRegistry.set(creator, true);
+      const creatorIsClass = isClass(creator)
+      const instance = creatorIsClass
+          ? // @ts-expect-error: This expression is not constructable.
+          // eslint-disable-next-line new-cap
+          new creator(...parameters)
+          // @ts-expect-error: This expression is not callable.
+          : creator(...parameters);
+      callableRegistry.set(creator, !creatorIsClass);
       return instance;
-    } catch {
-      // @ts-expect-error: This expression is not constructable.
-      // eslint-disable-next-line new-cap
-      const instance = new creator(...parameters);
-      callableRegistry.set(creator, false);
-      return instance;
+    } catch (e) {
+      const error = e as Error
+      error.message = `Failed to instantiate ${creator.name}: ${error.message}`
+      throw error
     }
   }
 
