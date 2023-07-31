@@ -102,7 +102,7 @@ expect(apiService).toStrictEqual<ApiService>({
 });
 ```
 
-### Injetions
+### Injections
 
 If the constructor or function has arguments you need to register dependencies
 by [`injected`](./pointers-and-registrators.md#injectedtarget-tokens) registrator.
