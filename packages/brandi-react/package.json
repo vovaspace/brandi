@@ -1,6 +1,6 @@
 {
   "name": "brandi-react",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "React bindings for Brandi — the dependency injection container.",
   "main": "./lib/brandi-react.js",
   "module": "./lib/brandi-react.mjs",

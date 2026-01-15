@@ -1,6 +1,6 @@
 {
   "name": "brandi",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "The dependency injection container.",
   "main": "./lib/brandi.js",
   "module": "./lib/brandi.mjs",
